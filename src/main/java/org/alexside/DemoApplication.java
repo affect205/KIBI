@@ -1,19 +1,22 @@
-package com.example;
+package org.alexside;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
+import org.alexside.gui.LoginPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Service;
 
+import java.util.logging.Logger;
+
 @SpringBootApplication
 public class DemoApplication {
+
+	private Logger log = Logger.getLogger(DemoApplication.class.getName());
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
@@ -28,7 +31,7 @@ public class DemoApplication {
 	}
 
 	@Theme("valo")
-	@SpringUI(path = "")
+	@SpringUI(path = "login")
 	public static class VaadinUI extends UI {
 
 		@Autowired
@@ -36,11 +39,10 @@ public class DemoApplication {
 
 		@Override
 		protected void init(VaadinRequest request) {
-			Panel panel = new Panel("KIBI - система управления базой знаний");
-			panel.setHeight("300px");
-			panel.setWidth("500px");
-			VerticalLayout layout = new VerticalLayout(new Label(myService.sayHi()));
-			panel.setContent(layout);
+			Panel panel = new Panel("<b>KIBI</b> - система управления базой знаний");
+			panel.setHeight("100%");
+			panel.setWidth("100%");
+			panel.setContent(new LoginPanel());
 			setContent(panel);
 		}
 
