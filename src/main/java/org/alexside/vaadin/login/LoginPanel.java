@@ -1,0 +1,84 @@
+package org.alexside.vaadin.login;
+
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.*;
+import org.alexside.service.LoginService;
+import org.alexside.utils.SpringUtils;
+import org.alexside.utils.VaadinUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.logging.Logger;
+
+/**
+ * Created by abalyshev on 18.10.16.
+ */
+@SpringComponent
+@Scope(SpringUtils.SCOPE_PROTOTYPE)
+public class LoginPanel extends VerticalLayout {
+
+    private static Logger log = Logger.getLogger(LoginPanel.class.getName());
+
+    @Autowired
+    private LoginService loginService;
+
+    private CustomLayout layout;
+
+    public LoginPanel() {
+        super();
+        setSizeFull();
+        setMargin(true);
+    }
+
+    @PostConstruct
+    public void onInit() {
+        log.info("[LoginPanel] onInit...");
+
+        try {
+            layout = new CustomLayout(LoginPanel.class.getClassLoader().getResourceAsStream("templates/auth.html"));
+        } catch (Exception e) {
+            log.warning(e.getMessage());
+        }
+
+        TextField loginField = new TextField();
+        loginField.setWidth("160px");
+        loginField.setHeight("30px");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setWidth("160px");
+        passwordField.setHeight("30px");
+
+        Button submitButton = new Button("Войти");
+        submitButton.addClickListener(clickEvent -> {
+            String login = loginField.getValue();
+            String password = passwordField.getValue();
+            log.info(String.format("login = %s, password = %s", login, password));
+            if (loginService.doLogin(login, password)) {
+                UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
+                Notification.show(String.format("С возвращением %s", login));
+            } else
+                Notification.show("Ошибка! Неверный логин или пароль.");
+        });
+
+        Button registerButton = new Button("Регистрация");
+        registerButton.addClickListener(clickEvent -> {
+            log.info("do registration");
+        });
+
+        layout.addComponent(loginField, "login");
+        layout.addComponent(passwordField, "password");
+        layout.addComponent(submitButton, "submit");
+        layout.addComponent(registerButton, "register");
+        layout.setSizeFull();
+
+        addComponents(layout);
+        setComponentAlignment(layout, Alignment.MIDDLE_RIGHT);
+    }
+
+    @PreDestroy
+    public void onDestroy() {
+        log.info("[LoginPanel] onDestroy...");
+    }
+}
