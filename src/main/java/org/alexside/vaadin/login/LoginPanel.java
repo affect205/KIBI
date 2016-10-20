@@ -2,7 +2,7 @@ package org.alexside.vaadin.login;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
-import org.alexside.service.LoginService;
+import org.alexside.security.AuthManager;
 import org.alexside.utils.SpringUtils;
 import org.alexside.utils.VaadinUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class LoginPanel extends VerticalLayout {
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
 
     @Autowired
-    private LoginService loginService;
+    private AuthManager authManager;
 
     private CustomLayout layout;
 
@@ -55,7 +55,7 @@ public class LoginPanel extends VerticalLayout {
             String login = loginField.getValue();
             String password = passwordField.getValue();
             log.info(String.format("login = %s, password = %s", login, password));
-            if (loginService.doLogin(login, password)) {
+            if (authManager.doLogin(login, password)) {
                 UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
                 Notification.show(String.format("С возвращением %s", login));
             } else

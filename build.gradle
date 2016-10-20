@@ -28,8 +28,12 @@ repositories {
 
 dependencies {
 	//compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')
+	//compile('org.springframework.boot:spring-boot-starter-security')
 	compile('com.vaadin:vaadin-spring-boot-starter:1.0.2')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+	// vaadin addons
+	//compile('org.vaadin.addons:loginform:0.6.2')
 }
 
 dependencyManagement {
