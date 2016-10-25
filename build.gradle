@@ -25,12 +25,16 @@ repositories {
 	mavenCentral()
 }
 
+def vaadinVersion = '7.7.3'
 
 dependencies {
 	//compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')
-	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('com.vaadin:vaadin-spring-boot-starter:1.0.2')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile("org.springframework.boot:spring-boot-starter-security")
+	compile("com.vaadin:vaadin-spring-boot-starter:1.0.2")
+
+	compile("com.vaadin:vaadin-push:${vaadinVersion}")
+
+	testCompile("org.springframework.boot:spring-boot-starter-test")
 
 	// vaadin addons
 	//compile('org.vaadin.addons:loginform:0.6.2')
@@ -38,6 +42,6 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "com.vaadin:vaadin-bom:7.7.3"
+		mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
 	}
 }

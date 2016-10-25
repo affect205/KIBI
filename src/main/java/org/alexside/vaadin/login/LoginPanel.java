@@ -5,7 +5,7 @@ import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
-import org.alexside.security.AuthManager;
+import org.alexside.utils.AuthUtils;
 import org.alexside.utils.SpringUtils;
 import org.alexside.utils.VaadinUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +74,14 @@ public class LoginPanel extends VerticalLayout {
         Button registerButton = new Button("Регистрация");
         registerButton.addClickListener(clickEvent -> {
             log.info("do registration");
+            String login = loginField.getValue();
+            String password = passwordField.getValue();
+            if (register(login, password)) {
+                UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
+                Notification.show(String.format("Регистрация завершена %s", login));
+            } else {
+                Notification.show("Ошибка! Неверный логин или пароль.");
+            }
         });
 
         layout.addComponent(loginField, "login");
@@ -91,17 +99,15 @@ public class LoginPanel extends VerticalLayout {
         log.info("[LoginPanel] onDestroy...");
     }
 
-    private boolean login(String username, String password) {
+    private boolean login(String login, String password) {
         try {
-//            Authentication token = authManager
-//                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            Authentication token = new UsernamePasswordAuthenticationToken(username, password);
-            SecurityContextHolder.getContext().setAuthentication(token);
+            Authentication token = authManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(login, password));
 
             // Reinitialize the session to protect against session fixation attacks. This does not work
             // with websocket communication.
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
-            //SecurityContextHolder.getContext().setAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(token);
 
             // Now when the session is reinitialized, we can enable websocket communication. Or we could have just
             // used WEBSOCKET_XHR and skipped this step completely.
@@ -109,6 +115,20 @@ public class LoginPanel extends VerticalLayout {
             UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
             return true;
         } catch (AuthenticationException ex) {
+            return false;
+        }
+    }
+
+    private boolean register(String login, String password) {
+        try {
+            if (AuthUtils.isExists(authManager, login, password)) return false;
+            Authentication token = new UsernamePasswordAuthenticationToken(login, password);
+            VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+            SecurityContextHolder.getContext().setAuthentication(token);
+            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET);
+            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
