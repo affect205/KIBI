@@ -13,6 +13,7 @@ import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.desktop.DesktopView;
 import org.alexside.vaadin.login.LoginView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 
 import javax.annotation.PostConstruct;
 import java.security.Principal;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
  */
 @Theme("valo")
 @SpringUI(path = "")
-//@PreserveOnRefresh
+@PreserveOnRefresh
 public class KibiUI extends UI {
 
     private static Logger log = Logger.getLogger(KibiUI.class.getName());
@@ -57,14 +58,27 @@ public class KibiUI extends UI {
     }
 
     protected void checkAuth(VaadinRequest request) {
-        Principal principal = VaadinSession.getCurrent().getAttribute(Principal.class);
-        String token = (String) VaadinSession.getCurrent().getAttribute(AuthUtils.USER_WEB_TOKEN);
-        if (principal == null) {
-            navigator.navigateTo(VaadinUtils.VIEW_LOGIN);
-        } else {
-            log.info(String.format("user = %s, token = %s", principal.toString(),
-                    VaadinSession.getCurrent().getAttribute(AuthUtils.USER_WEB_TOKEN)));
+//        Principal principal = VaadinSession.getCurrent().getAttribute(Principal.class);
+//        String token = (String) VaadinSession.getCurrent().getAttribute(AuthUtils.USER_WEB_TOKEN);
+//        if (principal == null) {
+//            navigator.navigateTo(VaadinUtils.VIEW_LOGIN);
+//        } else {
+//            log.info(String.format("user = %s, token = %s", principal.toString(),
+//                    VaadinSession.getCurrent().getAttribute(AuthUtils.USER_WEB_TOKEN)));
+//            navigator.navigateTo(VaadinUtils.VIEW_DESKTOP);
+//        }
+        if (AuthUtils.isLoggedIn()) {
+            Authentication auth = AuthUtils.getUser();
+            log.info(String.format("user = %s, token = %s", auth == null ? "unknown" : auth.getName(),
+                    auth == null ? "unknown" : auth.getCredentials()));
             navigator.navigateTo(VaadinUtils.VIEW_DESKTOP);
+        } else {
+            navigator.navigateTo(VaadinUtils.VIEW_LOGIN);
         }
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
     }
 }

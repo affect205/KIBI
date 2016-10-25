@@ -1,23 +1,12 @@
-package org.alexside.utils;
+package org.alexside.demo;
 
-import com.vaadin.server.VaadinSession;
-import org.alexside.security.AuthManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.security.Principal;
+public final class SecurityUtils {
 
-/**
- * Created by abalyshev on 20.10.16.
- */
-public class AuthUtils {
-
-    public static final String USER_WEB_TOKEN = "AUTH_WEB_TOKEN";
-
-    public static void saveUser(AuthManager.AuthInfo info) {
-        VaadinSession.getCurrent().setAttribute(Principal.class, info.getUser());
-        VaadinSession.getCurrent().setAttribute(USER_WEB_TOKEN, info.getToken());
+    private SecurityUtils() {
     }
 
     public static boolean isLoggedIn() {
@@ -28,9 +17,5 @@ public class AuthUtils {
     public static boolean hasRole(String role) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null && authentication.getAuthorities().contains(new SimpleGrantedAuthority(role));
-    }
-
-    public static Authentication getUser() {
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

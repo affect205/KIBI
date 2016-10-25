@@ -1,5 +1,8 @@
 package org.alexside.vaadin.login;
 
+import com.vaadin.server.VaadinService;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import org.alexside.security.AuthManager;
@@ -7,6 +10,11 @@ import org.alexside.utils.SpringUtils;
 import org.alexside.utils.VaadinUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,7 +30,7 @@ public class LoginPanel extends VerticalLayout {
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
 
     @Autowired
-    private AuthManager authManager;
+    AuthenticationManager authManager;
 
     private CustomLayout layout;
 
@@ -54,12 +62,13 @@ public class LoginPanel extends VerticalLayout {
         submitButton.addClickListener(clickEvent -> {
             String login = loginField.getValue();
             String password = passwordField.getValue();
-            log.info(String.format("login = %s, password = %s", login, password));
-            if (authManager.doLogin(login, password)) {
+            log.info(String.format("[LoginPanel] login = %s, password = %s", login, password));
+            if (login(login, password)) {
                 UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
                 Notification.show(String.format("С возвращением %s", login));
-            } else
+            } else {
                 Notification.show("Ошибка! Неверный логин или пароль.");
+            }
         });
 
         Button registerButton = new Button("Регистрация");
@@ -80,5 +89,27 @@ public class LoginPanel extends VerticalLayout {
     @PreDestroy
     public void onDestroy() {
         log.info("[LoginPanel] onDestroy...");
+    }
+
+    private boolean login(String username, String password) {
+        try {
+//            Authentication token = authManager
+//                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            Authentication token = new UsernamePasswordAuthenticationToken(username, password);
+            SecurityContextHolder.getContext().setAuthentication(token);
+
+            // Reinitialize the session to protect against session fixation attacks. This does not work
+            // with websocket communication.
+            VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+            //SecurityContextHolder.getContext().setAuthentication(token);
+
+            // Now when the session is reinitialized, we can enable websocket communication. Or we could have just
+            // used WEBSOCKET_XHR and skipped this step completely.
+            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET);
+            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+            return true;
+        } catch (AuthenticationException ex) {
+            return false;
+        }
     }
 }

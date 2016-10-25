@@ -21,12 +21,18 @@ public class DesktopPanel extends VerticalLayout {
         Button logoutButton = new Button("Выйти");
         logoutButton.addStyleName(BaseTheme.BUTTON_LINK);
         logoutButton.addClickListener(clickEvent -> {
-            UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_LOGIN);
+            logout();
+            //UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_LOGIN);
         });
 
         VerticalLayout layout = new VerticalLayout(new Label("Рабочий стол..."), logoutButton);
         layout.setSizeFull();
         addComponents(layout);
         setComponentAlignment(layout, Alignment.MIDDLE_CENTER);
+    }
+
+    private void logout() {
+        UI.getCurrent().getPage().reload();
+        UI.getCurrent().getSession().close();
     }
 }
