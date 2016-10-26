@@ -1,10 +1,13 @@
 package org.alexside.vaadin;
 
 import com.vaadin.annotations.PreserveOnRefresh;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
 import org.alexside.security.AuthManager;
@@ -24,7 +27,9 @@ import java.util.logging.Logger;
  */
 @Theme("valo")
 @SpringUI(path = "")
-@PreserveOnRefresh
+//@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
+//@Push(value = PushMode.AUTOMATIC)
+//@PreserveOnRefresh
 public class KibiUI extends UI {
 
     private static Logger log = Logger.getLogger(KibiUI.class.getName());

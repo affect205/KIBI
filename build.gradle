@@ -11,6 +11,7 @@ buildscript {
 }
 
 apply plugin: 'java'
+apply plugin: 'war'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 
@@ -33,6 +34,7 @@ dependencies {
 	compile("com.vaadin:vaadin-spring-boot-starter:1.0.2")
 
 	compile("com.vaadin:vaadin-push:${vaadinVersion}")
+	compile("com.google.code.gson:gson:2.7")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 

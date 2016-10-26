@@ -1,5 +1,9 @@
 package org.alexside.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.vaadin.server.VaadinSession;
 import org.alexside.security.AuthManager;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Principal;
 
 /**
@@ -36,7 +42,19 @@ public class AuthUtils {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    public static boolean isExists(AuthenticationManager authManager, String login, String password) {
-        return authManager.authenticate(new UsernamePasswordAuthenticationToken(login, password)) != null;
+    public static boolean isExists(String login, String password) {
+        try {
+            JsonObject usersJson = JsonUtils.readUsersJson();
+            JsonArray ja = usersJson.getAsJsonArray("users");
+            for (JsonElement je : ja) {
+                String uLogin = je.getAsJsonObject().get("login").getAsString();
+                String uPassword = je.getAsJsonObject().get("login").getAsString();
+                System.out.println(String.format("login = %s, password = %s", uLogin, uPassword));
+                if (login.equals(uLogin) && password.equals(uPassword)) return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

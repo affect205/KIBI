@@ -1,6 +1,6 @@
 package org.alexside;
 
-import org.alexside.demo.VaadinSessionSecurityContextHolderStrategy;
+import org.alexside.demo.VaadinSecurityContextHolder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -37,7 +37,7 @@ public class KibiApp {
 
         static {
             // Use a custom SecurityContextHolderStrategy
-            SecurityContextHolder.setStrategyName(VaadinSessionSecurityContextHolderStrategy.class.getName());
+            SecurityContextHolder.setStrategyName(VaadinSecurityContextHolder.class.getName());
         }
     }
 

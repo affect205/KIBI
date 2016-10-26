@@ -14,10 +14,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -101,6 +107,7 @@ public class LoginPanel extends VerticalLayout {
 
     private boolean login(String login, String password) {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Authentication token = authManager
                     .authenticate(new UsernamePasswordAuthenticationToken(login, password));
 
@@ -111,8 +118,8 @@ public class LoginPanel extends VerticalLayout {
 
             // Now when the session is reinitialized, we can enable websocket communication. Or we could have just
             // used WEBSOCKET_XHR and skipped this step completely.
-            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET);
-            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+//            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET_XHR);
+//            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
             return true;
         } catch (AuthenticationException ex) {
             return false;
@@ -121,12 +128,14 @@ public class LoginPanel extends VerticalLayout {
 
     private boolean register(String login, String password) {
         try {
-            if (AuthUtils.isExists(authManager, login, password)) return false;
-            Authentication token = new UsernamePasswordAuthenticationToken(login, password);
+            if (AuthUtils.isExists(login, password)) return false;
+            Set<GrantedAuthority> roles = new HashSet<>(Arrays.asList(new SimpleGrantedAuthority("USER")));
+            Authentication token = new UsernamePasswordAuthenticationToken(login, password, roles);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
             SecurityContextHolder.getContext().setAuthentication(token);
-            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET);
-            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET);
+//            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
             return true;
         } catch (Exception e) {
             return false;
