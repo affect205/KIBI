@@ -63,18 +63,9 @@ public class KibiUI extends UI {
     }
 
     protected void checkAuth(VaadinRequest request) {
-//        Principal principal = VaadinSession.getCurrent().getAttribute(Principal.class);
-//        String token = (String) VaadinSession.getCurrent().getAttribute(AuthUtils.USER_WEB_TOKEN);
-//        if (principal == null) {
-//            navigator.navigateTo(VaadinUtils.VIEW_LOGIN);
-//        } else {
-//            log.info(String.format("user = %s, token = %s", principal.toString(),
-//                    VaadinSession.getCurrent().getAttribute(AuthUtils.USER_WEB_TOKEN)));
-//            navigator.navigateTo(VaadinUtils.VIEW_DESKTOP);
-//        }
         if (AuthUtils.isLoggedIn()) {
             Authentication auth = AuthUtils.getUser();
-            log.info(String.format("user = %s, token = %s", auth == null ? "unknown" : auth.getName(),
+            log.info(String.format("[KibiUI::checkAuth]user = %s, token = %s", auth == null ? "unknown" : auth.getPrincipal(),
                     auth == null ? "unknown" : auth.getCredentials()));
             navigator.navigateTo(VaadinUtils.VIEW_DESKTOP);
         } else {

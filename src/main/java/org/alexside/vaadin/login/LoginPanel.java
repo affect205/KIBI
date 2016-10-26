@@ -1,29 +1,24 @@
 package org.alexside.vaadin.login;
 
 import com.vaadin.server.VaadinService;
-import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
+import org.alexside.lang.Lang;
 import org.alexside.utils.AuthUtils;
+import org.alexside.utils.JsonUtils;
 import org.alexside.utils.SpringUtils;
 import org.alexside.utils.VaadinUtils;
+import org.alexside.vaadin.misc.ActionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -69,24 +64,26 @@ public class LoginPanel extends VerticalLayout {
             String login = loginField.getValue();
             String password = passwordField.getValue();
             log.info(String.format("[LoginPanel] login = %s, password = %s", login, password));
-            if (login(login, password)) {
+            ActionResponse resp = login(login, password);
+            if (resp.success()) {
                 UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
-                Notification.show(String.format("С возвращением %s", login));
+                Notification.show(resp.getMessage());
             } else {
-                Notification.show("Ошибка! Неверный логин или пароль.");
+                Notification.show(resp.getMessage());
             }
         });
 
         Button registerButton = new Button("Регистрация");
         registerButton.addClickListener(clickEvent -> {
-            log.info("do registration");
             String login = loginField.getValue();
             String password = passwordField.getValue();
-            if (register(login, password)) {
+            log.info(String.format("[login] login = %s, password = %s", login, password));
+            ActionResponse resp = register(login, password);
+            if (resp.success()) {
                 UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
-                Notification.show(String.format("Регистрация завершена %s", login));
+                Notification.show(resp.getMessage());
             } else {
-                Notification.show("Ошибка! Неверный логин или пароль.");
+                Notification.show(resp.getMessage());
             }
         });
 
@@ -105,40 +102,32 @@ public class LoginPanel extends VerticalLayout {
         log.info("[LoginPanel] onDestroy...");
     }
 
-    private boolean login(String login, String password) {
+    private ActionResponse login(String login, String password) {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Authentication token = authManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(login, password));
-
-            // Reinitialize the session to protect against session fixation attacks. This does not work
-            // with websocket communication.
-            VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+            if (!AuthUtils.isExists(login, password)) {
+                return ActionResponse.error(Lang.ERROR_USER_NOT_EXISTS);
+            }
+            Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             SecurityContextHolder.getContext().setAuthentication(token);
-
-            // Now when the session is reinitialized, we can enable websocket communication. Or we could have just
-            // used WEBSOCKET_XHR and skipped this step completely.
-//            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET_XHR);
-//            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
-            return true;
-        } catch (AuthenticationException ex) {
-            return false;
+            authManager.authenticate(token);
+            VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+            return ActionResponse.success(Lang.SUCCESS_LOGIN);
+        } catch (AuthenticationException e) {
+            return ActionResponse.error(e.getMessage());
         }
     }
 
-    private boolean register(String login, String password) {
+    private ActionResponse register(String login, String password) {
         try {
-            if (AuthUtils.isExists(login, password)) return false;
-            Set<GrantedAuthority> roles = new HashSet<>(Arrays.asList(new SimpleGrantedAuthority("USER")));
-            Authentication token = new UsernamePasswordAuthenticationToken(login, password, roles);
+            if (AuthUtils.isExists(login, password))
+                return ActionResponse.error(Lang.ERROR_USER_EXISTS);
+            Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
             SecurityContextHolder.getContext().setAuthentication(token);
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//            UI.getCurrent().getPushConfiguration().setTransport(Transport.WEBSOCKET);
-//            UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
-            return true;
+            JsonUtils.addUser(login, password);
+            return ActionResponse.success(Lang.SUCCESS_LOGIN);
         } catch (Exception e) {
-            return false;
+            return ActionResponse.error(e.getMessage());
         }
     }
 }

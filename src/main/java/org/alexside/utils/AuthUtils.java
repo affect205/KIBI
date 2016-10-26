@@ -44,11 +44,11 @@ public class AuthUtils {
 
     public static boolean isExists(String login, String password) {
         try {
-            JsonObject usersJson = JsonUtils.readUsersJson();
+            JsonObject usersJson = JsonUtils.getUsers();
             JsonArray ja = usersJson.getAsJsonArray("users");
             for (JsonElement je : ja) {
                 String uLogin = je.getAsJsonObject().get("login").getAsString();
-                String uPassword = je.getAsJsonObject().get("login").getAsString();
+                String uPassword = je.getAsJsonObject().get("password").getAsString();
                 System.out.println(String.format("login = %s, password = %s", uLogin, uPassword));
                 if (login.equals(uLogin) && password.equals(uPassword)) return true;
             }

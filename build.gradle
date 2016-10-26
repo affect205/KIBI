@@ -35,6 +35,7 @@ dependencies {
 
 	compile("com.vaadin:vaadin-push:${vaadinVersion}")
 	compile("com.google.code.gson:gson:2.7")
+	compile("commons-io:commons-io:2.5")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 
