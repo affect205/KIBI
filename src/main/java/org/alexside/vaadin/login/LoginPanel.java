@@ -109,8 +109,8 @@ public class LoginPanel extends VerticalLayout {
             }
             Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             SecurityContextHolder.getContext().setAuthentication(token);
-            authManager.authenticate(token);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+            //authManager.authenticate(token);
             return ActionResponse.success(Lang.SUCCESS_LOGIN);
         } catch (AuthenticationException e) {
             return ActionResponse.error(e.getMessage());
