@@ -1,13 +1,8 @@
 package org.alexside.vaadin;
 
-import com.vaadin.annotations.PreserveOnRefresh;
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
 import org.alexside.security.AuthManager;
@@ -19,13 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 
 import javax.annotation.PostConstruct;
-import java.security.Principal;
 import java.util.logging.Logger;
 
 /**
  * Created by abalyshev on 19.10.16.
  */
-@Theme("valo")
+@Theme("kibi")
 @SpringUI(path = "")
 //@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 //@Push(value = PushMode.AUTOMATIC)

@@ -3,6 +3,7 @@ package org.alexside.vaadin.login;
 import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.lang.Lang;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.JsonUtils;
@@ -74,6 +75,8 @@ public class LoginPanel extends VerticalLayout {
         });
 
         Button registerButton = new Button("Регистрация");
+        registerButton.setStyleName(BaseTheme.BUTTON_LINK);
+        registerButton.addStyleName("register");
         registerButton.addClickListener(clickEvent -> {
             String login = loginField.getValue();
             String password = passwordField.getValue();

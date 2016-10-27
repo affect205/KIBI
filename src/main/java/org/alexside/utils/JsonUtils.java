@@ -16,7 +16,8 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
  */
 public class JsonUtils {
 
-    private static final String USERS_PATH = "C:\\Users\\Alex\\users\\users.json";
+    //private static final String USERS_PATH = "C:\\Users\\Alex\\users\\users.json";
+    private static final String USERS_PATH = "/home/abalyshev/java/users.json";
 
     public static synchronized JsonObject getUsers() throws Exception {
         return new Gson().fromJson(getJsonString(), JsonObject.class);

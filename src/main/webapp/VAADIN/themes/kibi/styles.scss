@@ -1,0 +1,16 @@
+@import "../valo/valo";
+
+.kibi {
+    @include valo;
+}
+
+.v-label-register_label {
+    color: greenyellow;
+    text-decoration: underline;
+}
+
+.register .v-button-caption {
+    color: white;
+    border-color: white;
+    background: transparent;
+}
