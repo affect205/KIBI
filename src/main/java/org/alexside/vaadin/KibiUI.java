@@ -1,11 +1,13 @@
 package org.alexside.vaadin;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
-import org.alexside.security.AuthManager;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.desktop.DesktopView;
@@ -21,8 +23,7 @@ import java.util.logging.Logger;
  */
 @Theme("kibi")
 @SpringUI(path = "")
-//@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
-//@Push(value = PushMode.AUTOMATIC)
+@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 //@PreserveOnRefresh
 public class KibiUI extends UI {
 
@@ -33,9 +34,6 @@ public class KibiUI extends UI {
 
     @Autowired
     private DesktopView desktopView;
-
-    @Autowired
-    private AuthManager authManager;
 
     private Navigator navigator;
 
