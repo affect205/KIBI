@@ -19,7 +19,7 @@ apply plugin: 'eclipse-wtp'
 
 vaadin {
 	version '7.7.+'
-	//widgetset 'com.example.MyWidgetset'
+	widgetset 'org.alexside.AppWidgetset'
 }
 
 jar {

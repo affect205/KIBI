@@ -1,5 +1,6 @@
 package org.alexside.vaadin.login;
 
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
@@ -90,10 +91,21 @@ public class LoginPanel extends VerticalLayout {
             }
         });
 
+        Button forgotButton = new Button("Забыли пароль?");
+        forgotButton.setIcon(FontAwesome.INFO_CIRCLE);
+        forgotButton.setHeight("25px");
+        forgotButton.setStyleName(BaseTheme.BUTTON_LINK);
+        forgotButton.addStyleName("register");
+        forgotButton.addClickListener(clickEvent -> {
+            log.info("[forgot] reset password...");
+        });
+
+
         layout.addComponent(loginField, "login");
         layout.addComponent(passwordField, "password");
         layout.addComponent(submitButton, "submit");
         layout.addComponent(registerButton, "register");
+        layout.addComponent(forgotButton, "forgot");
         layout.setSizeFull();
 
         addComponents(layout);
@@ -122,8 +134,10 @@ public class LoginPanel extends VerticalLayout {
 
     private ActionResponse register(String login, String password) {
         try {
-            if (AuthUtils.isExists(login, password))
-                return ActionResponse.error(Lang.ERROR_USER_EXISTS);
+            if ("".equals(login.trim())) throw new Exception(Lang.ERROR_WRONG_LOGIN);
+            if ("".equals(password.trim())) throw new Exception(Lang.ERROR_WRONG_PASSWORD);
+            if (AuthUtils.isExists(login, password)) throw new Exception(Lang.ERROR_USER_EXISTS);
+
             Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
             SecurityContextHolder.getContext().setAuthentication(token);
