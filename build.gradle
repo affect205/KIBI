@@ -39,19 +39,24 @@ repositories {
 def vaadinVersion = '7.7.3'
 
 dependencies {
-	//compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')
-	compile("org.springframework.boot:spring-boot-starter-security")
 	compile("com.vaadin:vaadin-spring-boot-starter:1.0.2")
 
+	// Spring
+	compile("org.springframework.boot:spring-boot-starter-security")
+
+	// Vaadin addons
 	compile("com.vaadin:vaadin-push:${vaadinVersion}")
+	compile("org.vaadin.addons:cssinject:2.0.3")
+	//compile('org.vaadin.addons:loginform:0.6.2')
+
+	// MongoDB
+	compile("org.mongodb:mongodb-driver:3.3.0")
+
+	// Utils
 	compile("com.google.code.gson:gson:2.7")
 	compile("commons-io:commons-io:2.5")
-	compile("org.vaadin.addons:cssinject:2.0.3")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
-
-	// vaadin addons
-	//compile('org.vaadin.addons:loginform:0.6.2')
 }
 
 dependencyManagement {
