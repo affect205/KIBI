@@ -8,12 +8,12 @@ import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
+import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.desktop.DesktopView;
 import org.alexside.vaadin.login.LoginView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 
 import javax.annotation.PostConstruct;
 import java.util.logging.Logger;
@@ -56,9 +56,9 @@ public class KibiUI extends UI {
 
     protected void checkAuth(VaadinRequest request) {
         if (AuthUtils.isLoggedIn()) {
-            Authentication auth = AuthUtils.getUser();
-            log.info(String.format("[KibiUI::checkAuth]user = %s, token = %s", auth == null ? "unknown" : auth.getPrincipal(),
-                    auth == null ? "unknown" : auth.getCredentials()));
+            User user = AuthUtils.getUser();
+            log.info(String.format("[KibiUI::checkAuth]login = %s, password = %s", user == null ? "unknown" : user.getLogin(),
+                    user == null ? "unknown" : user.getPassword()));
             navigator.navigateTo(VaadinUtils.VIEW_DESKTOP);
         } else {
             navigator.navigateTo(VaadinUtils.VIEW_LOGIN);

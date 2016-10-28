@@ -1,9 +1,10 @@
 package org.alexside.service;
 
 import org.alexside.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,21 +13,24 @@ import java.util.List;
 @Service
 public class UserService {
 
-    public static List<User> userList;
-    static {
-        userList = new LinkedList<User>(){{
-            add(new User("admin", "admin"));
-            add(new User("user", "user"));
-        }};
-
-    }
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public User findUser(final String login, final String password) {
-        for (User u : userList) {
-            if (login.equals(u.getLogin()) && password.equals(u.getPassword())) {
-                return u;
+        List<User> users = mongoTemplate.findAll(User.class);
+        for (User user : users) {
+            if (login.equals(user.getLogin()) && password.equals(user.getPassword())) {
+                return user;
             }
         }
         return null;
+    }
+
+    public boolean isExists(final String login, final String password) {
+        return findUser(login, password) != null;
+    }
+
+    public void addUser(final String login, final String password) {
+        mongoTemplate.insert(new User(login, password));
     }
 }

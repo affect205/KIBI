@@ -1,11 +1,17 @@
 package org.alexside.entity;
 
-import java.security.Principal;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by abalyshev on 20.10.16.
  */
-public class User implements Principal {
+@Document
+public class User {
+
+    @Id
+    private String id;
+
     private String login;
     private String password;
 
@@ -13,9 +19,6 @@ public class User implements Principal {
         this.login = login;
         this.password = password;
     }
-
-    @Override
-    public String getName() { return login; }
 
     public String getLogin() {
         return login;
@@ -55,7 +58,8 @@ public class User implements Principal {
     @Override
     public String toString() {
         return "User{" +
-                "login='" + login + '\'' +
+                "id='" + id + '\'' +
+                ", login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }

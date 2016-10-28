@@ -43,6 +43,7 @@ dependencies {
 
 	// Spring
 	compile("org.springframework.boot:spring-boot-starter-security")
+	compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
 	// Vaadin addons
 	compile("com.vaadin:vaadin-push:${vaadinVersion}")

@@ -1,32 +1,17 @@
 package org.alexside.utils;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.vaadin.server.VaadinSession;
-import org.alexside.security.AuthManager;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.alexside.entity.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Principal;
 
 /**
  * Created by abalyshev on 20.10.16.
  */
 public class AuthUtils {
-
-    public static final String USER_WEB_TOKEN = "AUTH_WEB_TOKEN";
-
-    public static void saveUser(AuthManager.AuthInfo info) {
-        VaadinSession.getCurrent().setAttribute(Principal.class, info.getUser());
-        VaadinSession.getCurrent().setAttribute(USER_WEB_TOKEN, info.getToken());
-    }
 
     public static boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -38,8 +23,13 @@ public class AuthUtils {
         return authentication != null && authentication.getAuthorities().contains(new SimpleGrantedAuthority(role));
     }
 
-    public static Authentication getUser() {
-        return SecurityContextHolder.getContext().getAuthentication();
+    public static User getUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            // TODO: redirect to errorView
+            return null;
+        }
+        return new User(auth.getPrincipal().toString(), auth.getCredentials().toString());
     }
 
     public static boolean isExists(String login, String password) {

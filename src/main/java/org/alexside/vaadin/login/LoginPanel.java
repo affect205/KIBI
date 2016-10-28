@@ -6,14 +6,12 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.lang.Lang;
-import org.alexside.utils.AuthUtils;
-import org.alexside.utils.JsonUtils;
+import org.alexside.service.UserService;
 import org.alexside.utils.SpringUtils;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.misc.ActionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -33,7 +31,7 @@ public class LoginPanel extends VerticalLayout {
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
 
     @Autowired
-    AuthenticationManager authManager;
+    private UserService userService;
 
     private CustomLayout layout;
 
@@ -93,7 +91,6 @@ public class LoginPanel extends VerticalLayout {
 
         Button forgotButton = new Button("Забыли пароль?");
         forgotButton.setIcon(FontAwesome.INFO_CIRCLE);
-        forgotButton.setHeight("25px");
         forgotButton.setStyleName(BaseTheme.BUTTON_LINK);
         forgotButton.addStyleName("register");
         forgotButton.addClickListener(clickEvent -> {
@@ -119,13 +116,12 @@ public class LoginPanel extends VerticalLayout {
 
     private ActionResponse login(String login, String password) {
         try {
-            if (!AuthUtils.isExists(login, password)) {
+            if (!userService.isExists(login, password)) {
                 return ActionResponse.error(Lang.ERROR_USER_NOT_EXISTS);
             }
             Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             SecurityContextHolder.getContext().setAuthentication(token);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
-            //authManager.authenticate(token);
             return ActionResponse.success(Lang.SUCCESS_LOGIN);
         } catch (AuthenticationException e) {
             return ActionResponse.error(e.getMessage());
@@ -136,12 +132,12 @@ public class LoginPanel extends VerticalLayout {
         try {
             if ("".equals(login.trim())) throw new Exception(Lang.ERROR_WRONG_LOGIN);
             if ("".equals(password.trim())) throw new Exception(Lang.ERROR_WRONG_PASSWORD);
-            if (AuthUtils.isExists(login, password)) throw new Exception(Lang.ERROR_USER_EXISTS);
+            if (userService.isExists(login, password)) throw new Exception(Lang.ERROR_USER_EXISTS);
 
+            userService.addUser(login, password);
             Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
             SecurityContextHolder.getContext().setAuthentication(token);
-            JsonUtils.addUser(login, password);
             return ActionResponse.success(Lang.SUCCESS_LOGIN);
         } catch (Exception e) {
             return ActionResponse.error(e.getMessage());
