@@ -7,6 +7,8 @@ import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.SpringUtils;
+import org.alexside.vaadin.misc.KibiTree;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +20,9 @@ import javax.annotation.PostConstruct;
 @Scope(SpringUtils.SCOPE_PROTOTYPE)
 public class DesktopPanel extends VerticalLayout {
 
+    @Autowired
+    private KibiTree kibiTree;
+
     private Label content;
     private VerticalLayout layout;
 
@@ -25,16 +30,14 @@ public class DesktopPanel extends VerticalLayout {
     public void onInit() {
         Button logoutButton = new Button("Выйти");
         logoutButton.addStyleName(BaseTheme.BUTTON_LINK);
-        logoutButton.addClickListener(clickEvent -> {
-            logout();
-        });
+        logoutButton.addClickListener(clickEvent -> logout());
 
         content = new Label("", ContentMode.HTML);
 
         layout = new VerticalLayout(content, logoutButton);
         layout.setSizeFull();
 
-        addComponents(layout);
+        addComponents(layout, kibiTree);
         setComponentAlignment(layout, Alignment.MIDDLE_CENTER);
     }
 

@@ -2,6 +2,9 @@ package org.alexside.entity;
 
 import org.alexside.enums.TreeKind;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Alex Balyschev
@@ -55,9 +58,15 @@ public abstract class TItem {
         return parent;
     }
 
+    public boolean hasParent() { return parent != null; }
+
     public void setParent(TItem parent) {
         this.parent = parent;
     }
+
+    public boolean hasChildren() { return false; }
+
+    public Set<TItem> getChildren() { return new HashSet<>(); }
 
     @Override
     public String toString() {
@@ -79,7 +88,6 @@ public abstract class TItem {
     @Override
     public int hashCode() {
         int result = getId();
-        result = 31 * result + getName().hashCode();
         result = 31 * result + getKind().hashCode();
         return result;
     }

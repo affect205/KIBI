@@ -13,9 +13,13 @@ public class Notice extends TItem {
     private String content;
     private int sorting;
 
-    public Notice(int id, String name, String content, Category parent, int sorting) {
+    public Notice(int id, String name, String content, Category parent) {
         super(id, name, TreeKind.NOTICE, parent);
         this.content = content;
+    }
+
+    public Notice(int id, String name, String content, Category parent, int sorting) {
+        this(id, name, content, parent);
         this.sorting = sorting;
     }
 

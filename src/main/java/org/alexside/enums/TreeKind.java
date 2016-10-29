@@ -6,5 +6,5 @@ package org.alexside.enums;
  * Date: 13.07.16
  */
 public enum  TreeKind {
-    CATEGORY, NOTICE;
+    CATEGORY, NOTICE, UNKNOWN;
 }
