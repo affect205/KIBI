@@ -2,16 +2,22 @@ package org.alexside.entity;
 
 import org.alexside.enums.TreeKind;
 import org.alexside.utils.StringUtils;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Alex Balyschev
  * Date: 12.07.16
  */
+@Document(collection = "titems")
 public class Notice extends TItem {
-
+    @Field
     private String content;
+    @Field
     private int sorting;
+
+    public Notice() {}
 
     public Notice(int id, String name, String content, Category parent) {
         super(id, name, TreeKind.NOTICE, parent);

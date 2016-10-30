@@ -3,7 +3,7 @@ package org.alexside.lang;
 /**
  * Created by abalyshev on 26.10.16.
  */
-public class Lang {
+public class Strings {
     public static final String ERROR_WRONG_LOGIN = "Неверный логин";
     public static final String ERROR_WRONG_PASSWORD = "Неверный пароль";
     public static final String ERROR_USER_EXISTS = "Пользователь с таким логином существует";

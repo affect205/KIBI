@@ -1,31 +1,47 @@
 package org.alexside.entity;
 
 import org.alexside.enums.TreeKind;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Reference;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Alex Balyschev
  * Date: 13.07.16
  */
+@Document(collection = "titems")
 public abstract class TItem {
+    public static final String PATH_SEPARATOR = ".";
+    @Id
+    protected String _id;
+    @Field
     protected int id;
+    @Field
     protected String name;
+    @Field
     protected TreeKind kind;
+    @Reference
     protected TItem parent;
+    @Field
+    protected String path;
+
+    public TItem() {}
 
     public TItem(int id, String name, TreeKind kind, TItem parent) {
-        this(id, name, kind);
-        this.parent = parent;
-    }
-
-    public TItem(int id, String name, TreeKind kind) {
         this.id = id;
         this.name = name;
         this.kind = kind;
-        this.parent = null;
+        this.parent = parent;
+        this.path = (parent == null ? "" : parent.getPath() + ".") + kind.getPath() + id;
+    }
+
+    public TItem(int id, String name, TreeKind kind) {
+        this(id, name, kind, null);
     }
 
     public int getId() {
@@ -66,7 +82,11 @@ public abstract class TItem {
 
     public boolean hasChildren() { return false; }
 
-    public Set<TItem> getChildren() { return new HashSet<>(); }
+    public List<TItem> getChildren() { return new ArrayList<>(); }
+
+    public String getPath() { return path; }
+
+    public void setPath(String path) { this.path = path; }
 
     @Override
     public String toString() {

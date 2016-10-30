@@ -6,12 +6,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by abalyshev on 19.10.16.
  */
 @Service
 public class UserService {
+
+    private static Logger log = Logger.getLogger(UserService.class.getName());
 
     @Autowired
     private MongoTemplate mongoTemplate;

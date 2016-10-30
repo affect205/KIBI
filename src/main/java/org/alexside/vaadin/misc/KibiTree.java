@@ -59,6 +59,12 @@ public class KibiTree extends Panel {
         setContent(tree);
     }
 
+    public TItem getSelected() {
+        Item selected = tree.getItem(tree.getValue());
+        if (selected == null) return null;
+        return (TItem) selected.getItemProperty("object").getValue();
+    }
+
     private void initContainer(HierarchicalContainer container, TItem tItem) {
         Item item = container.addItem(tItem.hashCode());
         item.getItemProperty("id").setValue(tItem.getId());

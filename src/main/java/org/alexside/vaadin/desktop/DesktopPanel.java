@@ -4,7 +4,9 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
+import org.alexside.entity.TItem;
 import org.alexside.entity.User;
+import org.alexside.service.TItemService;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.SpringUtils;
 import org.alexside.vaadin.misc.KibiTree;
@@ -23,6 +25,9 @@ public class DesktopPanel extends VerticalLayout {
     @Autowired
     private KibiTree kibiTree;
 
+    @Autowired
+    private TItemService itemService;
+
     private Label content;
     private VerticalLayout layout;
 
@@ -37,7 +42,13 @@ public class DesktopPanel extends VerticalLayout {
         layout = new VerticalLayout(content, logoutButton);
         layout.setSizeFull();
 
-        addComponents(layout, kibiTree);
+        Button loadButton = new Button("Сохранить");
+        loadButton.addClickListener(event -> {
+            TItem selected = kibiTree.getSelected();
+            itemService.saveTItem(selected);
+        });
+
+        addComponents(layout, kibiTree, loadButton);
         setComponentAlignment(layout, Alignment.MIDDLE_CENTER);
     }
 

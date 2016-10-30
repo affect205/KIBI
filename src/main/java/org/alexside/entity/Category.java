@@ -2,33 +2,45 @@ package org.alexside.entity;
 
 
 import org.alexside.enums.TreeKind;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Alex Balyschev
  * Date: 12.07.16
  */
+@Document(collection = "titems")
 public class Category extends TItem {
-
+    @Field
     private int sorting;
-    private Set<TItem> children;
+    @Transient
+    private List<TItem> children;
+
+    public Category() {
+        children = new ArrayList<>();
+    }
 
     public Category(int id) {
-        this(id, "");
+        this(id, "", null, -1);
     }
 
     public Category(int id, String name) {
-        super(id, name, TreeKind.CATEGORY);
-        children = new HashSet<>();
+        this(id, name, null, -1);
+    }
+
+    public Category(int id, String name, Category parent) {
+        this(id, name, parent, -1);
     }
 
     public Category(int id, String name, Category parent, int sorting) {
         super(id, name, TreeKind.CATEGORY, parent);
         this.sorting = sorting;
-        this.children = new HashSet<>();
+        this.children = new ArrayList<>();
     }
 
     public int getSorting() {
@@ -43,9 +55,9 @@ public class Category extends TItem {
     public boolean hasChildren() { return !children.isEmpty(); }
 
     @Override
-    public Set<TItem> getChildren() { return children; }
+    public List<TItem> getChildren() { return children; }
 
-    public void setChildren(Set<TItem> children) { this.children.addAll(children); }
+    public void setChildren(List<TItem> children) { this.children.addAll(children); }
 
     public void addChild(TItem child) { children.add(child); }
 

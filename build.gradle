@@ -52,6 +52,7 @@ dependencies {
 
 	// MongoDB
 	compile("org.mongodb:mongodb-driver:3.3.0")
+	compile 'org.mongodb.morphia:morphia:1.2.1'
 
 	// Utils
 	compile("com.google.code.gson:gson:2.7")

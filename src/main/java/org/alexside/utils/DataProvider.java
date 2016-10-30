@@ -30,10 +30,10 @@ public class DataProvider {
         Category c1 = new Category(1, "Программирование");
         c1.addChild(new Notice(1, "Основы программирования", "Основы программирования...", c1));
 
-        Category c2 = new Category(2, "Java");
+        Category c2 = new Category(2, "Java", c1);
         c2.addChild(new Notice(2, "Основы Java", "Основы Java...", c2));
 
-        Category c3 = new Category(3, "C++");
+        Category c3 = new Category(3, "C++", c1);
         c3.addChild(new Notice(3, "Основы C++", "Основы C++...", c3));
 
         c1.addChild(c2);

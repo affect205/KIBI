@@ -6,5 +6,13 @@ package org.alexside.enums;
  * Date: 13.07.16
  */
 public enum  TreeKind {
-    CATEGORY, NOTICE, UNKNOWN;
+    CATEGORY("C"), NOTICE("N"), UNKNOWN("U");
+
+    TreeKind(String path) {
+        this.path = path;
+    }
+
+    private String path;
+
+    public String getPath() { return path; }
 }

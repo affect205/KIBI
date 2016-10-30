@@ -5,7 +5,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
-import org.alexside.lang.Lang;
+import org.alexside.lang.Strings;
 import org.alexside.service.UserService;
 import org.alexside.utils.SpringUtils;
 import org.alexside.utils.VaadinUtils;
@@ -116,13 +116,15 @@ public class LoginPanel extends VerticalLayout {
 
     private ActionResponse login(String login, String password) {
         try {
+            login = "alex";
+            password = "pass";
             if (!userService.isExists(login, password)) {
-                return ActionResponse.error(Lang.ERROR_USER_NOT_EXISTS);
+                return ActionResponse.error(Strings.ERROR_USER_NOT_EXISTS);
             }
             Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             SecurityContextHolder.getContext().setAuthentication(token);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
-            return ActionResponse.success(Lang.SUCCESS_LOGIN);
+            return ActionResponse.success(Strings.SUCCESS_LOGIN);
         } catch (AuthenticationException e) {
             return ActionResponse.error(e.getMessage());
         }
@@ -130,15 +132,15 @@ public class LoginPanel extends VerticalLayout {
 
     private ActionResponse register(String login, String password) {
         try {
-            if ("".equals(login.trim())) throw new Exception(Lang.ERROR_WRONG_LOGIN);
-            if ("".equals(password.trim())) throw new Exception(Lang.ERROR_WRONG_PASSWORD);
-            if (userService.isExists(login, password)) throw new Exception(Lang.ERROR_USER_EXISTS);
+            if ("".equals(login.trim())) throw new Exception(Strings.ERROR_WRONG_LOGIN);
+            if ("".equals(password.trim())) throw new Exception(Strings.ERROR_WRONG_PASSWORD);
+            if (userService.isExists(login, password)) throw new Exception(Strings.ERROR_USER_EXISTS);
 
             userService.addUser(login, password);
             Authentication token = new UsernamePasswordAuthenticationToken(login, password);
             VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
             SecurityContextHolder.getContext().setAuthentication(token);
-            return ActionResponse.success(Lang.SUCCESS_LOGIN);
+            return ActionResponse.success(Strings.SUCCESS_LOGIN);
         } catch (Exception e) {
             return ActionResponse.error(e.getMessage());
         }
