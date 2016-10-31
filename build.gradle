@@ -14,13 +14,13 @@ apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
-apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
+//apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
 apply plugin: 'eclipse-wtp'
 
-vaadin {
-	version '7.7.+'
-	widgetset 'org.alexside.AppWidgetset'
-}
+//vaadin {
+//	version '7.7.+'
+//	widgetset 'org.alexside.AppWidgetset'
+//}
 
 jar {
 	baseName = 'kibi'

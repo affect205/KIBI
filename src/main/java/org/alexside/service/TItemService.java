@@ -9,10 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -32,24 +29,24 @@ public class TItemService {
     public void saveTItem(TItem tItem) {
         if (tItem == null) return;
         saveTItemRecursive(tItem);
+    }
+
+    public List<TItem> findAll() {
+        List<TItem> tItemList = new LinkedList<>();
         try {
-            List<TItem> tItemList = mongoTemplate.findAll(TItem.class);
-            tItemList.forEach(i -> {
-                if (i.getKind() == TreeKind.CATEGORY) {
-                    tItemList.forEach(i2 -> {
-                        if (i.equals(i2.getParent()))
-                            i.getChildren().add(i2);
+            tItemList = mongoTemplate.findAll(TItem.class);
+            for (TItem ti : tItemList) {
+                if (ti.getKind() == TreeKind.CATEGORY) {
+                    tItemList.forEach(ti2 -> {
+                        if (ti.equals(ti2.getParent()))
+                            ti.getChildren().add(ti2);
                     });
                 }
-            });
-            if (tItemList != null) {
-                tItemList.forEach(i -> {
-                    log.info(i.toString());
-                });
             }
         } catch (Exception e) {
             log.warning(e.getMessage());
         }
+        return tItemList;
     }
 
     private void saveTItemRecursive(TItem tItem) {
