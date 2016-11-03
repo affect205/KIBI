@@ -50,6 +50,7 @@ public class KibiTree extends Panel {
         container.addContainerProperty("kind", TreeKind.class, TreeKind.UNKNOWN);
         container.addContainerProperty("object", TItem.class, null);
         data.forEach(tItem -> initContainer(container, tItem));
+        sortContainer(container);
 
         tree = new Tree("", container);
         tree.setImmediate(true);
@@ -97,6 +98,7 @@ public class KibiTree extends Panel {
                 } else if (action == delete) {
                     removeItem((HierarchicalContainer)tree.getContainerDataSource(), target);
                 }
+                sortContainer((HierarchicalContainer) tree.getContainerDataSource());
             }
         });
 
@@ -146,5 +148,9 @@ public class KibiTree extends Panel {
 
     private void removeItem(HierarchicalContainer container, Object itemId) {
         container.removeItem(itemId);
+    }
+
+    private void sortContainer(HierarchicalContainer container) {
+        container.sort(new Object[]{"kind", "name"}, new boolean[] {true, true});
     }
 }

@@ -101,13 +101,13 @@ public abstract class TItem {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TItem) || o == null) return false;
-        TItem tItem = (TItem) o;
-        return id == tItem.getId() && kind == tItem.getKind();
+        TItem ti = (TItem) o;
+        return name.hashCode() == ti.getName().hashCode() && kind == ti.getKind();
     }
 
     @Override
     public int hashCode() {
-        int result = getId();
+        int result = getName().hashCode();
         result = 31 * result + getKind().hashCode();
         return result;
     }
