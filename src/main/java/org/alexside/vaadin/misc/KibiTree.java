@@ -6,13 +6,12 @@ import com.vaadin.event.Action;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Tree;
+import com.vaadin.ui.*;
 import org.alexside.entity.Category;
 import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
 import org.alexside.enums.TreeKind;
+import org.alexside.service.TItemService;
 import org.alexside.utils.DataProvider;
 import org.alexside.utils.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +31,9 @@ public class KibiTree extends Panel {
     @Autowired
     protected DataProvider dataProvider;
 
+    @Autowired
+    private TItemService itemService;
+
     protected Tree tree;
     protected Action addCategory = new Action("Добавить категорию", FontAwesome.FOLDER);
     protected Action addNotice = new Action("Добавить запись", FontAwesome.EDIT);
@@ -40,7 +42,7 @@ public class KibiTree extends Panel {
     @PostConstruct
     public void onIit() {
         setCaption("Дерево знаний");
-        setWidth("360px");
+        setSizeFull();
 
         List<TItem> data = dataProvider.getTreeData();
         HierarchicalContainer container = new HierarchicalContainer();
@@ -110,7 +112,13 @@ public class KibiTree extends Panel {
                 tree.expandItem(i);
             }
         });
-        setContent(tree);
+
+        VerticalLayout layout = new VerticalLayout();
+        Button loadButton = new Button("Сохранить");
+        loadButton.addClickListener(event -> itemService.saveTItem(getSelected()));
+        layout.addComponents(tree, loadButton);
+
+        setContent(layout);
     }
 
     public TItem getSelected() {

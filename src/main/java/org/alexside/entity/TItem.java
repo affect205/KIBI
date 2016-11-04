@@ -102,13 +102,19 @@ public abstract class TItem {
         if (this == o) return true;
         if (!(o instanceof TItem) || o == null) return false;
         TItem ti = (TItem) o;
-        return name.hashCode() == ti.getName().hashCode() && kind == ti.getKind();
+        return name.hashCode() == ti.getName().hashCode() && kind == ti.getKind() && compareParents(ti);
     }
 
     @Override
     public int hashCode() {
         int result = getName().hashCode();
         result = 31 * result + getKind().hashCode();
+        if (parent != null) result = 31 * result + getParent().hashCode();
         return result;
+    }
+
+    private boolean compareParents(TItem ti) {
+        return (parent == null ? 0 : parent.hashCode()) ==
+                (ti.getParent() == null ? 0 : ti.getParent().hashCode());
     }
 }

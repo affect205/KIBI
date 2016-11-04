@@ -4,11 +4,10 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
-import org.alexside.entity.TItem;
 import org.alexside.entity.User;
-import org.alexside.service.TItemService;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.SpringUtils;
+import org.alexside.vaadin.desktop.notice.ViewPanel;
 import org.alexside.vaadin.misc.KibiTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -26,38 +25,47 @@ public class DesktopPanel extends VerticalLayout {
     private KibiTree kibiTree;
 
     @Autowired
-    private TItemService itemService;
+    private ViewPanel viewPanel;
 
     private Label content;
-    private VerticalLayout layout;
 
     @PostConstruct
     public void onInit() {
+        setSizeFull();
         Button logoutButton = new Button("Выйти");
         logoutButton.addStyleName(BaseTheme.BUTTON_LINK);
         logoutButton.addClickListener(clickEvent -> logout());
+        logoutButton.setWidth("80px");
 
         content = new Label("", ContentMode.HTML);
+        content.setWidth("200px");
 
-        layout = new VerticalLayout(content, logoutButton);
-        layout.setSizeFull();
+        HorizontalLayout hLayout1 = new HorizontalLayout(content, logoutButton);
+        hLayout1.setSizeFull();
+        hLayout1.setSpacing(true);
+        hLayout1.setComponentAlignment(content, Alignment.MIDDLE_RIGHT);
+        hLayout1.setComponentAlignment(logoutButton, Alignment.MIDDLE_RIGHT);
+        hLayout1.setExpandRatio(content, 1);
 
-        Button loadButton = new Button("Сохранить");
-        loadButton.addClickListener(event -> {
-            TItem selected = kibiTree.getSelected();
-            itemService.saveTItem(selected);
-        });
+        HorizontalLayout hLayout2 = new HorizontalLayout(kibiTree, viewPanel);
+        hLayout2.setSizeFull();
+        hLayout2.setMargin(true);
+        hLayout2.setSpacing(true);
+        hLayout2.setExpandRatio(kibiTree, 1);
+        hLayout2.setExpandRatio(viewPanel, 4);
 
-        addComponents(layout, kibiTree, loadButton);
-        setComponentAlignment(layout, Alignment.MIDDLE_CENTER);
+        addComponent(hLayout2);
+        addComponent(hLayout1);
+
+        setExpandRatio(hLayout1, 1);
+        setExpandRatio(hLayout2, 7);
     }
 
     @Override
     public void attach() {
         super.attach();
         User user = AuthUtils.getUser();
-        String html = String .format("<h2>Рабочий стол...</h2>Пользователь: <b>%s</b>", user.getLogin());
-        content.setValue(html);
+        content.setValue(String.format("Пользователь: <b>%s</b>", user.getLogin()));
     }
 
     private void logout() {
