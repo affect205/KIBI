@@ -41,7 +41,7 @@ public class KibiTree extends Panel {
 
     @PostConstruct
     public void onIit() {
-        setCaption("Дерево знаний");
+        setCaption("<b>Дерево знаний</b>");
         setSizeFull();
 
         List<TItem> data = dataProvider.getTreeData();
