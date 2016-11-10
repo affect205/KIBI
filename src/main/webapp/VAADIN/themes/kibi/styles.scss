@@ -19,7 +19,11 @@
     color: white;
 }
 
-.tree_item .v-icon {
+.v-icon {
     color: darkgray;
     font-size: 20px;
+}
+
+.no-toolbar .gwt-RichTextToolbar-bottom {
+    display: none;
 }

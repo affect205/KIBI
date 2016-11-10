@@ -1,16 +1,16 @@
 package org.alexside.vaadin.desktop;
 
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
-import org.alexside.utils.SpringUtils;
-import org.alexside.vaadin.desktop.notice.ViewPanel;
+import org.alexside.vaadin.desktop.view.ViewPanel;
 import org.alexside.vaadin.misc.KibiTree;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 
@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct;
  * Created by abalyshev on 19.10.16.
  */
 @SpringComponent
-@Scope(SpringUtils.SCOPE_PROTOTYPE)
+@ViewScope
 public class DesktopPanel extends VerticalLayout {
 
     @Autowired
@@ -39,6 +39,9 @@ public class DesktopPanel extends VerticalLayout {
 
         content = new Label("", ContentMode.HTML);
         content.setWidth("200px");
+        User user = AuthUtils.getUser();
+//        content.setValue(String.format("%s: <b>%s</b>",
+//                FontAwesome.USER.getHtml(), user.getLogin()));
 
         HorizontalLayout hLayout1 = new HorizontalLayout(content, logoutButton);
         hLayout1.setSizeFull();
@@ -49,7 +52,7 @@ public class DesktopPanel extends VerticalLayout {
 
         HorizontalLayout hLayout2 = new HorizontalLayout(kibiTree, viewPanel);
         hLayout2.setSizeFull();
-        hLayout2.setMargin(true);
+        hLayout2.setMargin(new MarginInfo(true, false));
         hLayout2.setSpacing(true);
         hLayout2.setExpandRatio(kibiTree, 1);
         hLayout2.setExpandRatio(viewPanel, 4);
@@ -58,14 +61,7 @@ public class DesktopPanel extends VerticalLayout {
         addComponent(hLayout1);
 
         setExpandRatio(hLayout1, 1);
-        setExpandRatio(hLayout2, 7);
-    }
-
-    @Override
-    public void attach() {
-        super.attach();
-        User user = AuthUtils.getUser();
-        content.setValue(String.format("Пользователь: <b>%s</b>", user.getLogin()));
+        setExpandRatio(hLayout2, 10);
     }
 
     private void logout() {

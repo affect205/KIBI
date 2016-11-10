@@ -7,12 +7,15 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.spring.navigator.SpringViewProvider;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
+import org.alexside.utils.EventUtils;
 import org.alexside.utils.VaadinUtils;
-import org.alexside.vaadin.desktop.DesktopView;
-import org.alexside.vaadin.login.LoginView;
+import org.alexside.vaadin.misc.HeaderPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -22,7 +25,7 @@ import java.util.logging.Logger;
  * Created by abalyshev on 19.10.16.
  */
 @Theme("kibi")
-@SpringUI(path = "")
+@SpringUI
 @Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 //@PreserveOnRefresh
 public class KibiUI extends UI {
@@ -30,18 +33,22 @@ public class KibiUI extends UI {
     private static Logger log = Logger.getLogger(KibiUI.class.getName());
 
     @Autowired
-    private LoginView loginView;
-
-    @Autowired
-    private DesktopView desktopView;
+    private SpringViewProvider viewProvider;
 
     private Navigator navigator;
 
     @PostConstruct
     public void onInit() {
-        navigator = new Navigator(this, this);
-        navigator.addView(VaadinUtils.VIEW_LOGIN, loginView);
-        navigator.addView(VaadinUtils.VIEW_DESKTOP, desktopView);
+        final VerticalLayout root = new VerticalLayout();
+        root.setSizeFull();
+        setContent(root);
+
+        final Panel viewContainer = new HeaderPanel();
+        root.addComponent(viewContainer);
+        root.setExpandRatio(viewContainer, 1.0f);
+
+        navigator = new Navigator(this, viewContainer);
+        navigator.addProvider(viewProvider);
     }
 
     @Override
@@ -59,9 +66,10 @@ public class KibiUI extends UI {
             User user = AuthUtils.getUser();
             log.info(String.format("[KibiUI::checkAuth]login = %s, password = %s", user == null ? "unknown" : user.getLogin(),
                     user == null ? "unknown" : user.getPassword()));
-            navigator.navigateTo(VaadinUtils.VIEW_DESKTOP);
+            EventUtils.initEventBusInstance();
+            navigator.navigateTo(viewProvider.getViewName(VaadinUtils.VIEW_DESKTOP));
         } else {
-            navigator.navigateTo(VaadinUtils.VIEW_LOGIN);
+            navigator.navigateTo(viewProvider.getViewName(VaadinUtils.VIEW_LOGIN));
         }
     }
 

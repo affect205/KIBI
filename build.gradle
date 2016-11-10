@@ -54,6 +54,7 @@ dependencies {
 	compile 'org.mongodb.morphia:morphia:1.2.1'
 
 	// Utils
+	compile('com.google.guava:guava:20.0')
 	compile("com.google.code.gson:gson:2.7")
 	compile("commons-io:commons-io:2.5")
 

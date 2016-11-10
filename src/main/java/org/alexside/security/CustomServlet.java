@@ -1,4 +1,4 @@
-package org.alexside.demo;
+package org.alexside.security;
 
 import com.vaadin.server.CustomizedSystemMessages;
 import com.vaadin.server.SystemMessagesProvider;

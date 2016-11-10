@@ -6,6 +6,7 @@ import com.vaadin.event.Action;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import org.alexside.entity.Category;
 import org.alexside.entity.Notice;
@@ -13,9 +14,7 @@ import org.alexside.entity.TItem;
 import org.alexside.enums.TreeKind;
 import org.alexside.service.TItemService;
 import org.alexside.utils.DataProvider;
-import org.alexside.utils.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
@@ -25,7 +24,7 @@ import java.util.List;
  * Created by abalyshev on 27.10.16.
  */
 @SpringComponent
-@Scope(SpringUtils.SCOPE_SINGLETON)
+@ViewScope
 public class KibiTree extends Panel {
 
     @Autowired

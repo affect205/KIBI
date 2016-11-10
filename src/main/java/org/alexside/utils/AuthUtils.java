@@ -15,7 +15,8 @@ public class AuthUtils {
 
     public static boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.isAuthenticated();
+        // TODO: figure out this shit...
+        return authentication != null; /*&& authentication.isAuthenticated();*/
     }
 
     public static boolean hasRole(String role) {

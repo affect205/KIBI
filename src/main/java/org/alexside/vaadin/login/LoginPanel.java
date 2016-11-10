@@ -3,15 +3,14 @@ package org.alexside.vaadin.login;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.lang.Strings;
 import org.alexside.service.UserService;
-import org.alexside.utils.SpringUtils;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.misc.ActionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -25,7 +24,7 @@ import java.util.logging.Logger;
  * Created by abalyshev on 18.10.16.
  */
 @SpringComponent
-@Scope(SpringUtils.SCOPE_PROTOTYPE)
+@ViewScope
 public class LoginPanel extends VerticalLayout {
 
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
@@ -127,6 +126,7 @@ public class LoginPanel extends VerticalLayout {
         } catch (AuthenticationException e) {
             return ActionResponse.error(e.getMessage());
         }
+
     }
 
     private ActionResponse register(String login, String password) {
