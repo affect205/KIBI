@@ -39,6 +39,8 @@ public class KibiUI extends UI {
 
     @PostConstruct
     public void onInit() {
+        EventUtils.initEventBusInstance();
+
         final VerticalLayout root = new VerticalLayout();
         root.setSizeFull();
         setContent(root);
@@ -66,7 +68,6 @@ public class KibiUI extends UI {
             User user = AuthUtils.getUser();
             log.info(String.format("[KibiUI::checkAuth]login = %s, password = %s", user == null ? "unknown" : user.getLogin(),
                     user == null ? "unknown" : user.getPassword()));
-            EventUtils.initEventBusInstance();
             navigator.navigateTo(viewProvider.getViewName(VaadinUtils.VIEW_DESKTOP));
         } else {
             navigator.navigateTo(viewProvider.getViewName(VaadinUtils.VIEW_LOGIN));

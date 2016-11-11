@@ -14,4 +14,8 @@ public class EventUtils {
     public static EventBus getEventBusInstance() {
         return VaadinSession.getCurrent().getAttribute(EventBus.class);
     }
+
+    public static void post(Object event) {
+        getEventBusInstance().post(event);
+    }
 }

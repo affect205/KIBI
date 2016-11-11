@@ -12,8 +12,10 @@ import org.alexside.entity.Category;
 import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
 import org.alexside.enums.TreeKind;
+import org.alexside.events.TItemSelectionEvent;
 import org.alexside.service.TItemService;
 import org.alexside.utils.DataProvider;
+import org.alexside.utils.EventUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -59,6 +61,12 @@ public class KibiTree extends Panel {
         tree.setItemIconPropertyId("icon");
         tree.setItemCaptionPropertyId("name");
         tree.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
+        tree.addValueChangeListener(event -> {
+            TItem selected = getSelected();
+            if (selected != null) {
+                EventUtils.post(new TItemSelectionEvent(selected));
+            }
+        });
 
         tree.addActionHandler(new Action.Handler() {
             @Override

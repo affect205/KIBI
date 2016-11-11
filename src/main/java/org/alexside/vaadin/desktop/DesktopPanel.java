@@ -1,5 +1,6 @@
 package org.alexside.vaadin.desktop;
 
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -40,8 +41,11 @@ public class DesktopPanel extends VerticalLayout {
         content = new Label("", ContentMode.HTML);
         content.setWidth("200px");
         User user = AuthUtils.getUser();
-//        content.setValue(String.format("%s: <b>%s</b>",
-//                FontAwesome.USER.getHtml(), user.getLogin()));
+        if (user != null) {
+            content.setValue(String.format("%s: <b>%s</b>",
+                    FontAwesome.USER.getHtml(), user.getLogin()));
+        }
+
 
         HorizontalLayout hLayout1 = new HorizontalLayout(content, logoutButton);
         hLayout1.setSizeFull();
