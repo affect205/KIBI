@@ -9,7 +9,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
-import org.alexside.vaadin.desktop.view.ViewPanel;
+import org.alexside.vaadin.desktop.display.DisplayPanel;
 import org.alexside.vaadin.misc.KibiTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +26,7 @@ public class DesktopPanel extends VerticalLayout {
     private KibiTree kibiTree;
 
     @Autowired
-    private ViewPanel viewPanel;
+    private DisplayPanel viewPanel;
 
     private Label content;
 

@@ -5,6 +5,7 @@ import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.Action;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
@@ -13,7 +14,6 @@ import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
 import org.alexside.enums.TreeKind;
 import org.alexside.events.TItemSelectionEvent;
-import org.alexside.service.TItemService;
 import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.List;
+
+import static org.alexside.utils.ThemeUtils.PANEL_HEADER;
 
 /**
  * Created by abalyshev on 27.10.16.
@@ -32,9 +34,7 @@ public class KibiTree extends Panel {
     @Autowired
     protected DataProvider dataProvider;
 
-    @Autowired
-    private TItemService itemService;
-
+    protected Label addButton;
     protected Tree tree;
     protected Action addCategory = new Action("Добавить категорию", FontAwesome.FOLDER);
     protected Action addNotice = new Action("Добавить запись", FontAwesome.EDIT);
@@ -42,12 +42,34 @@ public class KibiTree extends Panel {
 
     @PostConstruct
     public void onIit() {
-        setCaption("<b>Дерево знаний</b>");
         setSizeFull();
+
+        Label captionLabel = new Label("<b>Дерево знаний</b>", ContentMode.HTML);
+        captionLabel.setSizeFull();
+
+        addButton = new Label(FontAwesome.PLUS_SQUARE.getHtml(), ContentMode.HTML);
+        addButton.setDescription("Добавить категорию");
+
+        HorizontalLayout addWrap = new HorizontalLayout();
+        addWrap.addComponent(addButton);
+        addWrap.addLayoutClickListener(event -> {
+            TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), null);
+            Item added = addContainerItem(
+                    (HierarchicalContainer)tree.getContainerDataSource(), ti);
+            if (added == null) return;
+            tree.expandItem(ti.hashCode());
+            tree.setChildrenAllowed(ti.hashCode(), true);
+            dataProvider.saveTItem(ti);
+        });
+
+        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, addWrap);
+        topToolbar.addStyleName(PANEL_HEADER);
+        topToolbar.setSizeFull();
+        topToolbar.setComponentAlignment(addWrap, Alignment.TOP_RIGHT);
+        topToolbar.setExpandRatio(captionLabel, 1.0f);
 
         List<TItem> data = dataProvider.getTreeData();
         HierarchicalContainer container = new HierarchicalContainer();
-        container.addContainerProperty("id", Integer.class, -1);
         container.addContainerProperty("name", String.class, "");
         container.addContainerProperty("icon", Resource.class, null);
         container.addContainerProperty("kind", TreeKind.class, TreeKind.UNKNOWN);
@@ -57,7 +79,7 @@ public class KibiTree extends Panel {
 
         tree = new Tree("", container);
         tree.setImmediate(true);
-        tree.addStyleName("tree_item");
+        //tree.addStyleName("tree_item");
         tree.setItemIconPropertyId("icon");
         tree.setItemCaptionPropertyId("name");
         tree.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
@@ -92,14 +114,14 @@ public class KibiTree extends Panel {
                 if (selected == null) return;
 
                 if (action == addCategory) {
-                    TItem ti = new Category(-1, "Категория_" + Instant.now().toEpochMilli(), (Category) selected);
+                    TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), (Category) selected);
                     Item added = addContainerItem(
                             (HierarchicalContainer)tree.getContainerDataSource(), ti);
                     if (added == null) return;
                     tree.expandItem(ti.hashCode());
                     tree.setChildrenAllowed(ti.hashCode(), true);
                 } else if (action == addNotice) {
-                    TItem ti = new Notice(-1, "Запись_" + Instant.now().toEpochMilli(), "", (Category) selected);
+                    TItem ti = new Notice("Запись_" + Instant.now().toEpochMilli(), "", (Category) selected);
                     Item added = addContainerItem(
                             (HierarchicalContainer)tree.getContainerDataSource(), ti);
                     if (added == null) return;
@@ -121,9 +143,8 @@ public class KibiTree extends Panel {
         });
 
         VerticalLayout layout = new VerticalLayout();
-        Button loadButton = new Button("Сохранить");
-        loadButton.addClickListener(event -> itemService.saveTItem(getSelected()));
-        layout.addComponents(tree, loadButton);
+        layout.addComponents(topToolbar, tree);
+        layout.setExpandRatio(tree, 1.0f);
 
         setContent(layout);
     }
@@ -147,10 +168,8 @@ public class KibiTree extends Panel {
     private Item addContainerItem(HierarchicalContainer container, TItem ti) {
         Item item = container.addItem(ti.hashCode());
         if (item == null) return null;
-        item.getItemProperty("id").setValue(ti.getId());
 
-        FontAwesome icon = ti.getKind() == TreeKind.CATEGORY ?
-                FontAwesome.FOLDER : FontAwesome.EDIT;
+        FontAwesome icon = ti.isCategory() ? FontAwesome.FOLDER : FontAwesome.EDIT;
 
         item.getItemProperty("name").setValue(ti.getName());
         item.getItemProperty("icon").setValue(icon);

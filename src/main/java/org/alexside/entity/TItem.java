@@ -20,36 +20,31 @@ public abstract class TItem {
     @Id
     protected String _id;
     @Field
-    protected int id;
-    @Field
     protected String name;
     @Field
     protected TreeKind kind;
     @Reference
     protected TItem parent;
-    @Field
-    protected String path;
 
     public TItem() {}
 
-    public TItem(int id, String name, TreeKind kind, TItem parent) {
-        this.id = id;
+    public TItem(String id, String name, TreeKind kind, TItem parent) {
+        this._id = id;
         this.name = name;
         this.kind = kind;
         this.parent = parent;
-        this.path = (parent == null ? "" : parent.getPath() + ".") + kind.getPath() + id;
     }
 
-    public TItem(int id, String name, TreeKind kind) {
+    public TItem(String id, String name, TreeKind kind) {
         this(id, name, kind, null);
     }
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return _id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(String id) {
+        this._id = id;
     }
 
     public String getName() {
@@ -84,14 +79,18 @@ public abstract class TItem {
 
     public List<TItem> getChildren() { return new ArrayList<>(); }
 
-    public String getPath() { return path; }
+    public String getContent() { return ""; }
 
-    public void setPath(String path) { this.path = path; }
+    public void setContent(String content) {}
+
+    public boolean isCategory() { return kind == TreeKind.CATEGORY; }
+
+    public boolean isNotice() { return kind == TreeKind.NOTICE; }
 
     @Override
     public String toString() {
         return "TItem{" +
-                "id=" + id +
+                "id=" + _id +
                 ", name='" + name + '\'' +
                 ", kind=" + kind +
                 '}';

@@ -22,23 +22,19 @@ public class Category extends TItem {
     private List<TItem> children;
 
     public Category() {
-        children = new ArrayList<>();
+        this("", null, -1);
     }
 
-    public Category(int id) {
-        this(id, "", null, -1);
+    public Category(String name) {
+        this(name, null, -1);
     }
 
-    public Category(int id, String name) {
-        this(id, name, null, -1);
+    public Category(String name, Category parent) {
+        this(name, parent, -1);
     }
 
-    public Category(int id, String name, Category parent) {
-        this(id, name, parent, -1);
-    }
-
-    public Category(int id, String name, Category parent, int sorting) {
-        super(id, name, TreeKind.CATEGORY, parent);
+    public Category(String name, Category parent, int sorting) {
+        super(null, name, TreeKind.CATEGORY, parent);
         this.sorting = sorting;
         this.children = new ArrayList<>();
     }
@@ -64,7 +60,7 @@ public class Category extends TItem {
     @Override
     public String toString() {
         return "Category{" +
-                "id=" + id +
+                "id=" + _id +
                 ", name='" + name + '\'' +
                 ", kind=" + kind +
                 ", parent=" + (parent != null ? parent.getId() : "null") +

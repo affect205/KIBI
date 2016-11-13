@@ -52,7 +52,7 @@ public class TItemService {
     private void saveTItemRecursive(TItem tItem) {
         if (tItem == null) return;
         try {
-            mongoTemplate.insert(tItem);
+            mongoTemplate.save(tItem);
             if (tItem.hasChildren()) {
                 tItem.getChildren().forEach(child -> saveTItemRecursive(child));
             }
@@ -75,41 +75,4 @@ public class TItemService {
             log.warning(e.getMessage());
         }
     }
-
-    public TItem find(final String id) {
-        final TItem tItem = mongoTemplate.findOne(
-                Query.query(new Criteria("id").is(id)), TItem.class
-        );
-        if (tItem == null) return tItem;
-        return build(
-                tItem,
-                mongoTemplate.find(
-                        Query.query(new Criteria("path").regex("^" + tItem.getPath() + "[.]")),
-                        TItem.class
-                )
-        );
-    }
-
-    private TItem build(final TItem root, final Collection<TItem> documents) {
-        final Map<String, TItem> map = new HashMap<>();
-        for (final TItem document : documents) {
-            map.put(document.getPath(), document);
-        }
-        for (final TItem document : documents) {
-            map.put(document.getPath(), document);
-            final String path = document
-                    .getPath()
-                    .substring(0, document.getPath().lastIndexOf(TItem.PATH_SEPARATOR));
-            if (path.equals(root.getPath())) {
-                root.getChildren().add(document);
-            } else {
-                final TItem parent = map.get(path);
-                if (parent != null) {
-                    parent.getChildren().add(document);
-                }
-            }
-        }
-        return root;
-    }
-
 }

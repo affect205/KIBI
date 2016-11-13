@@ -19,20 +19,22 @@ public class Notice extends TItem {
 
     public Notice() {}
 
-    public Notice(int id, String name, String content, Category parent) {
-        super(id, name, TreeKind.NOTICE, parent);
-        this.content = content;
-    }
-
-    public Notice(int id, String name, String content, Category parent, int sorting) {
-        this(id, name, content, parent);
+    public Notice(String name, String content, Category parent, int sorting) {
+        this(name, content, parent);
         this.sorting = sorting;
     }
 
+    public Notice(String name, String content, Category parent) {
+        super(null, name, TreeKind.NOTICE, parent);
+        this.content = content;
+    }
+
+    @Override
     public String getContent() {
         return content;
     }
 
+    @Override
     public void setContent(String content) {
         this.content = content;
     }
@@ -48,7 +50,7 @@ public class Notice extends TItem {
     @Override
     public String toString() {
         return "Notice{" +
-                "id=" + id +
+                "id=" + _id +
                 ", name='" + name + '\'' +
                 ", kind=" + kind +
                 ", content='" + StringUtils.substring(content, 20) + "...'" +

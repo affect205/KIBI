@@ -1,4 +1,4 @@
-package org.alexside.vaadin.desktop.view;
+package org.alexside.vaadin.desktop.display;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -6,12 +6,13 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
-import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
-import org.alexside.enums.TreeKind;
+import org.alexside.events.TItemRefreshEvent;
 import org.alexside.events.TItemSelectionEvent;
+import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.HtmlUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -23,7 +24,10 @@ import static org.alexside.utils.HtmlUtils.URL_TEST;
  */
 @SpringComponent
 @ViewScope
-public class ViewPanel extends Panel {
+public class DisplayPanel extends Panel {
+
+    @Autowired
+    protected DataProvider dataProvider;
 
     private VerticalLayout layout;
     private EventBus eventBus;
@@ -32,6 +36,8 @@ public class ViewPanel extends Panel {
     private TextField nameField;
     private TextArea editTA;
     private RichTextArea viewRTA;
+
+    private TItem editTi;
 
     @PostConstruct
     public void onInit() {
@@ -76,6 +82,14 @@ public class ViewPanel extends Panel {
         });
 
         Button saveButton = new Button("Сохранить");
+        saveButton.addClickListener(event -> {
+            if (editTi != null) {
+                editTi.setName(nameField.getValue());
+                if (editTi.isNotice()) editTi.setContent(editTA.getValue());
+                dataProvider.saveTItem(editTi);
+                EventUtils.post(new TItemRefreshEvent(editTi));
+            }
+        });
 
         HorizontalLayout bottomToolbar = new HorizontalLayout(urlField, urlButton, saveButton);
         bottomToolbar.setSizeFull();
@@ -102,21 +116,25 @@ public class ViewPanel extends Panel {
     public void onTItemSelection(TItemSelectionEvent event) {
         if (event.getItem() == null) return;
         resetPanel();
-        TItem ti = event.getItem();
-        nameField.setValue(ti.getName());
-        if (ti.getKind() == TreeKind.CATEGORY) {
+        editTi = event.getItem();
+        nameField.setValue(editTi.getName());
+        if (editTi.isCategory()) {
             tabsheet.setEnabled(false);
-        } else if (ti.getKind() == TreeKind.NOTICE) {
-            Notice notice = (Notice)ti;
-            viewRTA.setValue(notice.getContent());
-            editTA.setValue(notice.getContent());
+            viewRTA.setEnabled(false);
+            editTA.setEnabled(false);
+        } else if (editTi.isNotice()) {
+            viewRTA.setValue(editTi.getContent());
+            editTA.setValue(editTi.getContent());
         }
     }
 
     public void resetPanel() {
+        editTi = null;
         nameField.clear();
-        editTA.clear();
         viewRTA.clear();
+        editTA.clear();
         tabsheet.setEnabled(true);
+        viewRTA.setEnabled(true);
+        editTA.setEnabled(true);
     }
 }

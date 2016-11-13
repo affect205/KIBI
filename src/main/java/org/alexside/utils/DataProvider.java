@@ -30,4 +30,8 @@ public class DataProvider {
         List<TItem> data = itemService.findAll();
         return data;
     }
+
+    public void saveTItem(TItem ti) {
+        itemService.saveTItem(ti);
+    }
 }
