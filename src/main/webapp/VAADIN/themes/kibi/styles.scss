@@ -1,3 +1,6 @@
+$v-app-loading-text: "Loading...";
+$v-font-family: "Palatino Linotype", "Book Antiqua", serif;
+
 @import "../valo/valo";
 
 .kibi {
@@ -26,4 +29,8 @@
 
 .no-toolbar .gwt-RichTextToolbar-bottom {
     display: none;
+}
+
+.header_button .v-icon:hover {
+    color: #1b87e3;
 }

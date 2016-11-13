@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.List;
 
+import static org.alexside.utils.ThemeUtils.HEADER_BUTTON;
 import static org.alexside.utils.ThemeUtils.PANEL_HEADER;
 
 /**
@@ -52,6 +53,7 @@ public class KibiTree extends Panel {
 
         HorizontalLayout addWrap = new HorizontalLayout();
         addWrap.addComponent(addButton);
+        addWrap.addStyleName(HEADER_BUTTON);
         addWrap.addLayoutClickListener(event -> {
             TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), null);
             Item added = addContainerItem(
@@ -79,7 +81,6 @@ public class KibiTree extends Panel {
 
         tree = new Tree("", container);
         tree.setImmediate(true);
-        //tree.addStyleName("tree_item");
         tree.setItemIconPropertyId("icon");
         tree.setItemCaptionPropertyId("name");
         tree.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);

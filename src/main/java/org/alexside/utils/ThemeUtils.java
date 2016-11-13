@@ -5,4 +5,5 @@ package org.alexside.utils;
  */
 public class ThemeUtils {
     public static final String PANEL_HEADER = "v-panel-caption";
+    public static final String HEADER_BUTTON = "header_button";
 }
