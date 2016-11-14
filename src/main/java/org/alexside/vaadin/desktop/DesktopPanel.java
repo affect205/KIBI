@@ -10,6 +10,8 @@ import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
 import org.alexside.vaadin.desktop.display.DisplayPanel;
+import org.alexside.vaadin.desktop.qa.CategoryQAPanel;
+import org.alexside.vaadin.desktop.qa.NoticeQAPanel;
 import org.alexside.vaadin.misc.KibiTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,11 +30,19 @@ public class DesktopPanel extends VerticalLayout {
     @Autowired
     private DisplayPanel viewPanel;
 
+    @Autowired
+    private CategoryQAPanel categoryQAPanel;
+
+    @Autowired
+    private NoticeQAPanel noticeQAPanel;
+
     private Label content;
 
     @PostConstruct
     public void onInit() {
         setSizeFull();
+        setMargin(true);
+
         Button logoutButton = new Button("Выйти");
         logoutButton.addStyleName(BaseTheme.BUTTON_LINK);
         logoutButton.addClickListener(clickEvent -> logout());
@@ -46,26 +56,34 @@ public class DesktopPanel extends VerticalLayout {
                     FontAwesome.USER.getHtml(), user.getLogin()));
         }
 
+        HorizontalLayout footerLayout = new HorizontalLayout(content, logoutButton);
+        footerLayout.setSizeFull();
+        footerLayout.setSpacing(true);
+        footerLayout.setComponentAlignment(content, Alignment.MIDDLE_RIGHT);
+        footerLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_RIGHT);
+        footerLayout.setExpandRatio(content, 1);
 
-        HorizontalLayout hLayout1 = new HorizontalLayout(content, logoutButton);
-        hLayout1.setSizeFull();
-        hLayout1.setSpacing(true);
-        hLayout1.setComponentAlignment(content, Alignment.MIDDLE_RIGHT);
-        hLayout1.setComponentAlignment(logoutButton, Alignment.MIDDLE_RIGHT);
-        hLayout1.setExpandRatio(content, 1);
+        HorizontalLayout qaLayout = new HorizontalLayout(categoryQAPanel, noticeQAPanel);
+        qaLayout.setSizeFull();
+        qaLayout.setSpacing(true);
+        qaLayout.setMargin(new MarginInfo(true, false, false, false));
 
-        HorizontalLayout hLayout2 = new HorizontalLayout(kibiTree, viewPanel);
-        hLayout2.setSizeFull();
-        hLayout2.setMargin(new MarginInfo(true, false));
-        hLayout2.setSpacing(true);
-        hLayout2.setExpandRatio(kibiTree, 1);
-        hLayout2.setExpandRatio(viewPanel, 4);
+        VerticalLayout viewLayout = new VerticalLayout(viewPanel, qaLayout);
+        viewLayout.setSizeFull();
+        viewLayout.setExpandRatio(viewPanel, 7);
+        viewLayout.setExpandRatio(qaLayout, 2);
 
-        addComponent(hLayout2);
-        addComponent(hLayout1);
+        HorizontalLayout contentLayout = new HorizontalLayout(kibiTree, viewLayout);
+        contentLayout.setSizeFull();
+        contentLayout.setSpacing(true);
+        contentLayout.setExpandRatio(kibiTree, 1);
+        contentLayout.setExpandRatio(viewLayout, 4);
 
-        setExpandRatio(hLayout1, 1);
-        setExpandRatio(hLayout2, 10);
+        addComponent(contentLayout);
+        addComponent(footerLayout);
+
+        setExpandRatio(contentLayout, 12);
+        setExpandRatio(footerLayout, 1);
     }
 
     private void logout() {

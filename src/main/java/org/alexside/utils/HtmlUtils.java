@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
  * Created by Alex on 04.11.2016.
  */
 public class HtmlUtils {
-    public static final String URL_TEST = "https://www.championat.com";
+    public static final String URL_TEST = "https://mail.ru";
 
     public static String loadHtml(String url) {
         Charset charset = Charset.forName("UTF8");
