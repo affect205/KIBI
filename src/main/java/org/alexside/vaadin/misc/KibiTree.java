@@ -1,5 +1,7 @@
 package org.alexside.vaadin.misc;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.Action;
@@ -13,12 +15,14 @@ import org.alexside.entity.Category;
 import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
 import org.alexside.enums.TreeKind;
+import org.alexside.events.TItemRefreshEvent;
 import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.List;
 
@@ -35,14 +39,20 @@ public class KibiTree extends Panel {
     @Autowired
     protected DataProvider dataProvider;
 
+    protected EventBus eventBus;
+
     protected Label addButton;
     protected Tree tree;
+
     protected Action addCategory = new Action("Добавить категорию", FontAwesome.FOLDER);
     protected Action addNotice = new Action("Добавить запись", FontAwesome.EDIT);
     protected Action delete = new Action("Удалить", FontAwesome.CLOSE);
 
     @PostConstruct
     public void onIit() {
+        eventBus = EventUtils.getEventBusInstance();
+        eventBus.register(this);
+
         setSizeFull();
 
         Label captionLabel = new Label("<b>Дерево знаний</b>", ContentMode.HTML);
@@ -56,12 +66,12 @@ public class KibiTree extends Panel {
         addWrap.addStyleName(HEADER_BUTTON);
         addWrap.addLayoutClickListener(event -> {
             TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), null);
+            dataProvider.saveTItem(ti);
             Item added = addContainerItem(
                     (HierarchicalContainer)tree.getContainerDataSource(), ti);
             if (added == null) return;
-            tree.expandItem(ti.hashCode());
-            tree.setChildrenAllowed(ti.hashCode(), true);
-            dataProvider.saveTItem(ti);
+            tree.expandItem(ti.getId());
+            tree.setChildrenAllowed(ti.getId(), true);
         });
 
         HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, addWrap);
@@ -72,6 +82,7 @@ public class KibiTree extends Panel {
 
         List<TItem> data = dataProvider.getTreeData();
         HierarchicalContainer container = new HierarchicalContainer();
+        container.addContainerProperty("id", String.class, "");
         container.addContainerProperty("name", String.class, "");
         container.addContainerProperty("icon", Resource.class, null);
         container.addContainerProperty("kind", TreeKind.class, TreeKind.UNKNOWN);
@@ -116,18 +127,22 @@ public class KibiTree extends Panel {
 
                 if (action == addCategory) {
                     TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), (Category) selected);
+                    // at first persist item to storage to get unique id
+                    dataProvider.saveTItem(ti);
                     Item added = addContainerItem(
                             (HierarchicalContainer)tree.getContainerDataSource(), ti);
                     if (added == null) return;
-                    tree.expandItem(ti.hashCode());
-                    tree.setChildrenAllowed(ti.hashCode(), true);
+                    tree.expandItem(ti.getId());
+                    tree.setChildrenAllowed(ti.getId(), true);
                 } else if (action == addNotice) {
                     TItem ti = new Notice("Запись_" + Instant.now().toEpochMilli(), "", (Category) selected);
+                    dataProvider.saveTItem(ti);
                     Item added = addContainerItem(
                             (HierarchicalContainer)tree.getContainerDataSource(), ti);
                     if (added == null) return;
-                    tree.setChildrenAllowed(ti.hashCode(), false);
+                    tree.setChildrenAllowed(ti.getId(), false);
                 } else if (action == delete) {
+                    dataProvider.removeTItem(selected);
                     removeItem((HierarchicalContainer)tree.getContainerDataSource(), target);
                 }
                 sortContainer((HierarchicalContainer) tree.getContainerDataSource());
@@ -150,12 +165,26 @@ public class KibiTree extends Panel {
         setContent(layout);
     }
 
+    @PreDestroy
+    public void onDestroy() {
+        eventBus.unregister(this);
+    }
+
     public TItem getSelected() {
         Item selected = tree.getItem(tree.getValue());
         if (selected == null) return null;
         return (TItem) selected.getItemProperty("object").getValue();
     }
 
+    @Subscribe
+    public void onTItemRefreshEvent(TItemRefreshEvent event) {
+        if (event.getItem() == null) return;
+        Item item = tree.getContainerDataSource().getItem(event.getItem().getId());
+        if (item != null) {
+            item.getItemProperty("object").setValue(event.getItem());
+            item.getItemProperty("name").setValue(event.getItem().getName());
+        }
+    }
 
     private void initContainer(HierarchicalContainer container, TItem ti) {
         Item item = addContainerItem(container, ti);
@@ -167,17 +196,19 @@ public class KibiTree extends Panel {
     }
 
     private Item addContainerItem(HierarchicalContainer container, TItem ti) {
-        Item item = container.addItem(ti.hashCode());
+        if (ti == null) return null;
+        Item item = container.addItem(ti.getId());
         if (item == null) return null;
 
         FontAwesome icon = ti.isCategory() ? FontAwesome.FOLDER : FontAwesome.EDIT;
 
+        item.getItemProperty("id").setValue(ti.getId());
         item.getItemProperty("name").setValue(ti.getName());
         item.getItemProperty("icon").setValue(icon);
         item.getItemProperty("kind").setValue(ti.getKind());
         item.getItemProperty("object").setValue(ti);
 
-        if (ti.hasParent()) container.setParent(ti.hashCode(), ti.getParent().hashCode());
+        if (ti.hasParent()) container.setParent(ti.getId(), ti.getParent().getId());
         return item;
     }
 

@@ -1,15 +1,13 @@
 package org.alexside.service;
 
 import org.alexside.entity.TItem;
-import org.alexside.enums.TreeKind;
 import org.mongodb.morphia.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -26,17 +24,12 @@ public class TItemService {
     @Autowired
     private Datastore datastore;
 
-    public void saveTItem(TItem tItem) {
-        if (tItem == null) return;
-        saveTItemRecursive(tItem);
-    }
-
     public List<TItem> findAll() {
         List<TItem> tItemList = new LinkedList<>();
         try {
             tItemList = mongoTemplate.findAll(TItem.class);
             for (TItem ti : tItemList) {
-                if (ti.getKind() == TreeKind.CATEGORY) {
+                if (ti.isCategory()) {
                     tItemList.forEach(ti2 -> {
                         if (ti.equals(ti2.getParent()))
                             ti.getChildren().add(ti2);
@@ -49,6 +42,11 @@ public class TItemService {
         return tItemList;
     }
 
+    public void saveTItem(TItem tItem) {
+        if (tItem == null) return;
+        saveTItemRecursive(tItem);
+    }
+
     private void saveTItemRecursive(TItem tItem) {
         if (tItem == null) return;
         try {
@@ -59,6 +57,11 @@ public class TItemService {
         } catch (Exception e) {
             log.warning(e.getMessage());
         }
+    }
+
+    public void removeTItem(TItem tItem) {
+        if (tItem == null) return;
+        mongoTemplate.remove(tItem);
     }
 
     private void saveTItemMorphia(TItem tItem) {

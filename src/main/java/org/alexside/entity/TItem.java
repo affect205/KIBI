@@ -16,7 +16,6 @@ import java.util.List;
  */
 @Document(collection = "titems")
 public abstract class TItem {
-    public static final String PATH_SEPARATOR = ".";
     @Id
     protected String _id;
     @Field
@@ -29,6 +28,7 @@ public abstract class TItem {
     public TItem() {}
 
     public TItem(String id, String name, TreeKind kind, TItem parent) {
+        this();
         this._id = id;
         this.name = name;
         this.kind = kind;
@@ -106,7 +106,7 @@ public abstract class TItem {
 
     @Override
     public int hashCode() {
-        int result = getName().hashCode();
+        int result = name.hashCode();
         result = 31 * result + getKind().hashCode();
         if (parent != null) result = 31 * result + getParent().hashCode();
         return result;
