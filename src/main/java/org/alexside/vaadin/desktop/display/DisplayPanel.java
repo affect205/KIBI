@@ -3,6 +3,7 @@ package org.alexside.vaadin.desktop.display;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import static org.alexside.utils.HtmlUtils.URL_TEST;
+import static org.alexside.utils.ThemeUtils.PANEL_HEADER;
 
 /**
  * Created by Alex on 04.11.2016.
@@ -44,15 +46,23 @@ public class DisplayPanel extends Panel {
         eventBus = EventUtils.getEventBusInstance();
         eventBus.register(this);
 
-        setCaption("<b>Просмотр</b>");
         setSizeFull();
 
         layout = new VerticalLayout();
-        layout.setMargin(true);
         layout.setSizeFull();
 
+        Label captionLabel = new Label("<b>Просмотр</b>", ContentMode.HTML);
+        captionLabel.setCaptionAsHtml(true);
+
         nameField = new TextField();
-        nameField.setWidth("100%");
+        nameField.setWidth("360px");
+        nameField.setHeight("60%");
+
+        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, nameField);
+        topToolbar.addStyleName(PANEL_HEADER);
+        topToolbar.setSizeFull();
+        topToolbar.setComponentAlignment(nameField, Alignment.TOP_RIGHT);
+        topToolbar.setExpandRatio(captionLabel, 1.0f);
 
         tabsheet = new TabSheet();
         tabsheet.setSizeFull();
@@ -70,8 +80,8 @@ public class DisplayPanel extends Panel {
         VerticalLayout viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();
 
-        TabSheet.Tab viewTab = tabsheet.addTab(viewLayout, "Просмотр", null);
-        TabSheet.Tab editTab = tabsheet.addTab(editLayout, "Редактирование", null);
+        TabSheet.Tab viewTab = tabsheet.addTab(viewLayout, "", FontAwesome.EYE);
+        TabSheet.Tab editTab = tabsheet.addTab(editLayout, "", FontAwesome.CODE);
 
         TextField urlField = new TextField();
         urlField.setWidth("320px");
@@ -99,10 +109,15 @@ public class DisplayPanel extends Panel {
         bottomToolbar.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
         bottomToolbar.setExpandRatio(saveButton, 1);
 
-        layout.addComponents(nameField, tabsheet, bottomToolbar);
-        layout.setExpandRatio(nameField, 1);
-        layout.setExpandRatio(tabsheet, 7);
-        layout.setExpandRatio(bottomToolbar, 1);
+        VerticalLayout contentWrap = new VerticalLayout(tabsheet, bottomToolbar);
+        contentWrap.setSizeFull();
+        contentWrap.setMargin(true);
+        contentWrap.setExpandRatio(tabsheet, 10);
+        contentWrap.setExpandRatio(bottomToolbar, 1);
+
+        layout.addComponents(topToolbar, contentWrap);
+        layout.setExpandRatio(topToolbar, 1);
+        layout.setExpandRatio(contentWrap, 10);
 
         setContent(layout);
     }

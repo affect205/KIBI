@@ -58,13 +58,8 @@ public class KibiTree extends Panel {
         Label captionLabel = new Label("<b>Дерево знаний</b>", ContentMode.HTML);
         captionLabel.setSizeFull();
 
-        addButton = new Label(FontAwesome.PLUS_SQUARE.getHtml(), ContentMode.HTML);
-        addButton.setDescription("Добавить категорию");
-
-        HorizontalLayout addWrap = new HorizontalLayout();
-        addWrap.addComponent(addButton);
-        addWrap.addStyleName(HEADER_BUTTON);
-        addWrap.addLayoutClickListener(event -> {
+        HeaderButton addHBtn = HeaderButton.createAddButton();
+        addHBtn.addClickListener(event -> {
             TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), null);
             dataProvider.saveTItem(ti);
             Item added = addContainerItem(
@@ -74,10 +69,10 @@ public class KibiTree extends Panel {
             tree.setChildrenAllowed(ti.getId(), true);
         });
 
-        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, addWrap);
+        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, addHBtn);
         topToolbar.addStyleName(PANEL_HEADER);
         topToolbar.setSizeFull();
-        topToolbar.setComponentAlignment(addWrap, Alignment.TOP_RIGHT);
+        topToolbar.setComponentAlignment(addHBtn, Alignment.TOP_RIGHT);
         topToolbar.setExpandRatio(captionLabel, 1.0f);
 
         List<TItem> data = dataProvider.getTreeData();
