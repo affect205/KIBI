@@ -13,6 +13,7 @@ import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.HtmlUtils;
+import org.alexside.vaadin.misc.HeaderButton;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -33,13 +34,16 @@ public class DisplayPanel extends Panel {
 
     private VerticalLayout layout;
     private EventBus eventBus;
-    private TabSheet tabsheet;
 
     private TextField nameField;
     private TextArea editTA;
     private RichTextArea viewRTA;
 
     private TItem editTi;
+
+    private VerticalLayout editLayout;
+    private VerticalLayout viewLayout;
+    private VerticalLayout contentWrap;
 
     @PostConstruct
     public void onInit() {
@@ -58,30 +62,46 @@ public class DisplayPanel extends Panel {
         nameField.setWidth("360px");
         nameField.setHeight("60%");
 
-        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, nameField);
+        HeaderButton viewBtn = HeaderButton.createEyeButton();
+        viewBtn.addClickListener(event -> {
+            contentWrap.removeComponent(editLayout);
+            contentWrap.setExpandRatio(viewLayout, 10);
+        });
+        HeaderButton editBtn = HeaderButton.createCodeButton();
+        editBtn.addClickListener(event -> {
+            contentWrap.replaceComponent(viewLayout, editLayout);
+            contentWrap.setExpandRatio(editLayout, 10);
+        });
+
+        HorizontalLayout controlWrap = new HorizontalLayout(viewBtn, editBtn);
+        controlWrap.setSpacing(true);
+
+        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, nameField, controlWrap);
         topToolbar.addStyleName(PANEL_HEADER);
         topToolbar.setSizeFull();
-        topToolbar.setComponentAlignment(nameField, Alignment.TOP_RIGHT);
-        topToolbar.setExpandRatio(captionLabel, 1.0f);
-
-        tabsheet = new TabSheet();
-        tabsheet.setSizeFull();
+        topToolbar.setComponentAlignment(nameField, Alignment.TOP_LEFT);
+        topToolbar.setComponentAlignment(controlWrap, Alignment.TOP_RIGHT);
+        topToolbar.setExpandRatio(captionLabel, 1);
+        topToolbar.setExpandRatio(nameField, 10);
+        topToolbar.setExpandRatio(controlWrap, 1);
 
         editTA = new TextArea();
         editTA.setSizeFull();
         editTA.setWordwrap(true);
-        VerticalLayout editLayout = new VerticalLayout(editTA);
+        editLayout = new VerticalLayout(editTA);
         editLayout.setSizeFull();
+        editLayout.setVisible(false);
 
         viewRTA = new RichTextArea();
         viewRTA.setSizeFull();
         //viewRTA.addStyleName("no-toolbar");
         viewRTA.setValue(HtmlUtils.loadHtml(URL_TEST));
-        VerticalLayout viewLayout = new VerticalLayout(viewRTA);
+        viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();
+        viewLayout.setVisible(true);
 
-        TabSheet.Tab viewTab = tabsheet.addTab(viewLayout, "", FontAwesome.EYE);
-        TabSheet.Tab editTab = tabsheet.addTab(editLayout, "", FontAwesome.CODE);
+        //TabSheet.Tab viewTab = tabsheet.addTab(viewLayout, "", FontAwesome.EYE);
+        //TabSheet.Tab editTab = tabsheet.addTab(editLayout, "", FontAwesome.CODE);
 
         TextField urlField = new TextField();
         urlField.setWidth("320px");
@@ -109,10 +129,10 @@ public class DisplayPanel extends Panel {
         bottomToolbar.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
         bottomToolbar.setExpandRatio(saveButton, 1);
 
-        VerticalLayout contentWrap = new VerticalLayout(tabsheet, bottomToolbar);
+        contentWrap = new VerticalLayout(viewLayout, bottomToolbar);
         contentWrap.setSizeFull();
         contentWrap.setMargin(true);
-        contentWrap.setExpandRatio(tabsheet, 10);
+        contentWrap.setExpandRatio(viewLayout, 10);
         contentWrap.setExpandRatio(bottomToolbar, 1);
 
         layout.addComponents(topToolbar, contentWrap);
@@ -134,7 +154,8 @@ public class DisplayPanel extends Panel {
         editTi = event.getItem();
         nameField.setValue(editTi.getName());
         if (editTi.isCategory()) {
-            tabsheet.setEnabled(false);
+            contentWrap.setEnabled(false);
+            //tabsheet.setEnabled(false);
             viewRTA.setEnabled(false);
             editTA.setEnabled(false);
         } else if (editTi.isNotice()) {
@@ -148,7 +169,8 @@ public class DisplayPanel extends Panel {
         nameField.clear();
         viewRTA.clear();
         editTA.clear();
-        tabsheet.setEnabled(true);
+        contentWrap.setEnabled(true);
+        //tabsheet.setEnabled(true);
         viewRTA.setEnabled(true);
         editTA.setEnabled(true);
     }
