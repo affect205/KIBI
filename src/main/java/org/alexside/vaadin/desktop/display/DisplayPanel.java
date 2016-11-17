@@ -64,12 +64,14 @@ public class DisplayPanel extends Panel {
 
         HeaderButton viewBtn = HeaderButton.createEyeButton();
         viewBtn.addClickListener(event -> {
-            contentWrap.removeComponent(editLayout);
+            contentWrap.replaceComponent(editLayout, viewLayout);
+            contentWrap.addComponentAsFirst(viewLayout);
             contentWrap.setExpandRatio(viewLayout, 10);
         });
         HeaderButton editBtn = HeaderButton.createCodeButton();
         editBtn.addClickListener(event -> {
             contentWrap.replaceComponent(viewLayout, editLayout);
+            contentWrap.addComponentAsFirst(editLayout);
             contentWrap.setExpandRatio(editLayout, 10);
         });
 
@@ -77,28 +79,30 @@ public class DisplayPanel extends Panel {
         controlWrap.setSpacing(true);
 
         HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, nameField, controlWrap);
-        topToolbar.addStyleName(PANEL_HEADER);
         topToolbar.setSizeFull();
+        topToolbar.addStyleName(PANEL_HEADER);
         topToolbar.setComponentAlignment(nameField, Alignment.TOP_LEFT);
         topToolbar.setComponentAlignment(controlWrap, Alignment.TOP_RIGHT);
         topToolbar.setExpandRatio(captionLabel, 1);
         topToolbar.setExpandRatio(nameField, 10);
         topToolbar.setExpandRatio(controlWrap, 1);
 
+        String html = HtmlUtils.loadHtml(URL_TEST);
+
         editTA = new TextArea();
         editTA.setSizeFull();
         editTA.setWordwrap(true);
+        editTA.setValue(html);
+
         editLayout = new VerticalLayout(editTA);
         editLayout.setSizeFull();
-        editLayout.setVisible(false);
 
         viewRTA = new RichTextArea();
         viewRTA.setSizeFull();
+        viewRTA.setValue(html);
         //viewRTA.addStyleName("no-toolbar");
-        viewRTA.setValue(HtmlUtils.loadHtml(URL_TEST));
         viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();
-        viewLayout.setVisible(true);
 
         //TabSheet.Tab viewTab = tabsheet.addTab(viewLayout, "", FontAwesome.EYE);
         //TabSheet.Tab editTab = tabsheet.addTab(editLayout, "", FontAwesome.CODE);
@@ -134,6 +138,16 @@ public class DisplayPanel extends Panel {
         contentWrap.setMargin(true);
         contentWrap.setExpandRatio(viewLayout, 10);
         contentWrap.setExpandRatio(bottomToolbar, 1);
+        contentWrap.addComponentDetachListener(event -> {
+            Component c = event.getDetachedComponent();
+            if (c != null) {
+                if (c == viewLayout) {
+                    editTA.setValue(viewRTA.getValue());
+                } else if (c == editLayout) {
+                    viewRTA.setValue(editTA.getValue());
+                }
+            }
+        });
 
         layout.addComponents(topToolbar, contentWrap);
         layout.setExpandRatio(topToolbar, 1);
@@ -154,8 +168,6 @@ public class DisplayPanel extends Panel {
         editTi = event.getItem();
         nameField.setValue(editTi.getName());
         if (editTi.isCategory()) {
-            contentWrap.setEnabled(false);
-            //tabsheet.setEnabled(false);
             viewRTA.setEnabled(false);
             editTA.setEnabled(false);
         } else if (editTi.isNotice()) {
@@ -169,8 +181,6 @@ public class DisplayPanel extends Panel {
         nameField.clear();
         viewRTA.clear();
         editTA.clear();
-        contentWrap.setEnabled(true);
-        //tabsheet.setEnabled(true);
         viewRTA.setEnabled(true);
         editTA.setEnabled(true);
     }
