@@ -1,14 +1,21 @@
 package org.alexside.vaadin.desktop.qa;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Panel;
-import org.alexside.entity.Category;
-import org.alexside.entity.Notice;
+import org.alexside.entity.TItem;
+import org.alexside.events.TItemQASelectionEvent;
+import org.alexside.events.TItemSelectionEvent;
+import org.alexside.utils.EventUtils;
 import org.alexside.vaadin.misc.TagItem;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Created by Alex on 14.11.2016.
@@ -17,23 +24,66 @@ import javax.annotation.PostConstruct;
 @ViewScope
 public class NoticeQAPanel extends Panel {
 
+    private static final int LIMIT = 10;
+
+    private Deque<NoticeQA> noticeDeque;
+    private EventBus eventBus;
+
+    private CssLayout wrap;
+
+    public NoticeQAPanel() {
+        noticeDeque = new ArrayDeque<>(LIMIT);
+    }
+
     @PostConstruct
     public void onInit() {
-        setCaption("Записи");
+        setCaption("<b>Записи</b>");
         setSizeFull();
 
-        Category category = new Category("Тест. кат.", null);
+        eventBus = EventUtils.getEventBusInstance();
+        eventBus.register(this);
 
-        CssLayout wrap = new CssLayout();
+        wrap = new CssLayout();
         wrap.addStyleName("outlined");
-        wrap.addComponents(
-                new TagItem(new Notice("Программирование", "...", category)),
-                new TagItem(new Notice("С++", "...", category)),
-                new TagItem(new Notice("Java", "...", category)),
-                new TagItem(new Notice("Vaadin", "...", category)),
-                new TagItem(new Notice("NoSQL", "...", category)),
-                new TagItem(new Notice("Dishonored2ХОЧУ", "...", category))
-        );
+
         setContent(wrap);
+    }
+
+    @PreDestroy
+    public void onDestroy() {
+        eventBus.unregister(this);
+    }
+
+    @Subscribe
+    public void onTItemSelection(TItemSelectionEvent event) {
+        if (event.getItem() == null) return;
+        TItem ti = event.getItem();
+        if (ti.isNotice()) addQANotice(ti);
+    }
+
+    private void addQANotice(TItem ti) {
+        // TODO: исключить повторы
+        if (noticeDeque.size() >= LIMIT) removeQANotice();
+        TagItem tagItem = new TagItem(ti);
+        tagItem.addCallback(tItem ->
+                EventUtils.post(new TItemQASelectionEvent(tItem)));
+        NoticeQA noticeQA = new NoticeQA(ti, tagItem);
+        noticeDeque.push(noticeQA);
+        wrap.addComponent(noticeQA.tagItem);
+    }
+
+    public void removeQANotice() {
+        NoticeQA noticeQA = noticeDeque.removeLast();
+        wrap.removeComponent(noticeQA.tagItem);
+    }
+
+    private class NoticeQA {
+        public TItem item;
+        public TagItem tagItem;
+
+        public NoticeQA(TItem item, TagItem tagItem) {
+            this.item = item;
+            this.tagItem = tagItem;
+        }
     }
 }

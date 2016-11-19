@@ -5,6 +5,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Panel;
 import org.alexside.entity.Category;
+import org.alexside.entity.Notice;
 import org.alexside.vaadin.misc.TagItem;
 
 import javax.annotation.PostConstruct;
@@ -17,12 +18,16 @@ import javax.annotation.PostConstruct;
 public class CategoryQAPanel extends Panel {
     @PostConstruct
     public void onInit() {
-        setCaption("Категории");
+        setCaption("<b>Категории</b>");
         setSizeFull();
+
+        Category daddy = new Category("Программирование", null);
+        daddy.addChild(new Notice("Algorithm", "...", daddy));
+
         CssLayout wrap = new CssLayout();
         wrap.addStyleName("outlined");
         wrap.addComponents(
-                new TagItem(new Category("Программирование", null)),
+                new TagItem(daddy),
                 new TagItem(new Category("С++", null)),
                 new TagItem(new Category("Java", null)),
                 new TagItem(new Category("Vaadin", null)),

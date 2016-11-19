@@ -8,6 +8,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import org.alexside.entity.TItem;
+import org.alexside.events.TItemQASelectionEvent;
 import org.alexside.events.TItemRefreshEvent;
 import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.DataProvider;
@@ -104,9 +105,6 @@ public class DisplayPanel extends Panel {
         viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();
 
-        //TabSheet.Tab viewTab = tabsheet.addTab(viewLayout, "", FontAwesome.EYE);
-        //TabSheet.Tab editTab = tabsheet.addTab(editLayout, "", FontAwesome.CODE);
-
         TextField urlField = new TextField();
         urlField.setWidth("320px");
         Button urlButton = new Button(FontAwesome.UPLOAD);
@@ -164,8 +162,17 @@ public class DisplayPanel extends Panel {
     @Subscribe
     public void onTItemSelection(TItemSelectionEvent event) {
         if (event.getItem() == null) return;
-        resetPanel();
-        editTi = event.getItem();
+        selectTItem(event.getItem());
+    }
+
+    @Subscribe
+    public void onTItemQASelectionEvent(TItemQASelectionEvent event) {
+        if (event.getItem() == null) return;
+        selectTItem(event.getItem());
+    }
+
+    private void selectTItem(TItem ti) {
+        editTi = ti;
         nameField.setValue(editTi.getName());
         if (editTi.isCategory()) {
             viewRTA.setEnabled(false);

@@ -15,7 +15,6 @@ import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.VaadinUtils;
-import org.alexside.vaadin.misc.HeaderPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -45,7 +44,7 @@ public class KibiUI extends UI {
         root.setSizeFull();
         setContent(root);
 
-        final Panel viewContainer = new HeaderPanel();
+        final Panel viewContainer = new RootPanel();
         root.addComponent(viewContainer);
         root.setExpandRatio(viewContainer, 1.0f);
 

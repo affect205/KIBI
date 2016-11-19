@@ -12,6 +12,7 @@ import org.alexside.utils.AuthUtils;
 import org.alexside.vaadin.desktop.display.DisplayPanel;
 import org.alexside.vaadin.desktop.qa.CategoryQAPanel;
 import org.alexside.vaadin.desktop.qa.NoticeQAPanel;
+import org.alexside.vaadin.desktop.qa.TagQAPanel;
 import org.alexside.vaadin.misc.KibiTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +32,7 @@ public class DesktopPanel extends VerticalLayout {
     private DisplayPanel viewPanel;
 
     @Autowired
-    private CategoryQAPanel categoryQAPanel;
+    private TagQAPanel tagQAPanel;
 
     @Autowired
     private NoticeQAPanel noticeQAPanel;
@@ -63,7 +64,7 @@ public class DesktopPanel extends VerticalLayout {
         footerLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_RIGHT);
         footerLayout.setExpandRatio(content, 1);
 
-        HorizontalLayout qaLayout = new HorizontalLayout(categoryQAPanel, noticeQAPanel);
+        HorizontalLayout qaLayout = new HorizontalLayout(noticeQAPanel, tagQAPanel);
         qaLayout.setSizeFull();
         qaLayout.setSpacing(true);
         qaLayout.setMargin(new MarginInfo(true, false, false, false));

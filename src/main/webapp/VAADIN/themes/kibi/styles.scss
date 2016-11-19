@@ -41,4 +41,16 @@ $v-layout-margin-left: 12px;
 
 .tag_item {
     font-size: 12px;
+    margin: 7px 0px 0px 7px;
+}
+
+.tag_item .v-menubar {
+    border-radius: 13px;
+    background: transparent;
+    color: #1b87e3;
+}
+
+.tag_item .v-icon {
+    font-size: 14px;
+    color: #1b87e3;
 }

@@ -26,15 +26,12 @@ import javax.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.List;
 
-import static org.alexside.utils.ThemeUtils.HEADER_BUTTON;
-import static org.alexside.utils.ThemeUtils.PANEL_HEADER;
-
 /**
  * Created by abalyshev on 27.10.16.
  */
 @SpringComponent
 @ViewScope
-public class KibiTree extends Panel {
+public class KibiTree extends HeaderPanel {
 
     @Autowired
     protected DataProvider dataProvider;
@@ -49,14 +46,13 @@ public class KibiTree extends Panel {
     protected Action delete = new Action("Удалить", FontAwesome.CLOSE);
 
     @PostConstruct
-    public void onIit() {
-        eventBus = EventUtils.getEventBusInstance();
-        eventBus.register(this);
+    public void onInit() {
 
+        setCaption("<b>Дерево знаний</b>");
         setSizeFull();
 
-        Label captionLabel = new Label("<b>Дерево знаний</b>", ContentMode.HTML);
-        captionLabel.setSizeFull();
+        eventBus = EventUtils.getEventBusInstance();
+        eventBus.register(this);
 
         HeaderButton addHBtn = HeaderButton.createAddButton();
         addHBtn.addClickListener(event -> {
@@ -68,12 +64,7 @@ public class KibiTree extends Panel {
             tree.expandItem(ti.getId());
             tree.setChildrenAllowed(ti.getId(), true);
         });
-
-        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, addHBtn);
-        topToolbar.addStyleName(PANEL_HEADER);
-        topToolbar.setSizeFull();
-        topToolbar.setComponentAlignment(addHBtn, Alignment.TOP_RIGHT);
-        topToolbar.setExpandRatio(captionLabel, 1.0f);
+        addToHeader(addHBtn);
 
         List<TItem> data = dataProvider.getTreeData();
         HierarchicalContainer container = new HierarchicalContainer();
@@ -153,11 +144,7 @@ public class KibiTree extends Panel {
             }
         });
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.addComponents(topToolbar, tree);
-        layout.setExpandRatio(tree, 1.0f);
-
-        setContent(layout);
+        setContentExt(tree);
     }
 
     @PreDestroy
