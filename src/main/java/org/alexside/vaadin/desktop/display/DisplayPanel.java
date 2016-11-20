@@ -165,6 +165,7 @@ public class DisplayPanel extends HeaderPanel {
     }
 
     private void selectTItem(TItem ti) {
+        resetPanel();
         editTi = ti;
         nameField.setValue(editTi.getName());
         if (editTi.isCategory()) {

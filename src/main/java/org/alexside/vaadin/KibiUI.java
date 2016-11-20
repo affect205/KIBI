@@ -44,11 +44,12 @@ public class KibiUI extends UI {
         root.setSizeFull();
         setContent(root);
 
-        final Panel viewContainer = new RootPanel();
-        root.addComponent(viewContainer);
-        root.setExpandRatio(viewContainer, 1.0f);
+        final Panel container = new Panel();
+        container.setSizeFull();
+        root.addComponent(container);
+        root.setExpandRatio(container, 1.0f);
 
-        navigator = new Navigator(this, viewContainer);
+        navigator = new Navigator(this, container);
         navigator.addProvider(viewProvider);
     }
 

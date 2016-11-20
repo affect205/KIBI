@@ -8,11 +8,12 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.entity.User;
+import org.alexside.lang.Strings;
 import org.alexside.utils.AuthUtils;
 import org.alexside.vaadin.desktop.display.DisplayPanel;
-import org.alexside.vaadin.desktop.qa.CategoryQAPanel;
 import org.alexside.vaadin.desktop.qa.NoticeQAPanel;
 import org.alexside.vaadin.desktop.qa.TagQAPanel;
+import org.alexside.vaadin.misc.HeaderPanel;
 import org.alexside.vaadin.misc.KibiTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +24,7 @@ import javax.annotation.PostConstruct;
  */
 @SpringComponent
 @ViewScope
-public class DesktopPanel extends VerticalLayout {
+public class DesktopPanel extends HeaderPanel {
 
     @Autowired
     private KibiTree kibiTree;
@@ -41,8 +42,9 @@ public class DesktopPanel extends VerticalLayout {
 
     @PostConstruct
     public void onInit() {
+        setCaption(Strings.APP_TITLE);
         setSizeFull();
-        setMargin(true);
+        setContentMargin(true);
 
         Button logoutButton = new Button("Выйти");
         logoutButton.addStyleName(BaseTheme.BUTTON_LINK);
@@ -57,12 +59,15 @@ public class DesktopPanel extends VerticalLayout {
                     FontAwesome.USER.getHtml(), user.getLogin()));
         }
 
-        HorizontalLayout footerLayout = new HorizontalLayout(content, logoutButton);
-        footerLayout.setSizeFull();
-        footerLayout.setSpacing(true);
-        footerLayout.setComponentAlignment(content, Alignment.MIDDLE_RIGHT);
-        footerLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_RIGHT);
-        footerLayout.setExpandRatio(content, 1);
+        HorizontalLayout userLayout = new HorizontalLayout(content, logoutButton);
+        userLayout.setSizeFull();
+        userLayout.setSpacing(true);
+        userLayout.setComponentAlignment(content, Alignment.MIDDLE_RIGHT);
+        userLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_RIGHT);
+        userLayout.setExpandRatio(content, 1);
+        userLayout.setVisible(AuthUtils.isLoggedIn());
+
+        addToHeader(userLayout);
 
         HorizontalLayout qaLayout = new HorizontalLayout(noticeQAPanel, tagQAPanel);
         qaLayout.setSizeFull();
@@ -80,11 +85,7 @@ public class DesktopPanel extends VerticalLayout {
         contentLayout.setExpandRatio(kibiTree, 1);
         contentLayout.setExpandRatio(viewLayout, 4);
 
-        addComponent(contentLayout);
-        addComponent(footerLayout);
-
-        setExpandRatio(contentLayout, 12);
-        setExpandRatio(footerLayout, 1);
+        setContentAlt(contentLayout);
     }
 
     private void logout() {

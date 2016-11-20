@@ -10,6 +10,7 @@ import org.alexside.lang.Strings;
 import org.alexside.service.UserService;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.misc.ActionResponse;
+import org.alexside.vaadin.misc.HeaderPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
  */
 @SpringComponent
 @ViewScope
-public class LoginPanel extends VerticalLayout {
+public class LoginPanel extends HeaderPanel {
 
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
 
@@ -34,14 +35,12 @@ public class LoginPanel extends VerticalLayout {
 
     private CustomLayout layout;
 
-    public LoginPanel() {
-        super();
-        setSizeFull();
-        setMargin(true);
-    }
-
     @PostConstruct
     public void onInit() {
+        setCaption(Strings.APP_TITLE);
+        setSizeFull();
+        setContentMargin(true);
+
         log.info("[LoginPanel] onInit...");
 
         try {
@@ -96,7 +95,6 @@ public class LoginPanel extends VerticalLayout {
             log.info("[forgot] reset password...");
         });
 
-
         layout.addComponent(loginField, "login");
         layout.addComponent(passwordField, "password");
         layout.addComponent(submitButton, "submit");
@@ -104,8 +102,7 @@ public class LoginPanel extends VerticalLayout {
         layout.addComponent(forgotButton, "forgot");
         layout.setSizeFull();
 
-        addComponents(layout);
-        setComponentAlignment(layout, Alignment.MIDDLE_RIGHT);
+        setContentAlt(layout);
     }
 
     @PreDestroy

@@ -62,4 +62,8 @@ public class HeaderPanel extends Panel {
         contentLayout.addComponent(c);
         setContent(wrap);
     }
+
+    public void setContentMargin(boolean margin) {
+        contentLayout.setMargin(margin);
+    }
 }
