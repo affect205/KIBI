@@ -51,9 +51,10 @@ public class TagItem extends VerticalLayout {
             MenuBar.Command command = (MenuBar.Command) selectedItem -> {
                 callback.ifPresent(c -> c.accept(item));
             };
-            mi = menuBar.addItem(String.format("<b>%s</b>", ti.getName()), icon, command);
+            mi = menuBar.addItem(String.format("<b>%s</b>", preformat(ti.getName())), icon, command);
+            mi.setDescription(ti.getName());
         } else {
-            mi = parent.addItem(String.format("<b>%s</b>", ti.getName()), icon, TAG_COMMAND);
+            mi = parent.addItem(String.format("<b>%s</b>", preformat(ti.getName())), icon, TAG_COMMAND);
         }
 
         if (ti.isCategory()) {
@@ -61,6 +62,22 @@ public class TagItem extends VerticalLayout {
                 buildMenuItem(child, mi);
             }
         }
+    }
+
+    private String preformat(String name) {
+        final int maxLen = 21;
+        if (name == null) return "";
+        if (name.length() > maxLen) {
+            String[] split = name.split("\\s");
+            if (split.length == 1) return name.substring(0, maxLen) + "...";
+            String out = "";
+            for (String str : split) {
+                if ((out+str).length() > maxLen) break;
+                out += str + " ";
+            }
+            return name.equals(out) ? name : out.trim() + "...";
+        }
+        return name;
     }
 }
 

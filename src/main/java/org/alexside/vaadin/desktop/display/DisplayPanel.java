@@ -117,7 +117,13 @@ public class DisplayPanel extends Panel {
         saveButton.addClickListener(event -> {
             if (editTi != null) {
                 editTi.setName(nameField.getValue());
-                if (editTi.isNotice()) editTi.setContent(editTA.getValue());
+                if (editTi.isNotice()) {
+                    if (viewRTA.isAttached()) {
+                        editTi.setContent(viewRTA.getValue());
+                    } else if (editTA.isAttached()) {
+                        editTi.setContent(editTA.getValue());
+                    }
+                }
                 dataProvider.saveTItem(editTi);
                 EventUtils.post(new TItemRefreshEvent(editTi));
             }

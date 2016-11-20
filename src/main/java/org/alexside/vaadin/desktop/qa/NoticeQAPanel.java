@@ -62,7 +62,10 @@ public class NoticeQAPanel extends Panel {
     }
 
     private void addQANotice(TItem ti) {
-        // TODO: исключить повторы
+        noticeDeque.stream()    // remove duplicate
+                .filter(noticeQA -> noticeQA.item.equals(ti))
+                .findFirst()
+                .ifPresent(this::removeQANotice);
         if (noticeDeque.size() >= LIMIT) removeQANotice();
         TagItem tagItem = new TagItem(ti);
         tagItem.addCallback(tItem ->
@@ -75,6 +78,11 @@ public class NoticeQAPanel extends Panel {
     public void removeQANotice() {
         NoticeQA noticeQA = noticeDeque.removeLast();
         wrap.removeComponent(noticeQA.tagItem);
+    }
+
+    public void removeQANotice(NoticeQA noticeQA) {
+        wrap.removeComponent(noticeQA.tagItem);
+        noticeDeque.remove(noticeQA);
     }
 
     private class NoticeQA {
