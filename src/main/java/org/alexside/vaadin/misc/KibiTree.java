@@ -144,7 +144,7 @@ public class KibiTree extends HeaderPanel {
             }
         });
 
-        setContentExt(tree);
+        setContentAlt(tree);
     }
 
     @PreDestroy

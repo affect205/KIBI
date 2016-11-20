@@ -3,7 +3,6 @@ package org.alexside.vaadin.desktop.display;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
@@ -15,20 +14,20 @@ import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.HtmlUtils;
 import org.alexside.vaadin.misc.HeaderButton;
+import org.alexside.vaadin.misc.HeaderPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import static org.alexside.utils.HtmlUtils.URL_TEST;
-import static org.alexside.utils.ThemeUtils.PANEL_HEADER;
 
 /**
  * Created by Alex on 04.11.2016.
  */
 @SpringComponent
 @ViewScope
-public class DisplayPanel extends Panel {
+public class DisplayPanel extends HeaderPanel {
 
     @Autowired
     protected DataProvider dataProvider;
@@ -52,12 +51,10 @@ public class DisplayPanel extends Panel {
         eventBus.register(this);
 
         setSizeFull();
+        setCaption("<b>Просмотр</b>");
 
         layout = new VerticalLayout();
         layout.setSizeFull();
-
-        Label captionLabel = new Label("<b>Просмотр</b>", ContentMode.HTML);
-        captionLabel.setCaptionAsHtml(true);
 
         nameField = new TextField();
         nameField.setWidth("360px");
@@ -79,14 +76,8 @@ public class DisplayPanel extends Panel {
         HorizontalLayout controlWrap = new HorizontalLayout(viewBtn, editBtn);
         controlWrap.setSpacing(true);
 
-        HorizontalLayout topToolbar = new HorizontalLayout(captionLabel, nameField, controlWrap);
-        topToolbar.setSizeFull();
-        topToolbar.addStyleName(PANEL_HEADER);
-        topToolbar.setComponentAlignment(nameField, Alignment.TOP_LEFT);
-        topToolbar.setComponentAlignment(controlWrap, Alignment.TOP_RIGHT);
-        topToolbar.setExpandRatio(captionLabel, 1);
-        topToolbar.setExpandRatio(nameField, 10);
-        topToolbar.setExpandRatio(controlWrap, 1);
+        addToHeader(nameField, Alignment.TOP_LEFT, 10);
+        addToHeader(controlWrap);
 
         String html = HtmlUtils.loadHtml(URL_TEST);
 
@@ -153,11 +144,7 @@ public class DisplayPanel extends Panel {
             }
         });
 
-        layout.addComponents(topToolbar, contentWrap);
-        layout.setExpandRatio(topToolbar, 1);
-        layout.setExpandRatio(contentWrap, 10);
-
-        setContent(layout);
+        setContentAlt(contentWrap);
     }
 
     @PreDestroy
