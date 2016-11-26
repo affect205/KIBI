@@ -13,7 +13,7 @@ import org.alexside.utils.AuthUtils;
 import org.alexside.vaadin.desktop.display.DisplayPanel;
 import org.alexside.vaadin.desktop.qa.NoticeQAPanel;
 import org.alexside.vaadin.desktop.qa.TagQAPanel;
-import org.alexside.vaadin.misc.HeaderPanel;
+import org.alexside.vaadin.misc.KibiPanel;
 import org.alexside.vaadin.misc.KibiTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,7 +24,7 @@ import javax.annotation.PostConstruct;
  */
 @SpringComponent
 @ViewScope
-public class DesktopPanel extends HeaderPanel {
+public class DesktopPanel extends KibiPanel {
 
     @Autowired
     private KibiTree kibiTree;
@@ -46,7 +46,7 @@ public class DesktopPanel extends HeaderPanel {
         setSizeFull();
         setContentMargin(true);
 
-        Button logoutButton = new Button("Выйти");
+        Button logoutButton = new Button("Выйти", FontAwesome.SIGN_OUT);
         logoutButton.addStyleName(BaseTheme.BUTTON_LINK);
         logoutButton.addClickListener(clickEvent -> logout());
         logoutButton.setWidth("80px");
@@ -67,7 +67,7 @@ public class DesktopPanel extends HeaderPanel {
         userLayout.setExpandRatio(content, 1);
         userLayout.setVisible(AuthUtils.isLoggedIn());
 
-        addToHeader(userLayout);
+        addToTopToolbar(userLayout);
 
         HorizontalLayout qaLayout = new HorizontalLayout(noticeQAPanel, tagQAPanel);
         qaLayout.setSizeFull();

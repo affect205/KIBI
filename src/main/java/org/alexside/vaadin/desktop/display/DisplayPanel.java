@@ -6,6 +6,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import org.alexside.entity.TItem;
 import org.alexside.events.TItemQASelectionEvent;
 import org.alexside.events.TItemRefreshEvent;
@@ -14,20 +15,21 @@ import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.HtmlUtils;
 import org.alexside.vaadin.misc.HeaderButton;
-import org.alexside.vaadin.misc.HeaderPanel;
+import org.alexside.vaadin.misc.KibiPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import static org.alexside.utils.HtmlUtils.URL_TEST;
+import static org.alexside.vaadin.misc.HeaderButton.*;
 
 /**
  * Created by Alex on 04.11.2016.
  */
 @SpringComponent
 @ViewScope
-public class DisplayPanel extends HeaderPanel {
+public class DisplayPanel extends KibiPanel {
 
     @Autowired
     protected DataProvider dataProvider;
@@ -52,6 +54,7 @@ public class DisplayPanel extends HeaderPanel {
 
         setSizeFull();
         setCaption("<b>Просмотр</b>");
+        showBottomToolbar(true);
 
         layout = new VerticalLayout();
         layout.setSizeFull();
@@ -60,13 +63,13 @@ public class DisplayPanel extends HeaderPanel {
         nameField.setWidth("360px");
         nameField.setHeight("60%");
 
-        HeaderButton viewBtn = HeaderButton.createEyeButton();
+        HeaderButton viewBtn = eyeButton();
         viewBtn.addClickListener(event -> {
             contentWrap.replaceComponent(editLayout, viewLayout);
             contentWrap.addComponentAsFirst(viewLayout);
             contentWrap.setExpandRatio(viewLayout, 10);
         });
-        HeaderButton editBtn = HeaderButton.createCodeButton();
+        HeaderButton editBtn = codeButton();
         editBtn.addClickListener(event -> {
             contentWrap.replaceComponent(viewLayout, editLayout);
             contentWrap.addComponentAsFirst(editLayout);
@@ -76,8 +79,8 @@ public class DisplayPanel extends HeaderPanel {
         HorizontalLayout controlWrap = new HorizontalLayout(viewBtn, editBtn);
         controlWrap.setSpacing(true);
 
-        addToHeader(nameField, Alignment.TOP_LEFT, 10);
-        addToHeader(controlWrap);
+        addToTopToolbar(nameField, Alignment.TOP_LEFT, 10);
+        addToTopToolbar(controlWrap);
 
         String html = HtmlUtils.loadHtml(URL_TEST);
 
@@ -96,15 +99,8 @@ public class DisplayPanel extends HeaderPanel {
         viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();
 
-        TextField urlField = new TextField();
-        urlField.setWidth("320px");
-        Button urlButton = new Button(FontAwesome.UPLOAD);
-        urlButton.setDescription("Загрузить");
-        urlButton.addClickListener(event -> {
-            viewRTA.setValue(HtmlUtils.loadHtml(urlField.getValue()));
-        });
-
         Button saveButton = new Button("Сохранить");
+        saveButton.addStyleName(ValoTheme.BUTTON_TINY);
         saveButton.addClickListener(event -> {
             if (editTi != null) {
                 editTi.setName(nameField.getValue());
@@ -120,19 +116,46 @@ public class DisplayPanel extends HeaderPanel {
             }
         });
 
-        HorizontalLayout bottomToolbar = new HorizontalLayout(urlField, urlButton, saveButton);
-        bottomToolbar.setSizeFull();
-        bottomToolbar.setSpacing(true);
-        bottomToolbar.setComponentAlignment(urlField, Alignment.MIDDLE_LEFT);
-        bottomToolbar.setComponentAlignment(urlButton, Alignment.MIDDLE_LEFT);
-        bottomToolbar.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
-        bottomToolbar.setExpandRatio(saveButton, 1);
+        TextField urlField = new TextField();
+        urlField.setWidth("320px");
 
-        contentWrap = new VerticalLayout(viewLayout, bottomToolbar);
+        Button loadButton = new Button(FontAwesome.SEND);
+
+        HorizontalLayout urlPanel = new HorizontalLayout(urlField, loadButton);
+        urlPanel.setSizeFull();
+        urlPanel.setSpacing(true);
+        urlPanel.setMargin(true);
+        urlPanel.setExpandRatio(loadButton, 1);
+
+        Window urlWindow = new Window("Загрузкка из интернета");
+        urlWindow.setWidth("420px");
+        urlWindow.setHeight("120px");
+        urlWindow.setContent(urlPanel);
+        urlWindow.setModal(true);
+
+        loadButton.addClickListener(event -> {
+            final String result = HtmlUtils.loadHtml(urlField.getValue());
+            if (viewRTA.isAttached()) {
+                viewRTA.setValue(result);
+            } else if (editTA.isAttached()) {
+                editTA.setValue(result);
+            }
+            urlWindow.close();
+        });
+
+        HeaderButton urlButton = urlButton();
+        urlButton.setDescription("Загрузить");
+        urlButton.addClickListener(event -> {
+            UI.getCurrent().addWindow(urlWindow);
+        });
+
+        addToBottomToolbar(urlButton);
+        addToBottomToolbar(saveButton, Alignment.BOTTOM_RIGHT);
+
+        contentWrap = new VerticalLayout(viewLayout);
         contentWrap.setSizeFull();
         contentWrap.setMargin(true);
         contentWrap.setExpandRatio(viewLayout, 10);
-        contentWrap.setExpandRatio(bottomToolbar, 1);
         contentWrap.addComponentDetachListener(event -> {
             Component c = event.getDetachedComponent();
             if (c != null) {

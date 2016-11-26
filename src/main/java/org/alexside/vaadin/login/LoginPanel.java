@@ -10,7 +10,7 @@ import org.alexside.lang.Strings;
 import org.alexside.service.UserService;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.misc.ActionResponse;
-import org.alexside.vaadin.misc.HeaderPanel;
+import org.alexside.vaadin.misc.KibiPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 @SpringComponent
 @ViewScope
-public class LoginPanel extends HeaderPanel {
+public class LoginPanel extends KibiPanel {
 
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
 

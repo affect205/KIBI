@@ -7,10 +7,11 @@ import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.Action;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Tree;
 import org.alexside.entity.Category;
 import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 @SpringComponent
 @ViewScope
-public class KibiTree extends HeaderPanel {
+public class KibiTree extends KibiPanel {
 
     @Autowired
     protected DataProvider dataProvider;
@@ -54,7 +55,7 @@ public class KibiTree extends HeaderPanel {
         eventBus = EventUtils.getEventBusInstance();
         eventBus.register(this);
 
-        HeaderButton addHBtn = HeaderButton.createAddButton();
+        HeaderButton addHBtn = HeaderButton.addButton();
         addHBtn.addClickListener(event -> {
             TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), null);
             dataProvider.saveTItem(ti);
@@ -64,7 +65,7 @@ public class KibiTree extends HeaderPanel {
             tree.expandItem(ti.getId());
             tree.setChildrenAllowed(ti.getId(), true);
         });
-        addToHeader(addHBtn);
+        addToTopToolbar(addHBtn);
 
         List<TItem> data = dataProvider.getTreeData();
         HierarchicalContainer container = new HierarchicalContainer();

@@ -26,15 +26,19 @@ public class HeaderButton extends HorizontalLayout {
         addLayoutClickListener(event);
     }
 
-    public static HeaderButton createAddButton() {
+    public static HeaderButton addButton() {
         return new HeaderButton(FontAwesome.PLUS_SQUARE, "Добавить категорию");
     }
 
-    public static HeaderButton createCodeButton() {
+    public static HeaderButton codeButton() {
         return new HeaderButton(FontAwesome.CODE, "Редактирование");
     }
 
-    public static HeaderButton createEyeButton() {
+    public static HeaderButton eyeButton() {
         return new HeaderButton(FontAwesome.EYE, "Просмотр");
+    }
+
+    public static HeaderButton urlButton() {
+        return new HeaderButton(FontAwesome.SHARE, "Загрузить из интернета");
     }
 }
