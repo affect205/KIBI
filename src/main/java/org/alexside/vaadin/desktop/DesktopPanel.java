@@ -1,16 +1,13 @@
 package org.alexside.vaadin.desktop;
 
-import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
-import com.vaadin.ui.*;
-import com.vaadin.ui.themes.BaseTheme;
-import org.alexside.entity.User;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.VerticalLayout;
 import org.alexside.lang.Strings;
-import org.alexside.utils.AuthUtils;
 import org.alexside.vaadin.desktop.display.DisplayPanel;
+import org.alexside.vaadin.desktop.profile.ProfileMenu;
 import org.alexside.vaadin.desktop.qa.NoticeQAPanel;
 import org.alexside.vaadin.desktop.qa.TagQAPanel;
 import org.alexside.vaadin.misc.KibiPanel;
@@ -36,9 +33,10 @@ public class DesktopPanel extends KibiPanel {
     private TagQAPanel tagQAPanel;
 
     @Autowired
-    private NoticeQAPanel noticeQAPanel;
+    private ProfileMenu profileMenu;
 
-    private Label content;
+    @Autowired
+    private NoticeQAPanel noticeQAPanel;
 
     @PostConstruct
     public void onInit() {
@@ -46,28 +44,7 @@ public class DesktopPanel extends KibiPanel {
         setSizeFull();
         setContentMargin(true);
 
-        Button logoutButton = new Button("Выйти", FontAwesome.SIGN_OUT);
-        logoutButton.addStyleName(BaseTheme.BUTTON_LINK);
-        logoutButton.addClickListener(clickEvent -> logout());
-        logoutButton.setWidth("80px");
-
-        content = new Label("", ContentMode.HTML);
-        content.setWidth("200px");
-        User user = AuthUtils.getUser();
-        if (user != null) {
-            content.setValue(String.format("%s: <b>%s</b>",
-                    FontAwesome.USER.getHtml(), user.getLogin()));
-        }
-
-        HorizontalLayout userLayout = new HorizontalLayout(content, logoutButton);
-        userLayout.setSizeFull();
-        userLayout.setSpacing(true);
-        userLayout.setComponentAlignment(content, Alignment.MIDDLE_RIGHT);
-        userLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_RIGHT);
-        userLayout.setExpandRatio(content, 1);
-        userLayout.setVisible(AuthUtils.isLoggedIn());
-
-        addToTopToolbar(userLayout);
+        addToTopToolbar(profileMenu);
 
         HorizontalLayout qaLayout = new HorizontalLayout(noticeQAPanel, tagQAPanel);
         qaLayout.setSizeFull();
@@ -86,10 +63,5 @@ public class DesktopPanel extends KibiPanel {
         contentLayout.setExpandRatio(viewLayout, 4);
 
         setContentAlt(contentLayout);
-    }
-
-    private void logout() {
-        UI.getCurrent().getPage().reload();
-        UI.getCurrent().getSession().close();
     }
 }

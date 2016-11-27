@@ -53,7 +53,6 @@ public class DisplayPanel extends KibiPanel {
         eventBus.register(this);
 
         setSizeFull();
-        setCaption("<b>Просмотр</b>");
         showBottomToolbar(true);
 
         layout = new VerticalLayout();

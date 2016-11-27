@@ -81,6 +81,10 @@ public abstract class TItem {
 
     public String getContent() { return ""; }
 
+    public String getContentMeta() {
+        return String.format("%s|%s", name, getContent());
+    }
+
     public void setContent(String content) {}
 
     public boolean isCategory() { return kind == TreeKind.CATEGORY; }

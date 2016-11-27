@@ -179,6 +179,7 @@ public class KibiTree extends KibiPanel {
         if (item != null) {
             item.getItemProperty("object").setValue(event.getItem());
             item.getItemProperty("name").setValue(event.getItem().getName());
+            item.getItemProperty("content").setValue(event.getItem().getContentMeta());
         }
     }
 
@@ -202,7 +203,7 @@ public class KibiTree extends KibiPanel {
         item.getItemProperty("name").setValue(ti.getName());
         item.getItemProperty("icon").setValue(icon);
         item.getItemProperty("kind").setValue(ti.getKind());
-        item.getItemProperty("content").setValue(ti.isNotice() ? ti.getContent() : ti.getName());
+        item.getItemProperty("content").setValue(ti.getContentMeta());
         item.getItemProperty("object").setValue(ti);
 
         if (ti.hasParent()) container.setParent(ti.getId(), ti.getParent().getId());
