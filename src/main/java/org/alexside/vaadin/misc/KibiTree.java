@@ -4,14 +4,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Tree;
+import com.vaadin.ui.*;
 import org.alexside.entity.Category;
 import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
@@ -26,6 +25,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.List;
+
+import static org.alexside.utils.ThemeUtils.HEADER_BUTTON;
 
 /**
  * Created by abalyshev on 27.10.16.
@@ -48,14 +49,12 @@ public class KibiTree extends KibiPanel {
 
     @PostConstruct
     public void onInit() {
-
-        setCaption("<b>Дерево знаний</b>");
         setSizeFull();
 
         eventBus = EventUtils.getEventBusInstance();
         eventBus.register(this);
 
-        HeaderButton addHBtn = HeaderButton.addButton();
+        IconButton addHBtn = IconButton.addButton();
         addHBtn.addClickListener(event -> {
             TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), null);
             dataProvider.saveTItem(ti);
@@ -65,17 +64,31 @@ public class KibiTree extends KibiPanel {
             tree.expandItem(ti.getId());
             tree.setChildrenAllowed(ti.getId(), true);
         });
-        addToTopToolbar(addHBtn);
 
         List<TItem> data = dataProvider.getTreeData();
         HierarchicalContainer container = new HierarchicalContainer();
         container.addContainerProperty("id", String.class, "");
         container.addContainerProperty("name", String.class, "");
+        container.addContainerProperty("content", String.class, "");
         container.addContainerProperty("icon", Resource.class, null);
         container.addContainerProperty("kind", TreeKind.class, TreeKind.UNKNOWN);
         container.addContainerProperty("object", TItem.class, null);
         data.forEach(tItem -> initContainer(container, tItem));
         sortContainer(container);
+
+        TextField searchField = new TextField();
+        searchField.setSizeFull();
+        searchField.setWidth("240px");
+        searchField.addStyleName(HEADER_BUTTON);
+        searchField.addValueChangeListener(event -> {
+            container.removeAllContainerFilters();
+            String value = (String)event.getProperty().getValue();
+            SimpleStringFilter filter = new SimpleStringFilter("content", value, true, false);
+            container.addContainerFilter(filter);
+        });
+
+        addToTopToolbar(searchField, Alignment.TOP_LEFT, 4);
+        addToTopToolbar(addHBtn, Alignment.TOP_RIGHT, 1);
 
         tree = new Tree("", container);
         tree.setImmediate(true);
@@ -189,6 +202,7 @@ public class KibiTree extends KibiPanel {
         item.getItemProperty("name").setValue(ti.getName());
         item.getItemProperty("icon").setValue(icon);
         item.getItemProperty("kind").setValue(ti.getKind());
+        item.getItemProperty("content").setValue(ti.isNotice() ? ti.getContent() : ti.getName());
         item.getItemProperty("object").setValue(ti);
 
         if (ti.hasParent()) container.setParent(ti.getId(), ti.getParent().getId());

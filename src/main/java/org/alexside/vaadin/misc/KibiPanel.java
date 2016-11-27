@@ -20,6 +20,7 @@ public class KibiPanel extends Panel {
     public KibiPanel() {
         captionLabel = new Label("", ContentMode.HTML);
         captionLabel.setSizeFull();
+        captionLabel.setVisible(false);
 
         topToolbar = new HorizontalLayout(captionLabel);
         topToolbar.addStyleName(PANEL_HEADER);
@@ -51,6 +52,7 @@ public class KibiPanel extends Panel {
     @Override
     public void setCaption(String caption) {
         captionLabel.setValue(caption);
+        captionLabel.setVisible(true);
     }
 
     public void setContentAlt(Component c) {

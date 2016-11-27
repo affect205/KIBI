@@ -14,7 +14,7 @@ import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.HtmlUtils;
-import org.alexside.vaadin.misc.HeaderButton;
+import org.alexside.vaadin.misc.IconButton;
 import org.alexside.vaadin.misc.KibiPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,7 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import static org.alexside.utils.HtmlUtils.URL_TEST;
-import static org.alexside.vaadin.misc.HeaderButton.*;
+import static org.alexside.vaadin.misc.IconButton.*;
 
 /**
  * Created by Alex on 04.11.2016.
@@ -63,13 +63,13 @@ public class DisplayPanel extends KibiPanel {
         nameField.setWidth("360px");
         nameField.setHeight("60%");
 
-        HeaderButton viewBtn = eyeButton();
+        IconButton viewBtn = eyeButton();
         viewBtn.addClickListener(event -> {
             contentWrap.replaceComponent(editLayout, viewLayout);
             contentWrap.addComponentAsFirst(viewLayout);
             contentWrap.setExpandRatio(viewLayout, 10);
         });
-        HeaderButton editBtn = codeButton();
+        IconButton editBtn = codeButton();
         editBtn.addClickListener(event -> {
             contentWrap.replaceComponent(viewLayout, editLayout);
             contentWrap.addComponentAsFirst(editLayout);
@@ -143,7 +143,7 @@ public class DisplayPanel extends KibiPanel {
             urlWindow.close();
         });
 
-        HeaderButton urlButton = urlButton();
+        IconButton urlButton = urlButton();
         urlButton.setDescription("Загрузить");
         urlButton.addClickListener(event -> {
             UI.getCurrent().addWindow(urlWindow);
