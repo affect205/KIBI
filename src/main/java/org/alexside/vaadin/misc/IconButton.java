@@ -42,6 +42,10 @@ public class IconButton extends HorizontalLayout {
         addLayoutClickListener(event);
     }
 
+    public static IconButton addTagButton() {
+        return new IconButton(FontAwesome.PLUS_SQUARE, "Добавить тег");
+    }
+
     public static IconButton addButton() {
         return new IconButton(FontAwesome.PLUS_SQUARE, "Добавить категорию");
     }

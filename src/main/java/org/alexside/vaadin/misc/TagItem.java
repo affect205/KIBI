@@ -23,6 +23,7 @@ public class TagItem extends VerticalLayout {
     private TItem item;
     private Optional<Consumer<TItem>> callback;
     private MenuBar menuBar;
+    private MenuBar.MenuItem tagMi;
 
     public TagItem(TItem ti) {
         this.item = ti;
@@ -51,8 +52,9 @@ public class TagItem extends VerticalLayout {
             MenuBar.Command command = (MenuBar.Command) selectedItem -> {
                 callback.ifPresent(c -> c.accept(item));
             };
-            mi = menuBar.addItem(String.format("<b>%s</b>", preformat(ti.getName())), icon, command);
-            mi.setDescription(ti.getName());
+            tagMi = menuBar.addItem(String.format("<b>%s</b>", preformat(ti.getName())), icon, command);
+            tagMi.setDescription(ti.getName());
+            mi = tagMi;
         } else {
             mi = parent.addItem(String.format("<b>%s</b>", preformat(ti.getName())), icon, TAG_COMMAND);
         }
@@ -78,6 +80,10 @@ public class TagItem extends VerticalLayout {
             return name.equals(out) ? name : out.trim() + "...";
         }
         return name;
+    }
+
+    public void setTagText(String name) {
+        if (tagMi != null) tagMi.setText(String.format("<b>%s</b>", preformat(name)));
     }
 }
 

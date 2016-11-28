@@ -61,6 +61,6 @@ $v-layout-margin-left: 12px;
 }
 
 .panel_footer {
-    border-top: 1px solid #d5d5d5;
-    border-bottom: none;
+    border-top: 1px solid #d5d5d5 !important;
+    border-bottom: none !important;
 }

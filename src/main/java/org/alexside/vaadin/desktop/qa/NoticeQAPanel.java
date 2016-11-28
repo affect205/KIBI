@@ -8,8 +8,10 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Panel;
 import org.alexside.entity.TItem;
 import org.alexside.events.TItemQASelectionEvent;
+import org.alexside.events.TItemRefreshEvent;
 import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.EventUtils;
+import org.alexside.utils.ThemeUtils;
 import org.alexside.vaadin.misc.TagItem;
 
 import javax.annotation.PostConstruct;
@@ -44,7 +46,7 @@ public class NoticeQAPanel extends Panel {
         eventBus.register(this);
 
         wrap = new CssLayout();
-        wrap.addStyleName("outlined");
+        wrap.addStyleName(ThemeUtils.LAYOUT_OUTLINED);
 
         setContent(wrap);
     }
@@ -59,6 +61,17 @@ public class NoticeQAPanel extends Panel {
         if (event.getItem() == null) return;
         TItem ti = event.getItem();
         if (ti.isNotice()) addQANotice(ti);
+    }
+
+    @Subscribe
+    public void onTItemRefreshEvent(TItemRefreshEvent event) {
+        if (event.getItem() == null) return;
+        TItem ti = event.getItem();
+        noticeDeque.forEach(noticeQA -> {
+            if (noticeQA.item.equals(ti)) {
+                noticeQA.tagItem.setTagText(ti.getName());
+            }
+        });
     }
 
     private void addQANotice(TItem ti) {

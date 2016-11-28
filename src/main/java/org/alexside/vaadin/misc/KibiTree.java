@@ -78,7 +78,7 @@ public class KibiTree extends KibiPanel {
 
         TextField searchField = new TextField();
         searchField.setSizeFull();
-        searchField.setWidth("240px");
+        searchField.setWidth("80%");
         searchField.addStyleName(HEADER_BUTTON);
         searchField.addValueChangeListener(event -> {
             container.removeAllContainerFilters();
