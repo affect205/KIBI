@@ -27,6 +27,7 @@ public class TagService {
         try {
             result = mongoTemplate.findAll(Tag.class).stream()
                     .collect(Collectors.toSet());
+
             return result;
         } catch (Exception e) {
             log.warning(e.getMessage());
