@@ -2,19 +2,21 @@ package org.alexside.vaadin.desktop.qa;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
 import org.alexside.entity.TItem;
 import org.alexside.entity.Tag;
 import org.alexside.events.TItemQASelectionEvent;
 import org.alexside.events.TItemSelectionEvent;
+import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.ThemeUtils;
 import org.alexside.vaadin.misc.IconButton;
 import org.alexside.vaadin.misc.KibiPanel;
 import org.alexside.vaadin.misc.TagItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -26,6 +28,9 @@ import javax.annotation.PreDestroy;
 @ViewScope
 public class TagQAPanel extends KibiPanel {
 
+    @Autowired
+    private DataProvider dataProvider;
+
     private EventBus eventBus;
 
     private CssLayout wrap;
@@ -33,7 +38,6 @@ public class TagQAPanel extends KibiPanel {
 
     @PostConstruct
     public void onInit() {
-        setCaption("<b>Теги</b>");
         setSizeFull();
 
         eventBus = EventUtils.getEventBusInstance();
@@ -46,14 +50,29 @@ public class TagQAPanel extends KibiPanel {
         IconButton addButton = IconButton.addTagButton();
         addButton.addClickListener(event -> {
             if (item != null) {
-                Tag tag = new Tag(tagField.getValue(), item);
+                Tag tag = addQATag(new Tag(tagField.getValue(), item));
+                dataProvider.saveTag(tag);
                 item.addTag(tag);
-                addQATag(tag);
             }
         });
 
-        addToTopToolbar(tagField);
-        addToTopToolbar(addButton);
+        IconButton cloudButton = IconButton.cloudButton();
+        cloudButton.addClickListener(event -> {
+
+        });
+
+        Label captionLabel = new Label("<b>Теги</b>", ContentMode.HTML);
+        captionLabel.setSizeFull();
+
+        HorizontalLayout captionWrap = new HorizontalLayout(cloudButton, captionLabel);
+        captionWrap.setSpacing(true);
+
+        HorizontalLayout tagWrap = new HorizontalLayout(tagField, addButton);
+        tagWrap.setSpacing(true);
+        tagWrap.setHeight("60%");
+
+        addToTopToolbar(captionWrap, Alignment.TOP_LEFT);
+        addToTopToolbar(tagWrap, Alignment.TOP_RIGHT);
 
         wrap = new CssLayout();
         wrap.addStyleName(ThemeUtils.LAYOUT_OUTLINED);
@@ -90,8 +109,9 @@ public class TagQAPanel extends KibiPanel {
         });
     }
 
-    private void addQATag(Tag tag) {
+    private Tag addQATag(Tag tag) {
         TagItem tagItem = new TagItem(tag);
         wrap.addComponent(tagItem);
+        return tag;
     }
 }

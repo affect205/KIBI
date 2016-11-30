@@ -7,7 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,10 +23,10 @@ public class Notice extends TItem {
     @Field
     private int sorting;
     @DBRef
-    private List<Tag> tags;
+    private Set<Tag> tags;
 
     public Notice() {
-        this.tags = new ArrayList<>();
+        this.tags = new HashSet<>();
     }
 
     public Notice(String name, String content, Category parent, int sorting) {
@@ -35,7 +37,7 @@ public class Notice extends TItem {
     public Notice(String name, String content, Category parent) {
         super(null, name, TreeKind.NOTICE, parent);
         this.content = content;
-        this.tags = new ArrayList<>();
+        this.tags = new HashSet<>();
     }
 
     @Override
@@ -57,12 +59,12 @@ public class Notice extends TItem {
     }
 
     @Override
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 
     @Override
-    public void setTags(List<Tag> tags) {
+    public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
 

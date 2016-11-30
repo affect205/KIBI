@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,9 +36,17 @@ public class TagService {
         return result;
     }
 
-    public void saveTags(List<Tag> tags) {
+    public void saveTags(Collection<Tag> tags) {
         try {
             tags.forEach(tag -> mongoTemplate.save(tag));
+        } catch (Exception e) {
+            log.warning(e.getMessage());
+        }
+    }
+
+    public void saveTag(Tag tag) {
+        try {
+            mongoTemplate.save(tag);
         } catch (Exception e) {
             log.warning(e.getMessage());
         }

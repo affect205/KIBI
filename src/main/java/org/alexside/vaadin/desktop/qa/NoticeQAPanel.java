@@ -2,16 +2,18 @@ package org.alexside.vaadin.desktop.qa;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.*;
 import org.alexside.entity.TItem;
 import org.alexside.events.TItemQASelectionEvent;
 import org.alexside.events.TItemRefreshEvent;
 import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.ThemeUtils;
+import org.alexside.vaadin.misc.IconButton;
+import org.alexside.vaadin.misc.KibiPanel;
 import org.alexside.vaadin.misc.TagItem;
 
 import javax.annotation.PostConstruct;
@@ -24,7 +26,7 @@ import java.util.Deque;
  */
 @SpringComponent
 @ViewScope
-public class NoticeQAPanel extends Panel {
+public class NoticeQAPanel extends KibiPanel {
 
     private static final int LIMIT = 10;
 
@@ -39,7 +41,6 @@ public class NoticeQAPanel extends Panel {
 
     @PostConstruct
     public void onInit() {
-        setCaption("<b>Записи</b>");
         setSizeFull();
 
         eventBus = EventUtils.getEventBusInstance();
@@ -48,7 +49,15 @@ public class NoticeQAPanel extends Panel {
         wrap = new CssLayout();
         wrap.addStyleName(ThemeUtils.LAYOUT_OUTLINED);
 
-        setContent(wrap);
+        Label captionLabel = new Label("<b>Записи</b>", ContentMode.HTML);
+        IconButton noticeButton = IconButton.noticeButton();
+
+        HorizontalLayout captionWrap = new HorizontalLayout(noticeButton, captionLabel);
+        captionWrap.setSpacing(true);
+
+        addToTopToolbar(captionWrap, Alignment.TOP_LEFT);
+
+        setContentAlt(wrap);
     }
 
     @PreDestroy

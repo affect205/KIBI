@@ -69,4 +69,8 @@ public class IconButton extends HorizontalLayout {
     public static IconButton userButton(String text) {
         return new IconButton(FontAwesome.USER, text, "");
     }
+
+    public static IconButton cloudButton() { return new IconButton(FontAwesome.CLOUD, "Облако тегов"); }
+
+    public static IconButton noticeButton() { return new IconButton(FontAwesome.EDIT, ""); }
 }

@@ -7,7 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -91,9 +93,9 @@ public abstract class TItem {
 
     public boolean isNotice() { return kind == TreeKind.NOTICE; }
 
-    public List<Tag> getTags() { return new ArrayList<>(); }
+    public Set<Tag> getTags() { return new HashSet<>(); }
 
-    public void setTags(List<Tag> tags) {}
+    public void setTags(Set<Tag> tags) {}
 
     public void addTag(Tag tag) {}
 

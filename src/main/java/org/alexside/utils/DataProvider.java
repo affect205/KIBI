@@ -62,7 +62,5 @@ public class DataProvider {
         return tagCache;
     }
 
-    public void addTagCache(Tag tag) {
-
-    }
+    public void saveTag(Tag tag) { tagService.saveTag(tag); }
 }
