@@ -91,6 +91,12 @@ public abstract class TItem {
 
     public boolean isNotice() { return kind == TreeKind.NOTICE; }
 
+    public List<Tag> getTags() { return new ArrayList<>(); }
+
+    public void setTags(List<Tag> tags) {}
+
+    public void addTag(Tag tag) {}
+
     @Override
     public String toString() {
         return "TItem{" +

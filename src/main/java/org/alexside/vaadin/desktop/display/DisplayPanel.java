@@ -81,19 +81,19 @@ public class DisplayPanel extends KibiPanel {
         addToTopToolbar(nameField, Alignment.TOP_LEFT, 10);
         addToTopToolbar(controlWrap);
 
-        String html = HtmlUtils.loadHtml(URL_TEST);
+        //String html = HtmlUtils.loadHtml(URL_TEST);
 
         editTA = new TextArea();
         editTA.setSizeFull();
         editTA.setWordwrap(true);
-        editTA.setValue(html);
+        //editTA.setValue(html);
 
         editLayout = new VerticalLayout(editTA);
         editLayout.setSizeFull();
 
         viewRTA = new RichTextArea();
         viewRTA.setSizeFull();
-        viewRTA.setValue(html);
+        //viewRTA.setValue(html);
         //viewRTA.addStyleName("no-toolbar");
         viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();

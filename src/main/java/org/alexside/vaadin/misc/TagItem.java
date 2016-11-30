@@ -5,6 +5,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import org.alexside.entity.TItem;
+import org.alexside.entity.Tag;
 import org.alexside.utils.ThemeUtils;
 
 import java.util.Optional;
@@ -22,6 +23,10 @@ public class TagItem extends VerticalLayout {
 
     private TItem item;
     private Optional<Consumer<TItem>> callback;
+
+    private Tag tag;
+    private Optional<Consumer<Tag>> tagCallback;
+
     private MenuBar menuBar;
     private MenuBar.MenuItem tagMi;
 
@@ -40,8 +45,31 @@ public class TagItem extends VerticalLayout {
         addComponents(menuBar);
     }
 
+    public TagItem(Tag tag) {
+        this.tag = tag;
+        this.tagCallback = Optional.empty();
+
+        setSizeUndefined();
+        addStyleName(ThemeUtils.TAG_ITEM);
+
+        menuBar = new MenuBar();
+        menuBar.setHtmlContentAllowed(true);
+        menuBar.setAutoOpen(true);
+
+        MenuBar.Command command = (MenuBar.Command) selectedItem -> {
+            tagCallback.ifPresent(c -> c.accept(tag));
+        };
+        tagMi = menuBar.addItem(String.format("<b>%s</b>", preformat(tag.getName())), FontAwesome.HASHTAG, command);
+        tagMi.setDescription(tag.getName());
+        addComponents(menuBar);
+    }
+
     public void addCallback(Consumer<TItem> callback) {
         this.callback = Optional.ofNullable(callback);
+    }
+
+    public void addTagCallback(Consumer<Tag> callback) {
+        this.tagCallback = Optional.ofNullable(callback);
     }
 
     private void buildMenuItem(TItem ti, MenuBar.MenuItem parent) {
