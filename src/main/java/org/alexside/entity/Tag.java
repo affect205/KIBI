@@ -62,4 +62,23 @@ public class Tag {
     public void setReference(List<TItem> referenced) {
         this.referenced = referenced;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tag)) return false;
+
+        Tag tag = (Tag) o;
+
+        if (_id != null ? !_id.equals(tag._id) : tag._id != null) return false;
+        return getName() != null ? getName().equals(tag.getName()) : tag.getName() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = _id != null ? _id.hashCode() : 0;
+        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+        return result;
+    }
 }

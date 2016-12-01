@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.alexside.utils.SpringUtils.SCOPE_SINGLETON;
 
@@ -34,8 +31,8 @@ public class DataProvider {
 
     @PostConstruct
     public void onInit() {
-        dataCache = new LinkedList<>();
-        tagCache = new HashSet<>();
+        dataCache = itemService.findAll();
+        tagCache = tagService.findAll();
     }
 
     public List<TItem> getTreeData() {
@@ -47,9 +44,9 @@ public class DataProvider {
 
     public void saveTItem(TItem ti) {
         if (ti == null) return;
-        tagService.saveTags(ti.getTags());
         itemService.saveTItem(ti);
         dataCache.add(ti);
+        tagCache.addAll(ti.getTags());
     }
 
     public void removeTItem(TItem ti) {
@@ -59,8 +56,20 @@ public class DataProvider {
     }
 
     public Set<Tag> getTagCache() {
+        if (tagCache.isEmpty()) {
+            tagCache = tagService.findAll();
+        }
         return tagCache;
     }
 
     public void saveTag(Tag tag) { tagService.saveTag(tag); }
+
+    public Tag getUniqueTag(Tag tag) {
+        String s1 = tag.getName().toLowerCase().replaceAll("\\s", "");
+        for (Tag t : tagCache) {
+            String s2 = t.getName().toLowerCase().replaceAll("\\s", "");
+            if (Objects.equals(s1, s2)) return t;
+        }
+        return tag;
+    }
 }

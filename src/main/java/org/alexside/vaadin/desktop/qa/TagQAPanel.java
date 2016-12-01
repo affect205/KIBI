@@ -50,8 +50,9 @@ public class TagQAPanel extends KibiPanel {
         IconButton addButton = IconButton.addTagButton();
         addButton.addClickListener(event -> {
             if (item != null) {
-                Tag tag = addQATag(new Tag(tagField.getValue(), item));
+                Tag tag = dataProvider.getUniqueTag(new Tag(tagField.getValue(), item));
                 item.addTag(tag);
+                addQATag(tag);
             }
         });
 
@@ -108,9 +109,8 @@ public class TagQAPanel extends KibiPanel {
         });
     }
 
-    private Tag addQATag(Tag tag) {
+    private void addQATag(Tag tag) {
         TagItem tagItem = new TagItem(tag);
         wrap.addComponent(tagItem);
-        return tag;
     }
 }

@@ -78,7 +78,6 @@ public class KibiTree extends KibiPanel {
 
         TextField searchField = new TextField();
         searchField.setSizeFull();
-        searchField.setWidth("80%");
         searchField.addStyleName(HEADER_BUTTON);
         searchField.addValueChangeListener(event -> {
             container.removeAllContainerFilters();
@@ -87,7 +86,13 @@ public class KibiTree extends KibiPanel {
             container.addContainerFilter(filter);
         });
 
-        addToTopToolbar(searchField, Alignment.TOP_LEFT, 4);
+        IconButton searchButton = IconButton.searchButton();
+        HorizontalLayout searchWrap = new HorizontalLayout(searchButton, searchField);
+        searchWrap.setSizeFull();
+        searchWrap.setSpacing(true);
+        searchWrap.setExpandRatio(searchField, 1);
+
+        addToTopToolbar(searchWrap, Alignment.TOP_LEFT, 5);
         addToTopToolbar(addHBtn, Alignment.TOP_RIGHT, 1);
 
         tree = new Tree("", container);

@@ -6,9 +6,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -65,11 +63,13 @@ public class Notice extends TItem {
 
     @Override
     public void setTags(Set<Tag> tags) {
+        tags.remove(null);
         this.tags = tags;
     }
 
     @Override
     public void addTag(Tag tag) {
+        tags.remove(null);
         tags.add(tag);
     }
 

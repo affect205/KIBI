@@ -50,6 +50,9 @@ public class TItemService {
     private void saveTItemRecursive(TItem tItem) {
         if (tItem == null) return;
         try {
+            if (tItem.isNotice()) {
+                tItem.getTags().forEach(tag -> mongoTemplate.save(tag));
+            }
             mongoTemplate.save(tItem);
             if (tItem.hasChildren()) {
                 tItem.getChildren().forEach(child -> saveTItemRecursive(child));
