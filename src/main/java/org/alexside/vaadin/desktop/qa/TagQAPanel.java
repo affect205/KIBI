@@ -51,7 +51,6 @@ public class TagQAPanel extends KibiPanel {
         addButton.addClickListener(event -> {
             if (item != null) {
                 Tag tag = addQATag(new Tag(tagField.getValue(), item));
-                dataProvider.saveTag(tag);
                 item.addTag(tag);
             }
         });

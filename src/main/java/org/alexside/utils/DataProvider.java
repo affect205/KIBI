@@ -47,8 +47,8 @@ public class DataProvider {
 
     public void saveTItem(TItem ti) {
         if (ti == null) return;
-        itemService.saveTItem(ti);
         tagService.saveTags(ti.getTags());
+        itemService.saveTItem(ti);
         dataCache.add(ti);
     }
 
