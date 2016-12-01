@@ -51,7 +51,7 @@ public class DataProvider {
 
     public void removeTItem(TItem ti) {
         if (ti == null) return;
-        itemService.saveTItem(ti);
+        itemService.removeTItem(ti);
         dataCache.remove(ti);
     }
 
