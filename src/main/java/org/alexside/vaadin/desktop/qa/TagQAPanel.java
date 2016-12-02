@@ -8,6 +8,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import org.alexside.entity.TItem;
 import org.alexside.entity.Tag;
+import org.alexside.events.FilterByTagEvent;
 import org.alexside.events.TItemQASelectionEvent;
 import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.DataProvider;
@@ -57,9 +58,7 @@ public class TagQAPanel extends KibiPanel {
         });
 
         IconButton cloudButton = IconButton.cloudButton();
-        cloudButton.addClickListener(event -> {
-
-        });
+        cloudButton.addClickListener(event -> {});
 
         Label captionLabel = new Label("<b>Теги</b>", ContentMode.HTML);
         captionLabel.setSizeFull();
@@ -103,14 +102,14 @@ public class TagQAPanel extends KibiPanel {
     }
 
     private void addQATags(TItem ti) {
-        ti.getTags().forEach(tag -> {
-            TagItem tagItem = new TagItem(tag);
-            wrap.addComponent(tagItem);
-        });
+        ti.getTags().forEach(this::addQATag);
     }
 
     private void addQATag(Tag tag) {
         TagItem tagItem = new TagItem(tag);
+        tagItem.addTagCallback(t -> {
+            EventUtils.post(new FilterByTagEvent(t));
+        });
         wrap.addComponent(tagItem);
     }
 }

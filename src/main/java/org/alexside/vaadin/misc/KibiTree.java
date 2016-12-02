@@ -2,7 +2,9 @@ package org.alexside.vaadin.misc;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
@@ -14,7 +16,9 @@ import com.vaadin.ui.*;
 import org.alexside.entity.Category;
 import org.alexside.entity.Notice;
 import org.alexside.entity.TItem;
+import org.alexside.entity.Tag;
 import org.alexside.enums.TreeKind;
+import org.alexside.events.FilterByTagEvent;
 import org.alexside.events.TItemRefreshEvent;
 import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.DataProvider;
@@ -25,6 +29,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import static org.alexside.utils.ThemeUtils.HEADER_BUTTON;
 
@@ -40,7 +45,6 @@ public class KibiTree extends KibiPanel {
 
     protected EventBus eventBus;
 
-    protected Label addButton;
     protected Tree tree;
 
     protected Action addCategory = new Action("Добавить категорию", FontAwesome.FOLDER);
@@ -54,8 +58,8 @@ public class KibiTree extends KibiPanel {
         eventBus = EventUtils.getEventBusInstance();
         eventBus.register(this);
 
-        IconButton addHBtn = IconButton.addButton();
-        addHBtn.addClickListener(event -> {
+        IconButton addButton = IconButton.addButton();
+        addButton.addClickListener(event -> {
             TItem ti = new Category("Категория_" + Instant.now().toEpochMilli(), null);
             dataProvider.saveTItem(ti);
             Item added = addContainerItem(
@@ -86,14 +90,18 @@ public class KibiTree extends KibiPanel {
             container.addContainerFilter(filter);
         });
 
-        IconButton searchButton = IconButton.searchButton();
-        HorizontalLayout searchWrap = new HorizontalLayout(searchButton, searchField);
+        IconButton clearButton = IconButton.clearButton();
+        clearButton.addClickListener(event -> {
+            container.removeAllContainerFilters();
+        });
+
+        HorizontalLayout searchWrap = new HorizontalLayout(clearButton, searchField);
         searchWrap.setSizeFull();
         searchWrap.setSpacing(true);
         searchWrap.setExpandRatio(searchField, 1);
 
         addToTopToolbar(searchWrap, Alignment.TOP_LEFT, 5);
-        addToTopToolbar(addHBtn, Alignment.TOP_RIGHT, 1);
+        addToTopToolbar(addButton, Alignment.TOP_RIGHT, 1);
 
         tree = new Tree("", container);
         tree.setImmediate(true);
@@ -188,6 +196,15 @@ public class KibiTree extends KibiPanel {
         }
     }
 
+    @Subscribe
+    public void onFilterByTagEvent(FilterByTagEvent event) {
+        if (event.getTag() == null) return;
+        HierarchicalContainer container = (HierarchicalContainer)tree.getContainerDataSource();
+        container.removeAllContainerFilters();
+        Tag tag = event.getTag();
+        container.addContainerFilter(new FilterByTag("object", tag));
+    }
+
     private void initContainer(HierarchicalContainer container, TItem ti) {
         Item item = addContainerItem(container, ti);
         if (item == null) return;
@@ -221,5 +238,35 @@ public class KibiTree extends KibiPanel {
 
     private void sortContainer(HierarchicalContainer container) {
         container.sort(new Object[]{"kind", "name"}, new boolean[] {true, true});
+    }
+
+    private class FilterByTag implements Container.Filter {
+
+        private final Object propertyId;
+        private final Tag filterTag;
+
+        public FilterByTag(Object propertyId, Tag filterTag) {
+            this.propertyId = propertyId;
+            this.filterTag = filterTag;
+        }
+
+        @Override
+        public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException {
+            if (filterTag == null) return false;
+            Property<?> p = item.getItemProperty(propertyId);
+            if (p == null) return false;
+            TItem ti = (TItem) p.getValue();
+            if (ti == null) return false;
+            if (ti.isNotice() && ti.getTags().contains(filterTag)) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean appliesToProperty(Object propertyId) {
+            if ("object".equals(propertyId)) return true;
+            return false;
+        }
     }
 }
