@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -28,7 +27,6 @@ public class TagService {
         try {
             result = mongoTemplate.findAll(Tag.class).stream()
                     .collect(Collectors.toSet());
-
             return result;
         } catch (Exception e) {
             log.warning(e.getMessage());
@@ -51,5 +49,4 @@ public class TagService {
             log.warning(e.getMessage());
         }
     }
-
 }

@@ -8,6 +8,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import org.alexside.entity.TItem;
+import org.alexside.events.StatusEvent;
 import org.alexside.events.TItemQASelectionEvent;
 import org.alexside.events.TItemRefreshEvent;
 import org.alexside.events.TItemSelectionEvent;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import static org.alexside.utils.HtmlUtils.URL_TEST;
 import static org.alexside.vaadin.misc.IconButton.*;
 
 /**
@@ -53,7 +53,7 @@ public class DisplayPanel extends KibiPanel {
         eventBus.register(this);
 
         setSizeFull();
-        showBottomToolbar(true);
+        getBottomToolbar().setVisible(true);
 
         layout = new VerticalLayout();
         layout.setSizeFull();
@@ -101,17 +101,22 @@ public class DisplayPanel extends KibiPanel {
         Button saveButton = new Button("Сохранить");
         saveButton.addStyleName(ValoTheme.BUTTON_TINY);
         saveButton.addClickListener(event -> {
-            if (editTi != null) {
-                editTi.setName(nameField.getValue());
-                if (editTi.isNotice()) {
-                    if (viewRTA.isAttached()) {
-                        editTi.setContent(viewRTA.getValue());
-                    } else if (editTA.isAttached()) {
-                        editTi.setContent(editTA.getValue());
+            try {
+                if (editTi != null) {
+                    editTi.setName(nameField.getValue());
+                    if (editTi.isNotice()) {
+                        if (viewRTA.isAttached()) {
+                            editTi.setContent(viewRTA.getValue());
+                        } else if (editTA.isAttached()) {
+                            editTi.setContent(editTA.getValue());
+                        }
                     }
+                    dataProvider.saveTItem(editTi);
+                    EventUtils.post(new TItemRefreshEvent(editTi));
+                    EventUtils.post(new StatusEvent("Запись сохранена"));
                 }
-                dataProvider.saveTItem(editTi);
-                EventUtils.post(new TItemRefreshEvent(editTi));
+            } catch (Throwable e) {
+                EventUtils.post(new StatusEvent(String.format("Ошибка сохранения: %s", e.getMessage())));
             }
         });
 

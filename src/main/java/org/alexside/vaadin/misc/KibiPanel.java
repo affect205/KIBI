@@ -25,7 +25,7 @@ public class KibiPanel extends Panel {
         topToolbar = new HorizontalLayout(captionLabel);
         topToolbar.addStyleName(PANEL_HEADER);
         topToolbar.setWidth("100%");
-        topToolbar.setHeight("100px");
+        //topToolbar.setHeight("100px");
         topToolbar.setComponentAlignment(captionLabel, Alignment.TOP_LEFT);
         topToolbar.setExpandRatio(captionLabel, 1);
 
@@ -36,7 +36,7 @@ public class KibiPanel extends Panel {
         bottomToolbar.addStyleName(PANEL_HEADER);
         bottomToolbar.addStyleName(PANEL_FOOTER);
         bottomToolbar.setWidth("100%");
-        bottomToolbar.setHeight("100px");
+        //bottomToolbar.setHeight("100px");
         bottomToolbar.setVisible(false);
 
         wrap = new VerticalLayout(topToolbar, contentLayout, bottomToolbar);
@@ -101,9 +101,9 @@ public class KibiPanel extends Panel {
         contentLayout.setMargin(margin);
     }
 
-    public void showBottomToolbar(boolean show) {
-        bottomToolbar.setVisible(show);
-    }
+    public HorizontalLayout getTopToolbar() { return topToolbar; }
+
+    public HorizontalLayout getBottomToolbar() { return bottomToolbar; }
 
     private enum  ToolbarType {
         TOP, BOTTOM

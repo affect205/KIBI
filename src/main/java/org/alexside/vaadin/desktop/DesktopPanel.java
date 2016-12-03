@@ -3,6 +3,7 @@ package org.alexside.vaadin.desktop;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import org.alexside.lang.Strings;
@@ -36,6 +37,9 @@ public class DesktopPanel extends KibiPanel {
     private ProfileMenu profileMenu;
 
     @Autowired
+    private StatusBar statusBar;
+
+    @Autowired
     private NoticeQAPanel noticeQAPanel;
 
     @PostConstruct
@@ -43,6 +47,8 @@ public class DesktopPanel extends KibiPanel {
         setCaption(Strings.APP_TITLE);
         setSizeFull();
         setContentMargin(true);
+        getBottomToolbar().setVisible(true);
+        getBottomToolbar().setMargin(false);
 
         addToTopToolbar(profileMenu);
 
@@ -62,6 +68,7 @@ public class DesktopPanel extends KibiPanel {
         contentLayout.setExpandRatio(kibiTree, 1);
         contentLayout.setExpandRatio(viewLayout, 4);
 
+        addToBottomToolbar(statusBar, Alignment.BOTTOM_LEFT);
         setContentAlt(contentLayout);
     }
 }
