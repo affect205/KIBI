@@ -50,9 +50,8 @@ kibi.TagCloud = function (element) {
     // });
     console.log("init tag cloud...");
 
-    $("#tagcloud").tx3TagCloud({
-        multiplier: 5
-    });
+    $("#tagcloud").tx3TagCloud({multiplier: 4});
+
     $(".tag-item").click(function () {
         alert($(this).attr("object-id"));
     });
@@ -71,6 +70,24 @@ kibi.TagCloud = function (element) {
     this.setValue = function (value) {
         element.getElementsByTagName("input")[0].value =
             value;
+    };
+    this.getTags = function () {
+
+    };
+    this.setTags = function (tags) {
+        if (!tags) return;
+        console.log("tags...");
+        console.log(tags);
+        tags.forEach(function(tag) {
+            var value =
+                "<li class='tag-item' " +
+                "data-weight='" + tag.weight + "'" +
+                "object-id='" + tag.id + "'>" +
+                "<a href='#'>" + tag.name + "</a>" +
+                "</li>";
+            $("#tagcloud").append(value);
+        });
+        $("#tagcloud").tx3TagCloud({multiplier: 4});
     };
 
     // Default implementation of the click handler

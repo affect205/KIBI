@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Alex on 19.11.2016.
@@ -59,11 +61,12 @@ public class TagQAPanel extends KibiPanel {
 
         final TagCloud tagCloud = new TagCloud();
         tagCloud.setValue("Server-side value");
+        List<TagState> tags = Arrays.asList(new TagState("228", "GWT", 28), new TagState("229", "Scala", 36));
+        tagCloud.setTags(tags);
         tagCloud.addValueChangeListener(
                 (TagCloud.ValueChangeListener) () -> Notification.show("Value: " + tagCloud.getValue()));
 
         VerticalLayout cloudWrap = new VerticalLayout();
-        //cloudWrap.setSizeFull();
         cloudWrap.setWidth("960px");
         cloudWrap.setHeight("480px");
         cloudWrap.setMargin(true);
@@ -71,7 +74,6 @@ public class TagQAPanel extends KibiPanel {
 
         Window cloudWindow = new Window("Облако тегов");
         cloudWindow.setModal(true);
-        cloudWindow.setSizeFull();
         cloudWindow.setWidth("960px");
         cloudWindow.setHeight("480px");
         cloudWindow.setContent(cloudWrap);

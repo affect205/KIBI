@@ -6,6 +6,7 @@ import com.vaadin.ui.JavaScriptFunction;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Alex on 04.12.2016.
@@ -41,6 +42,10 @@ public class TagCloud extends AbstractJavaScriptComponent {
     public String getValue() {
         return getState().value;
     }
+
+    public void setTags(List<TagState> tags) { getState().tags = tags; }
+
+    public List<TagState> getTags() { return getState().tags; }
 
     @Override
     protected TagCloudState getState() {

@@ -15,6 +15,7 @@ import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.VaadinUtils;
+import org.alexside.vaadin.desktop.DesktopView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -51,6 +52,7 @@ public class KibiUI extends UI {
 
         navigator = new Navigator(this, container);
         navigator.addProvider(viewProvider);
+        //navigator.addView("", DesktopView.class);
     }
 
     @Override
