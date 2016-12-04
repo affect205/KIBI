@@ -57,8 +57,29 @@ public class TagQAPanel extends KibiPanel {
             }
         });
 
+        final TagCloud tagCloud = new TagCloud();
+        tagCloud.setValue("Server-side value");
+        tagCloud.addValueChangeListener(
+                (TagCloud.ValueChangeListener) () -> Notification.show("Value: " + tagCloud.getValue()));
+
+        VerticalLayout cloudWrap = new VerticalLayout();
+        //cloudWrap.setSizeFull();
+        cloudWrap.setWidth("960px");
+        cloudWrap.setHeight("480px");
+        cloudWrap.setMargin(true);
+        cloudWrap.addComponents(tagCloud);
+
+        Window cloudWindow = new Window("Облако тегов");
+        cloudWindow.setModal(true);
+        cloudWindow.setSizeFull();
+        cloudWindow.setWidth("960px");
+        cloudWindow.setHeight("480px");
+        cloudWindow.setContent(cloudWrap);
+
         IconButton cloudButton = IconButton.cloudButton();
-        cloudButton.addClickListener(event -> {});
+        cloudButton.addClickListener(event -> {
+            UI.getCurrent().addWindow(cloudWindow);
+        });
 
         Label captionLabel = new Label("<b>Теги</b>", ContentMode.HTML);
         captionLabel.setSizeFull();

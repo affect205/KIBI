@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="tx3-tag-cloud.css" media="screen" rel="stylesheet" type="text/css">
+</head>
+<body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script type="text/javascript" src="jquery.tx3-tag-cloud.js" ></script>
+<ul id="tagcloud">
+    <li data-weight="50" class="tag-item" object-id="1"><a href="#">HTML5</a></li>
+    <li data-weight="24" class="tag-item" object-id="2"><a href="#">CSS3</a></li>
+    <li data-weight="28" class="tag-item" object-id="3"><a href="#">Javascript</a></li>
+    <li data-weight="32" class="tag-item" object-id="4"><a href="#">jQuery</a></li>
+</ul>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#tagcloud").tx3TagCloud({
+            multiplier: 5
+        });
+    });
+    $(".tag-item").click(function () {
+        alert($(this).attr("object-id"));
+    });
+</script>
+
+</body>
+</html>
