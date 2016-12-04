@@ -10,13 +10,13 @@ kibi.TagCloud = function (element) {
         "list-style: none;" +
         "margin-right: 4px;" +
         "}" +
-        "ul.tx3-tag-cloud li a {" +
+        "ul.tx3-tag-cloud li {" +
         "display: block;" +
         "text-decoration: none;" +
         "color: #c9c9c9;" +
         "padding: 3px 10px;" +
         "}" +
-        "ul.tx3-tag-cloud li a:hover {" +
+        "ul.tx3-tag-cloud li:hover {" +
         "color: #000000;" +
         "-webkit-transition: color 250ms linear;" +
         "-moz-transition: color 250ms linear;" +
@@ -32,29 +32,18 @@ kibi.TagCloud = function (element) {
         "<input type='button' value='Click'/>" +
         "</div>" +
         "<ul id='tagcloud'>" +
-        "<li data-weight='50' class='tag-item' object-id='1'><a href='#'>HTML5</a></li>" +
-        "<li data-weight='32' class='tag-item' object-id='2'><a href='#'>NoSQL</a></li>" +
-        "<li data-weight='24' class='tag-item' object-id='3'><a href='#'>CSS3</a></li>" +
-        "<li data-weight='18' class='tag-item' object-id='4'><a href='#'>Spring</a></li>" +
-        "<li data-weight='28' class='tag-item' object-id='5'><a href='#'>Javascript</a></li>" +
-        "<li data-weight='30' class='tag-item' object-id='6'><a href='#'>Hibernate</a></li>" +
-        "<li data-weight='46' class='tag-item' object-id='7'><a href='#'>Java</a></li>" +
-        "<li data-weight='28' class='tag-item' object-id='8'><a href='#'>Vaadin</a></li>" +
-        "<li data-weight='32' class='tag-item' object-id='9'><a href='#'>jQuery</a></li>" +
+        "<li class='tag-item' tag-weight='50' tag-id='1'>HTML5</li>" +
+        "<li class='tag-item' tag-weight='32' tag-id='2'>NoSQL</li>" +
+        "<li class='tag-item' tag-weight='24' tag-id='3'>CSS3</li>" +
+        "<li class='tag-item' tag-weight='18' tag-id='4'>Spring</li>" +
+        "<li class='tag-item' tag-weight='28' tag-id='5'>Javascript</li>" +
+        "<li class='tag-item' tag-weight='30' tag-id='6'>Hibernate</li>" +
+        "<li class='tag-item' tag-weight='46' tag-id='7'>Java</li>" +
+        "<li class='tag-item' tag-weight='28' tag-id='8'>Vaadin</li>" +
+        "<li class='tag-item' tag-weight='32' tag-id='9'>jQuery</li>" +
         "</ul>";
 
-    // $(document).ready(function(){
-    //     $("#tagcloud").tx3TagCloud({
-    //         multiplier: 5
-    //     });
-    // });
-    console.log("init tag cloud...");
-
     $("#tagcloud").tx3TagCloud({multiplier: 4});
-
-    $(".tag-item").click(function () {
-        alert($(this).attr("object-id"));
-    });
 
     // Style it
     // element.style.border = "thin solid #1b87e3";
@@ -72,22 +61,23 @@ kibi.TagCloud = function (element) {
             value;
     };
     this.getTags = function () {
-
+        return [];
     };
     this.setTags = function (tags) {
         if (!tags) return;
-        console.log("tags...");
-        console.log(tags);
         tags.forEach(function(tag) {
             var value =
                 "<li class='tag-item' " +
-                "data-weight='" + tag.weight + "'" +
-                "object-id='" + tag.id + "'>" +
-                "<a href='#'>" + tag.name + "</a>" +
+                "tag-weight='" + tag.weight + "'" +
+                "tag-id='" + tag.id + "'>" +
+                tag.name +
                 "</li>";
             $("#tagcloud").append(value);
         });
         $("#tagcloud").tx3TagCloud({multiplier: 4});
+        $(".tag-item").click(function () {
+            self.onTagClick($(this).attr("tag-id"));
+        });
     };
 
     // Default implementation of the click handler
@@ -101,4 +91,13 @@ kibi.TagCloud = function (element) {
     button.onclick = function () {
         self.click();
     };
+
+    // клик по тегу
+    this.onTagClick = function (tagId) {
+        alert("Error: Must implement onTagClick() method");
+    };
+
+    $(".tag-item").click(function () {
+        self.onTagClick($(this).attr("tag-id"));
+    });
 };

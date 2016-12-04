@@ -21,18 +21,24 @@ import java.util.List;
 public class TagCloud extends AbstractJavaScriptComponent {
 
     ArrayList<ValueChangeListener> listeners = new ArrayList<>();
+    ArrayList<TagClickListener> tagClickListeners = new ArrayList<>();
 
     public TagCloud() {
         addFunction("onClick", (JavaScriptFunction) arguments -> {
             getState().value = arguments.getString(0);
-            for (ValueChangeListener listener: listeners) {
-                listener.valueChange();
-            }
+            listeners.forEach(listener -> listener.valueChange());
+        });
+        addFunction("onTagClick", (JavaScriptFunction) arguments -> {
+            tagClickListeners.forEach(listener -> listener.tagClick(arguments.getString(0)));
         });
     }
 
     public void addValueChangeListener(ValueChangeListener listener) {
         listeners.add(listener);
+    }
+
+    public void addTagClickListener(TagClickListener listener) {
+        tagClickListeners.add(listener);
     }
 
     public void setValue(String value) {
@@ -54,6 +60,10 @@ public class TagCloud extends AbstractJavaScriptComponent {
 
     public interface ValueChangeListener extends Serializable {
         void valueChange();
+    }
+
+    public interface TagClickListener extends Serializable {
+        void tagClick(String tagId);
     }
 }
 

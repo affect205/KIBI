@@ -15,4 +15,7 @@ window.org_alexside_vaadin_desktop_qa_TagCloud =
         tagcloud.click = function() {
             self.onClick(tagcloud.getValue());
         };
+        tagcloud.onTagClick = function (tagId) {
+            self.onTagClick(tagId);
+        };
     };

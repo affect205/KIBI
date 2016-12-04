@@ -63,8 +63,12 @@ public class TagQAPanel extends KibiPanel {
         tagCloud.setValue("Server-side value");
         List<TagState> tags = Arrays.asList(new TagState("228", "GWT", 28), new TagState("229", "Scala", 36));
         tagCloud.setTags(tags);
-        tagCloud.addValueChangeListener(
-                (TagCloud.ValueChangeListener) () -> Notification.show("Value: " + tagCloud.getValue()));
+        tagCloud.addValueChangeListener((TagCloud.ValueChangeListener) () -> {
+            Notification.show("Value: " + tagCloud.getValue());
+        });
+        tagCloud.addTagClickListener((TagCloud.TagClickListener) (String tagId) -> {
+            Notification.show(String.format("Tag id: %s", tagId));
+        });
 
         VerticalLayout cloudWrap = new VerticalLayout();
         cloudWrap.setWidth("960px");

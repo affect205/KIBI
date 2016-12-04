@@ -20,7 +20,7 @@
         $.each(element.find("li"), function () {
             cDataWeight = getDataWeight(this);
             if (cDataWeight == undefined) {
-                logWarning("No \"data-weight\" attribut defined on <li> element");
+                logWarning("No \"tag-weight\" attribut defined on <li> element");
             } else {
                 hDataWeight = cDataWeight > hDataWeight ? cDataWeight : hDataWeight;
                 lDataWeight = cDataWeight < lDataWeight ? cDataWeight : lDataWeight;
@@ -35,7 +35,7 @@
     }
 
     function getDataWeight(element) {
-        return parseInt($(element).attr("data-weight"));
+        return parseInt($(element).attr("tag-weight"));
     }
 
     function logWarning(message) {
