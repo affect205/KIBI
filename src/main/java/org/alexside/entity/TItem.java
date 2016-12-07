@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -94,6 +95,8 @@ public abstract class TItem {
     public boolean isNotice() { return kind == TreeKind.NOTICE; }
 
     public Set<Tag> getTags() { return new HashSet<>(); }
+
+    public Stream<Tag> getTagsAsStream() { return new HashSet<Tag>().stream(); }
 
     public void setTags(Set<Tag> tags) {}
 

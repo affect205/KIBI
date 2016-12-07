@@ -25,6 +25,8 @@ kibi.TagCloud = function (element) {
         "transition: color 250ms linear;" +
         "}" ;
 
+    // 50, 32, 24
+
     element.innerHTML =
         "<style> " + style + " </style>" +
         "<div class='textinput'>Enter a value: " +
@@ -32,9 +34,9 @@ kibi.TagCloud = function (element) {
         "<input type='button' value='Click'/>" +
         "</div>" +
         "<ul id='tagcloud'>" +
-        // "<li class='tag-item' tag-weight='50' tag-id='1'>HTML5</li>" +
-        // "<li class='tag-item' tag-weight='32' tag-id='2'>NoSQL</li>" +
-        // "<li class='tag-item' tag-weight='24' tag-id='3'>CSS3</li>" +
+        // "<li class='tag-item' tag-weight='30' tag-id='1'>HTML5</li>" +
+        // "<li class='tag-item' tag-weight='30' tag-id='2'>NoSQL</li>" +
+        // "<li class='tag-item' tag-weight='30' tag-id='3'>CSS3</li>" +
         // "<li class='tag-item' tag-weight='18' tag-id='4'>Spring</li>" +
         // "<li class='tag-item' tag-weight='28' tag-id='5'>Javascript</li>" +
         // "<li class='tag-item' tag-weight='30' tag-id='6'>Hibernate</li>" +
@@ -51,19 +53,17 @@ kibi.TagCloud = function (element) {
 
     // Getter and setter for the value property
     this.getValue = function () {
-        return element.
-        getElementsByTagName("input")[0].value;
+        return element.getElementsByTagName("input")[0].value;
     };
     this.setValue = function (value) {
-        element.getElementsByTagName("input")[0].value =
-            value;
+        element.getElementsByTagName("input")[0].value = value;
     };
     this.getTags = function () {
         return [];
     };
     this.setTags = function (tags) {
         if (!tags) return;
-        $(".tag-item").remove();
+        //$(".tag-item").remove();
         tags.forEach(function(tag) {
             var value =
                 "<li class='tag-item' " +

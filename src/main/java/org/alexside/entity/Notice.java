@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,6 +67,9 @@ public class Notice extends TItem {
         tags.remove(null);
         this.tags = tags;
     }
+
+    @Override
+    public Stream<Tag> getTagsAsStream() { return tags.stream(); }
 
     @Override
     public void addTag(Tag tag) {

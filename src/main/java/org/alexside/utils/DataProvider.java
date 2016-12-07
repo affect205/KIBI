@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.alexside.utils.SpringUtils.SCOPE_SINGLETON;
 
@@ -62,9 +64,18 @@ public class DataProvider {
         return tagCache;
     }
 
+    public Map<Tag, Long> getRatedTagCache() {
+        return dataCache.stream()
+                .filter(TItem::isNotice)
+                .flatMap(TItem::getTagsAsStream)
+                .collect(
+                        Collectors.groupingBy(Function.identity(), Collectors.counting()
+                ));
+    }
+
     public void saveTag(Tag tag) { tagService.saveTag(tag); }
 
-    public Tag getUniqueTag(Tag tag) {
+    public Tag uniqueTag(Tag tag) {
         String s1 = tag.getName().toLowerCase().replaceAll("\\s", "");
         for (Tag t : tagCache) {
             String s2 = t.getName().toLowerCase().replaceAll("\\s", "");

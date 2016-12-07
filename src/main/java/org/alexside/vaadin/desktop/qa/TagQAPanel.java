@@ -61,18 +61,15 @@ public class TagQAPanel extends KibiPanel {
         IconButton addButton = IconButton.addTagButton();
         addButton.addClickListener(event -> {
             if (item != null) {
-                Tag tag = dataProvider.getUniqueTag(new Tag(tagField.getValue(), item));
+                Tag tag = dataProvider.uniqueTag(new Tag(tagField.getValue(), item));
                 item.addTag(tag);
                 addQATag(tag);
             }
         });
 
+        // TODO just for tes: remove after
         final TagCloud tagCloud = new TagCloud();
         tagCloud.setValue("Server-side value");
-        List<TagState> tags = dataProvider.getTagCache().stream()
-                .map(t -> new TagState(t.getId(), t.getName(), 30))
-                .collect(Collectors.toList());
-        tagCloud.setTags(tags);
 
         VerticalLayout cloudWrap = new VerticalLayout();
         cloudWrap.setWidth("960px");
@@ -98,6 +95,11 @@ public class TagQAPanel extends KibiPanel {
 
         IconButton cloudButton = IconButton.cloudButton();
         cloudButton.addClickListener(event -> {
+            dataProvider.getRatedTagCache();
+            List<TagState> tags = dataProvider.getTagCache().stream()
+                    .map(t -> new TagState(t.getId(), t.getName(), 30))
+                    .collect(Collectors.toList());
+            tagCloud.setTags(tags);
             UI.getCurrent().addWindow(cloudWindow);
         });
 
