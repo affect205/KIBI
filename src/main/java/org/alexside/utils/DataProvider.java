@@ -72,4 +72,9 @@ public class DataProvider {
         }
         return tag;
     }
+
+    public Optional<Tag> findTagById(String id) {
+        if (id == null) return null;
+        return tagCache.stream().filter(tag -> id.equals(tag.getId())).findAny();
+    }
 }

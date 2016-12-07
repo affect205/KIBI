@@ -26,10 +26,17 @@
                 lDataWeight = cDataWeight < lDataWeight ? cDataWeight : lDataWeight;
             }
         });
+        console.log("hDataWeight: " + hDataWeight);
+        console.log("lDataWeight: " + lDataWeight);
         $.each(element.find("li"), function () {
             var dataWeight = getDataWeight(this);
-            var percent = Math.abs((dataWeight - lDataWeight) / (lDataWeight - hDataWeight));
-            $(this).css('font-size', (1 + (percent * settings['multiplier'])) + "em");
+            var dWeight = (hDataWeight == lDataWeight) ? 5 : lDataWeight - hDataWeight;
+            var percent = Math.abs(((dataWeight+1) - lDataWeight) / dWeight);
+            console.log("dWeight: " + dWeight);
+            console.log("percent: " + percent);
+            var fontSize = 1 + (percent * settings['multiplier']);
+            console.log("fontSize: " + fontSize);
+            $(this).css('font-size', fontSize + "em");
         });
 
     }
