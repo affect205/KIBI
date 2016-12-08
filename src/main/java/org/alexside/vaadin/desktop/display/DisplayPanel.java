@@ -158,7 +158,6 @@ public class DisplayPanel extends KibiPanel {
 
         contentWrap = new VerticalLayout(viewLayout);
         contentWrap.setSizeFull();
-        contentWrap.setMargin(true);
         contentWrap.setExpandRatio(viewLayout, 10);
         contentWrap.addComponentDetachListener(event -> {
             Component c = event.getDetachedComponent();

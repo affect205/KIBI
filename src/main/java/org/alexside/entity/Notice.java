@@ -59,6 +59,7 @@ public class Notice extends TItem {
 
     @Override
     public Set<Tag> getTags() {
+        tags.remove(null);
         return tags;
     }
 
@@ -69,7 +70,10 @@ public class Notice extends TItem {
     }
 
     @Override
-    public Stream<Tag> getTagsAsStream() { return tags.stream(); }
+    public Stream<Tag> getTagsAsStream() {
+        tags.remove(null);
+        return tags.stream();
+    }
 
     @Override
     public void addTag(Tag tag) {

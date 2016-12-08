@@ -63,6 +63,7 @@ public class TagQAPanel extends KibiPanel {
             if (item != null) {
                 Tag tag = dataProvider.uniqueTag(new Tag(tagField.getValue(), item));
                 item.addTag(tag);
+                dataProvider.saveTItem(item);
                 addQATag(tag);
             }
         });

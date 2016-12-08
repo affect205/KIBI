@@ -64,6 +64,11 @@ public class DataProvider {
         return tagCache;
     }
 
+    public Set<Tag> getTags() {
+        tagCache = tagService.findAll();
+        return tagCache;
+    }
+
     public Map<Tag, Long> getRatedTagCache() {
         return dataCache.stream()
                 .filter(TItem::isNotice)
