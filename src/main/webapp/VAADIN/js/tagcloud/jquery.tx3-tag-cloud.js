@@ -6,8 +6,7 @@
             multiplier: 1
         }, options);
         main(this);
-
-    }
+    };
 
     function main(element) {
         element.addClass("tx3-tag-cloud");
@@ -15,37 +14,22 @@
     }
 
     function addListElementFontSize(element) {
-        var hDataWeight = -9007199254740992;
-        var lDataWeight = 9007199254740992;
         $.each(element.find("li"), function () {
-            cDataWeight = getDataWeight(this);
-            if (cDataWeight == undefined) {
-                logWarning("No \"tag-weight\" attribut defined on <li> element");
-            } else {
-                hDataWeight = cDataWeight > hDataWeight ? cDataWeight : hDataWeight;
-                lDataWeight = cDataWeight < lDataWeight ? cDataWeight : lDataWeight;
-            }
-        });
-        console.log("hDataWeight: " + hDataWeight);
-        console.log("lDataWeight: " + lDataWeight);
-        $.each(element.find("li"), function () {
+            var percent = 0.5;
             var dataWeight = getDataWeight(this);
-            var dWeight = (hDataWeight == lDataWeight) ? 1 : lDataWeight - hDataWeight;
-            console.log("dWeight: " + dWeight);
-            var percent = Math.abs(((dataWeight+1) - lDataWeight) / dWeight);
-            console.log("percent: " + percent);
-            var fontSize = 1 + (percent * settings['multiplier']);
+            if (dataWeight != undefined && dataWeight != NaN && dataWeight > 1) {
+                if (dataWeight > 2) {
+                    var log = Math.log(dataWeight);
+                    percent = log - (log/6);
+                } else percent = 0.75;
+            }
+            var fontSize = percent * settings['multiplier'];
             console.log("fontSize: " + fontSize);
             $(this).css('font-size', fontSize + "em");
         });
-
     }
 
     function getDataWeight(element) {
         return parseInt($(element).attr("tag-weight"));
-    }
-
-    function logWarning(message) {
-        console.log("[WARNING] " + Date.now() + " : " + message);
     }
 }(jQuery));

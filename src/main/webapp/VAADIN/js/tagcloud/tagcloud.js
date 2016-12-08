@@ -73,7 +73,7 @@ kibi.TagCloud = function (element) {
                 "</li>";
             $("#tagcloud").append(value);
         });
-        $("#tagcloud").tx3TagCloud({multiplier: 1.5});
+        $("#tagcloud").tx3TagCloud({multiplier: 2});
         $(".tag-item").click(function () {
             self.onTagClick($(this).attr("tag-id"));
         });

@@ -2,18 +2,21 @@ package org.alexside.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Created by abalyshev on 20.10.16.
  */
-@Document
+@Document(collection="users")
 public class User {
-
     @Id
     private String id;
-
+    @Field
     private String login;
+    @Field
     private String password;
+    @Field
+    private String email;
 
     public User(String login, String password) {
         this.login = login;
@@ -35,6 +38,10 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getEmail() { return email; }
+
+    public void setEmail(String email) { this.email = email; }
 
     @Override
     public boolean equals(Object o) {

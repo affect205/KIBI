@@ -26,8 +26,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.alexside.vaadin.desktop.qa.TagCloud.computeWeight;
-
 /**
  * Created by Alex on 19.11.2016.
  */
@@ -96,7 +94,7 @@ public class TagQAPanel extends KibiPanel {
                     .map(entry -> new TagState(
                             entry.getKey().getId(),
                             entry.getKey().getName(),
-                            computeWeight(entry.getValue().intValue())))
+                            entry.getValue().intValue()))
                     .collect(Collectors.toList());
             tagCloud.setTags(tags);
             UI.getCurrent().addWindow(cloudWindow);
