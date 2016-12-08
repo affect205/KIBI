@@ -30,9 +30,9 @@
         console.log("lDataWeight: " + lDataWeight);
         $.each(element.find("li"), function () {
             var dataWeight = getDataWeight(this);
-            var dWeight = (hDataWeight == lDataWeight) ? 5 : lDataWeight - hDataWeight;
-            var percent = Math.abs(((dataWeight+1) - lDataWeight) / dWeight);
+            var dWeight = (hDataWeight == lDataWeight) ? 1 : lDataWeight - hDataWeight;
             console.log("dWeight: " + dWeight);
+            var percent = Math.abs(((dataWeight+1) - lDataWeight) / dWeight);
             console.log("percent: " + percent);
             var fontSize = 1 + (percent * settings['multiplier']);
             console.log("fontSize: " + fontSize);

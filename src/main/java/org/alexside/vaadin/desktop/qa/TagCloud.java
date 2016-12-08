@@ -65,6 +65,10 @@ public class TagCloud extends AbstractJavaScriptComponent {
     public interface TagClickListener extends Serializable {
         void tagClick(String tagId);
     }
+
+    public static int computeWeight(int rating) {
+        return 12+(2*rating);
+    }
 }
 
 

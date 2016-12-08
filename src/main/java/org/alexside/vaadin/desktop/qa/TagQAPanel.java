@@ -26,6 +26,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.alexside.vaadin.desktop.qa.TagCloud.computeWeight;
+
 /**
  * Created by Alex on 19.11.2016.
  */
@@ -60,12 +62,7 @@ public class TagQAPanel extends KibiPanel {
 
         IconButton addButton = IconButton.addTagButton();
         addButton.addClickListener(event -> {
-            if (item != null) {
-                Tag tag = dataProvider.uniqueTag(new Tag(tagField.getValue(), item));
-                item.addTag(tag);
-                dataProvider.saveTItem(item);
-                addQATag(tag);
-            }
+            saveTag(dataProvider.uniqueTag(new Tag(tagField.getValue(), item)));
         });
 
         // TODO just for tes: remove after
@@ -90,15 +87,16 @@ public class TagQAPanel extends KibiPanel {
 
         tagCloud.addTagClickListener((TagCloud.TagClickListener) (String tagId) -> {
             Notification.show(String.format("Tag id: %s", tagId));
-            dataProvider.findTagById(tagId).ifPresent(this::addQATag);
-            cloudWindow.close();
+            dataProvider.findTagById(tagId).ifPresent(tag -> saveTag(tag));
         });
 
         IconButton cloudButton = IconButton.cloudButton();
         cloudButton.addClickListener(event -> {
-            dataProvider.getRatedTagCache();
-            List<TagState> tags = dataProvider.getTagCache().stream()
-                    .map(t -> new TagState(t.getId(), t.getName(), 30))
+            List<TagState> tags = dataProvider.getRatedTagCache().entrySet().stream()
+                    .map(entry -> new TagState(
+                            entry.getKey().getId(),
+                            entry.getKey().getName(),
+                            computeWeight(entry.getValue().intValue())))
                     .collect(Collectors.toList());
             tagCloud.setTags(tags);
             UI.getCurrent().addWindow(cloudWindow);
@@ -171,6 +169,14 @@ public class TagQAPanel extends KibiPanel {
     public void removeQANotice(TagQA tagQA) {
         wrap.removeComponent(tagQA.tagItem);
         tagDeque.remove(tagQA);
+    }
+
+    private void saveTag(Tag tag) {
+        if (item != null) {
+            item.addTag(tag);
+            dataProvider.saveTItem(item);
+            addQATag(tag);
+        }
     }
 
     private static class TagQA {
