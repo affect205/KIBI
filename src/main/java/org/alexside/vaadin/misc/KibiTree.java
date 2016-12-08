@@ -29,9 +29,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import static org.alexside.utils.ThemeUtils.HEADER_BUTTON;
+import static org.alexside.utils.ThemeUtils.PANEL_SCROLLABLE;
 
 /**
  * Created by abalyshev on 27.10.16.
@@ -103,8 +103,10 @@ public class KibiTree extends KibiPanel {
         addToTopToolbar(searchWrap, Alignment.TOP_LEFT, 5);
         addToTopToolbar(addButton, Alignment.TOP_RIGHT, 1);
 
-        tree = new Tree("", container);
+        tree = new Tree(null, container);
+        tree.setSizeFull();
         tree.setImmediate(true);
+        tree.addStyleName(PANEL_SCROLLABLE);
         tree.setItemIconPropertyId("icon");
         tree.setItemCaptionPropertyId("name");
         tree.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
