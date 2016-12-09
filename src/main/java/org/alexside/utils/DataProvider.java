@@ -28,7 +28,7 @@ public class DataProvider {
     @Autowired
     private TagService tagService;
 
-    private List<TItem> dataCache;
+    private Set<TItem> dataCache;
     private Set<Tag> tagCache;
 
     @PostConstruct
@@ -37,7 +37,7 @@ public class DataProvider {
         tagCache = tagService.findAll();
     }
 
-    public List<TItem> getTreeData() {
+    public Set<TItem> getTreeData() {
         if (dataCache.isEmpty()) {
             dataCache = itemService.findAll();
         }

@@ -116,7 +116,7 @@ public abstract class TItem {
         if (this == o) return true;
         if (!(o instanceof TItem) || o == null) return false;
         TItem ti = (TItem) o;
-        return name.hashCode() == ti.getName().hashCode() && kind == ti.getKind() && compareParents(ti);
+        return name.equals(ti.getName()) && kind == ti.getKind() && compareParents(ti);
     }
 
     @Override
@@ -128,7 +128,6 @@ public abstract class TItem {
     }
 
     private boolean compareParents(TItem ti) {
-        return (parent == null ? 0 : parent.hashCode()) ==
-                (ti.getParent() == null ? 0 : ti.getParent().hashCode());
+        return ti.getParent() == null ? parent == null : parent.equals(ti.getParent());
     }
 }

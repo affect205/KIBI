@@ -35,7 +35,6 @@ import javax.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.alexside.utils.ThemeUtils.HEADER_BUTTON;
@@ -77,7 +76,7 @@ public class KibiTree extends KibiPanel {
             tree.setChildrenAllowed(ti.getId(), true);
         });
 
-        List<TItem> data = dataProvider.getTreeData();
+        Set<TItem> data = dataProvider.getTreeData();
         HierarchicalContainer container = new HierarchicalContainer();
         container.addContainerProperty("id", String.class, "");
         container.addContainerProperty("name", String.class, "");
@@ -86,6 +85,7 @@ public class KibiTree extends KibiPanel {
         container.addContainerProperty("kind", TreeKind.class, TreeKind.UNKNOWN);
         container.addContainerProperty("object", TItem.class, null);
         data.forEach(tItem -> initContainer(container, tItem));
+        data.forEach(tItem -> initContainerHierarchy(container, tItem));
         sortContainer(container);
 
         TextField searchField = new TextField();
@@ -253,7 +253,7 @@ public class KibiTree extends KibiPanel {
         Item item = addContainerItem(container, ti);
         if (item == null) return;
 
-        if (ti.getKind() == TreeKind.CATEGORY && ti.hasChildren()) {
+        if (ti.isCategory()) {
             ti.getChildren().forEach(child -> initContainer(container, child));
         }
     }
@@ -272,8 +272,13 @@ public class KibiTree extends KibiPanel {
         item.getItemProperty("content").setValue(ti.getContentMeta());
         item.getItemProperty("object").setValue(ti);
 
-        if (ti.hasParent()) container.setParent(ti.getId(), ti.getParent().getId());
         return item;
+    }
+
+    private void initContainerHierarchy(HierarchicalContainer container, TItem ti) {
+        if (ti.hasParent()) {
+            container.setParent(ti.getId(), ti.getParent().getId());
+        }
     }
 
     private void removeItem(HierarchicalContainer container, Object itemId) {

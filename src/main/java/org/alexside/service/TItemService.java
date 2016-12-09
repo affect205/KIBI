@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by Alex on 29.10.2016.
@@ -24,22 +26,22 @@ public class TItemService {
     @Autowired
     private Datastore datastore;
 
-    public List<TItem> findAll() {
-        List<TItem> tItemList = new LinkedList<>();
+    public Set<TItem> findAll() {
+        Set<TItem> result = new HashSet<>();
         try {
-            tItemList = mongoTemplate.findAll(TItem.class);
-            for (TItem ti : tItemList) {
+            result = mongoTemplate.findAll(TItem.class).stream().collect(Collectors.toSet());
+            for (TItem ti : result) {
                 if (ti.isCategory()) {
-                    tItemList.forEach(ti2 -> {
-                        if (ti.equals(ti2.getParent()))
-                            ti.getChildren().add(ti2);
-                    });
+                    List<TItem> children = result.stream()
+                            .filter(i -> i.getParent() != null && i.getParent().getId().equals(ti.getId()))
+                            .collect(Collectors.toList());
+                    ti.getChildren().addAll(children);
                 }
             }
         } catch (Exception e) {
             log.warning(e.getMessage());
         }
-        return tItemList;
+        return result;
     }
 
     public void saveTItem(TItem tItem) {
@@ -64,6 +66,12 @@ public class TItemService {
 
     public void removeTItem(TItem tItem) {
         if (tItem == null) return;
+        if (tItem.isCategory() && tItem.hasChildren()) {
+            tItem.getChildren().forEach(ti -> {
+                ti.setParent(tItem.getParent());
+                mongoTemplate.save(ti);
+            });
+        }
         mongoTemplate.remove(tItem);
     }
 
