@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 /**
  * Created by Alex on 14.11.2016.
+ * TODO: отрефакторить в базовый класс
  */
 public class TagItem extends VerticalLayout {
 
@@ -48,6 +49,14 @@ public class TagItem extends VerticalLayout {
     public TagItem(Tag tag) {
         this.tag = tag;
         this.tagCallback = Optional.empty();
+
+//        VerticalLayout layout = new VerticalLayout();
+//        setContent(layout);
+//
+//        ContextMenu contextMenu = new ContextMenu();
+//        contextMenu.addItem("Root Item").addItem("Sub item");
+//
+//        contextMenu.setAsContextMenuOf(layout);
 
         setSizeUndefined();
         addStyleName(ThemeUtils.TAG_ITEM);

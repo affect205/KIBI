@@ -7,6 +7,9 @@ buildscript {
 		maven {
 			url "https://plugins.gradle.org/m2/"
 		}
+		maven {
+			url 'http://maven.vaadin.com/vaadin-addons'
+		}
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -28,14 +31,7 @@ jar {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-repositories {
-	mavenCentral()
-	maven {
-		url 'http://maven.vaadin.com/vaadin-addons'
-	}
-}
-
-def vaadinVersion = '7.7.3'
+def vaadinVersion = '7.7.5'
 
 dependencies {
 	compile("com.vaadin:vaadin-spring-boot-starter:1.0.2")
@@ -46,7 +42,8 @@ dependencies {
 
 	// Vaadin addons
 	compile("com.vaadin:vaadin-push:${vaadinVersion}")
-	compile("org.vaadin.addons:cssinject:2.0.3")
+	compile("org.vaadin.addons:contextmenu:4.5")
+
 	//compile('org.vaadin.addons:loginform:0.6.2')
 
 	// MongoDB
@@ -57,6 +54,7 @@ dependencies {
 	compile('com.google.guava:guava:20.0')
 	compile("com.google.code.gson:gson:2.7")
 	compile("commons-io:commons-io:2.5")
+	compile("ma.glasnost.orika:orika-core:1.5.0")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 }
