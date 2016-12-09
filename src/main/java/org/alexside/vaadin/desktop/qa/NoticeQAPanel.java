@@ -47,6 +47,8 @@ public class NoticeQAPanel extends KibiPanel {
         eventBus.register(this);
 
         wrap = new CssLayout();
+        wrap.setSizeFull();
+        wrap.addStyleName(ThemeUtils.PANEL_SCROLLABLE);
         wrap.addStyleName(ThemeUtils.LAYOUT_OUTLINED);
 
         Label captionLabel = new Label("<b>Записи</b>", ContentMode.HTML);

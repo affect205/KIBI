@@ -51,6 +51,11 @@ public class DataProvider {
         tagCache.addAll(ti.getTags());
     }
 
+    public void saveTItems(Collection<TItem> items) {
+        if (items == null) return;
+        items.forEach(this::saveTItem);
+    }
+
     public void removeTItem(TItem ti) {
         if (ti == null) return;
         itemService.removeTItem(ti);

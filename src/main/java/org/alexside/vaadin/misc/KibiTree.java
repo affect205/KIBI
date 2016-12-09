@@ -8,6 +8,11 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
+import com.vaadin.event.DataBoundTransferable;
+import com.vaadin.event.dd.DragAndDropEvent;
+import com.vaadin.event.dd.DropHandler;
+import com.vaadin.event.dd.acceptcriteria.AcceptAll;
+import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -28,7 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.alexside.utils.ThemeUtils.HEADER_BUTTON;
 import static org.alexside.utils.ThemeUtils.PANEL_SCROLLABLE;
@@ -115,6 +123,40 @@ public class KibiTree extends KibiPanel {
             if (selected != null) {
                 EventUtils.post(new TItemSelectionEvent(selected));
             }
+        });
+        tree.setDragMode(Tree.TreeDragMode.NODE);
+        tree.setDropHandler(new DropHandler() {
+            @Override
+            public void drop(DragAndDropEvent dropEvent) {
+                DataBoundTransferable t = (DataBoundTransferable) dropEvent
+                        .getTransferable();
+                Container sourceContainer = t.getSourceContainer();
+                Object sourceItemId = t.getItemId();
+                Item sourceItem = sourceContainer.getItem(sourceItemId);
+                TItem sourceTi  = (TItem) sourceItem.getItemProperty("object").getValue();
+
+                AbstractSelect.AbstractSelectTargetDetails dropData = ((AbstractSelect.AbstractSelectTargetDetails) dropEvent
+                        .getTargetDetails());
+                Object targetItemId = dropData.getItemIdOver();
+                Item targetItem = sourceContainer.getItem(targetItemId);
+                TItem targetTi = (TItem) targetItem.getItemProperty("object").getValue();
+
+                if (sourceTi != null || targetTi != null || targetTi.isCategory()) {
+                    Set<TItem> savedItems = new HashSet<>();
+                    container.setParent(sourceItemId, targetItemId);
+                    TItem sourceParentTi = sourceTi.getParent();
+                    if (sourceParentTi != null) {
+                        sourceParentTi.getChildren().remove(sourceTi);
+                        savedItems.add(sourceParentTi);
+                    }
+                    sourceTi.setParent(targetTi);
+                    targetTi.getChildren().add(sourceTi);
+                    savedItems.addAll(Arrays.asList(targetTi, sourceTi));
+                    dataProvider.saveTItems(savedItems);
+                }
+            }
+            @Override
+            public AcceptCriterion getAcceptCriterion() { return AcceptAll.get(); }
         });
 
         tree.addActionHandler(new Action.Handler() {

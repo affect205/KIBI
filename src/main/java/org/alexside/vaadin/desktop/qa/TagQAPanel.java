@@ -79,13 +79,15 @@ public class TagQAPanel extends KibiPanel {
         cloudWindow.setHeight("480px");
         cloudWindow.setContent(cloudWrap);
 
-        tagCloud.addValueChangeListener((TagCloud.ValueChangeListener) () -> {
-            Notification.show("Value: " + tagCloud.getValue());
-        });
+//        tagCloud.addValueChangeListener((TagCloud.ValueChangeListener) () -> {
+//            Notification.show("Value: " + tagCloud.getValue());
+//        });
 
         tagCloud.addTagClickListener((TagCloud.TagClickListener) (String tagId) -> {
-            Notification.show(String.format("Tag id: %s", tagId));
-            dataProvider.findTagById(tagId).ifPresent(tag -> saveTag(tag));
+            dataProvider.findTagById(tagId).ifPresent(tag -> {
+                Notification.show(String.format("Тег %s добавлен", tag.getName()));
+                saveTag(tag);
+            });
         });
 
         IconButton cloudButton = IconButton.cloudButton();
@@ -114,6 +116,8 @@ public class TagQAPanel extends KibiPanel {
         addToTopToolbar(tagWrap, Alignment.TOP_RIGHT);
 
         wrap = new CssLayout();
+        wrap.setSizeFull();
+        wrap.addStyleName(ThemeUtils.PANEL_SCROLLABLE);
         wrap.addStyleName(ThemeUtils.LAYOUT_OUTLINED);
 
         setContentAlt(wrap);
