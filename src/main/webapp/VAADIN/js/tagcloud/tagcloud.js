@@ -63,7 +63,7 @@ kibi.TagCloud = function (element) {
     };
     this.setTags = function (tags) {
         if (!tags) return;
-        //$(".tag-item").remove();
+        $(".tag-item").remove();
         tags.forEach(function(tag) {
             var value =
                 "<li class='tag-item' " +

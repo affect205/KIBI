@@ -14,17 +14,17 @@ import org.alexside.events.TItemSelectionEvent;
 import org.alexside.utils.DataProvider;
 import org.alexside.utils.EventUtils;
 import org.alexside.utils.ThemeUtils;
+import org.alexside.vaadin.misc.HashTag;
 import org.alexside.vaadin.misc.IconButton;
 import org.alexside.vaadin.misc.KibiPanel;
-import org.alexside.vaadin.misc.TagItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.alexside.entity.Tag.equalsId;
 
 /**
  * Created by Alex on 19.11.2016.
@@ -63,7 +63,7 @@ public class TagQAPanel extends KibiPanel {
             saveTag(dataProvider.uniqueTag(new Tag(tagField.getValue(), item)));
         });
 
-        // TODO just for tes: remove after
+        // TODO just for test: remove after
         final TagCloud tagCloud = new TagCloud();
         tagCloud.setValue("Server-side value");
 
@@ -98,6 +98,7 @@ public class TagQAPanel extends KibiPanel {
                             entry.getKey().getName(),
                             entry.getValue().intValue()))
                     .collect(Collectors.toList());
+            //Collections.shuffle(tags);
             tagCloud.setTags(tags);
             UI.getCurrent().addWindow(cloudWindow);
         });
@@ -150,27 +151,37 @@ public class TagQAPanel extends KibiPanel {
     }
 
     private void addQATag(Tag tag) {
-        tagDeque.stream()
-                .filter(noticeQA -> noticeQA.tag.equals(tag))
-                .findFirst()
-                .ifPresent(this::removeQANotice);
+        removeQANotice(tag);
         if (tagDeque.size() >= LIMIT) removeQANotice();
-        TagItem tagItem = new TagItem(tag);
-        tagItem.addTagCallback(t -> {
+        HashTag hashTag = new HashTag(tag);
+        hashTag.addCallback(t -> {
             EventUtils.post(new FilterByTagEvent(t));
         });
-        tagDeque.push(new TagQA(tagItem, tag));
-        wrap.addComponent(tagItem);
+        hashTag.addDelCallback(t -> {
+            removeQANotice(t);
+            if (item != null) {
+                item.removeTag(t);
+                dataProvider.saveTItem(item);
+            }
+        });
+        tagDeque.push(new TagQA(hashTag, tag));
+        wrap.addComponent(hashTag);
     }
 
     public void removeQANotice() {
         TagQA tagQA = tagDeque.removeLast();
-        wrap.removeComponent(tagQA.tagItem);
+        wrap.removeComponent(tagQA.hashTag);
     }
 
-    public void removeQANotice(TagQA tagQA) {
-        wrap.removeComponent(tagQA.tagItem);
-        tagDeque.remove(tagQA);
+    public void removeQANotice(Tag tag) {
+        Optional<TagQA> tagQA = tagDeque.stream()
+                .filter(tqa -> equalsId(tqa.tag, tag))
+                .findFirst();
+        tagQA.ifPresent(tqa -> {
+            wrap.removeComponent(tqa.hashTag);
+            tagDeque.remove(tqa);
+        });
+
     }
 
     private void saveTag(Tag tag) {
@@ -182,10 +193,10 @@ public class TagQAPanel extends KibiPanel {
     }
 
     private static class TagQA {
-        public TagItem tagItem;
+        public HashTag hashTag;
         public Tag tag;
-        public TagQA(TagItem tagItem, Tag tag) {
-            this.tagItem = tagItem;
+        public TagQA(HashTag hashTag, Tag tag) {
+            this.hashTag = hashTag;
             this.tag = tag;
         }
     }

@@ -1,6 +1,7 @@
 package org.alexside.entity;
 
 import org.alexside.enums.TreeKind;
+import org.alexside.interfaces.INamed;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Reference;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
  * Date: 13.07.16
  */
 @Document(collection = "titems")
-public abstract class TItem {
+public abstract class TItem implements INamed {
     @Id
     protected String _id;
     @Field
@@ -50,6 +51,7 @@ public abstract class TItem {
         this._id = id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -102,6 +104,8 @@ public abstract class TItem {
 
     public void addTag(Tag tag) {}
 
+    public void removeTag(Tag tag) {}
+
     @Override
     public String toString() {
         return "TItem{" +
@@ -129,5 +133,12 @@ public abstract class TItem {
 
     private boolean compareParents(TItem ti) {
         return ti.getParent() == null ? parent == null : parent.equals(ti.getParent());
+    }
+
+    public static boolean equalsId(TItem ti1, TItem ti2) {
+        if (ti1 == null) return ti2 == null;
+        if (ti2 == null) return false;
+        if (ti1.getId() == null) return ti2.getId() == null;
+        return ti1.getId().equals(ti2.getId());
     }
 }

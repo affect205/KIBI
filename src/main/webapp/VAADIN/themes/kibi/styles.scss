@@ -36,28 +36,47 @@ $v-layout-margin-left: 7px;
 }
 
 .header_button .v-icon:hover {
-    color: #1b87e3;
+    color: #1b87e3 !important;
+}
+
+.header_button {
+    color: darkgray !important;
 }
 
 .tag_item {
-    font-size: 12px;
+    border: 1px solid #c5c5c5;
+    border-radius: 10px;
+    border-top-color: #c5c5c5;
+    border-bottom-color: #bcbcbc;
+    background-color: #fafafa;
+    background-image: -webkit-linear-gradient(top, #fafafa 2%, #efefef 98%);
+    background-image: linear-gradient(to bottom,#fafafa 2%, #efefef 98%);
+    -webkit-box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
     margin: 7px 0px 0px 7px;
+    padding: 6px;
+    font-size: 14px;
+    color: #1b87e3;
 }
 
-.tag_item .v-menubar {
-    border-radius: 13px;
-    background: transparent;
+.tag_item:hover {
+    border: 2px solid #1b87e3;
+}
+
+.tag_item .tag_close .v-icon {
+    font-size: 14px;
+    color: darkgray;
+}
+
+.tag_item .tag_icon .v-icon {
+    font-size: 14px;
     color: #1b87e3;
 }
 
 .profile_menu .v-menubar {
     border: none;
     background: transparent;
-}
-
-.tag_item .v-icon {
-    font-size: 14px;
-    color: #1b87e3;
 }
 
 .panel_footer {

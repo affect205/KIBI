@@ -5,7 +5,10 @@ import com.google.common.eventbus.Subscribe;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import org.alexside.entity.TItem;
 import org.alexside.events.TItemQASelectionEvent;
 import org.alexside.events.TItemRefreshEvent;
@@ -14,12 +17,14 @@ import org.alexside.utils.EventUtils;
 import org.alexside.utils.ThemeUtils;
 import org.alexside.vaadin.misc.IconButton;
 import org.alexside.vaadin.misc.KibiPanel;
-import org.alexside.vaadin.misc.TagItem;
+import org.alexside.vaadin.misc.QATag;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayDeque;
 import java.util.Deque;
+
+import static org.alexside.entity.TItem.equalsId;
 
 /**
  * Created by Alex on 14.11.2016.
@@ -80,20 +85,18 @@ public class NoticeQAPanel extends KibiPanel {
         TItem ti = event.getItem();
         noticeDeque.forEach(noticeQA -> {
             if (noticeQA.item.equals(ti)) {
-                noticeQA.tagItem.setTagText(ti.getName());
+                noticeQA.tagItem.setText(ti.getName());
             }
         });
     }
 
     private void addQANotice(TItem ti) {
-        noticeDeque.stream()    // remove duplicate
-                .filter(noticeQA -> noticeQA.item.equals(ti))
-                .findFirst()
-                .ifPresent(this::removeQANotice);
+        removeQANotice(ti);
         if (noticeDeque.size() >= LIMIT) removeQANotice();
-        TagItem tagItem = new TagItem(ti);
+        QATag tagItem = new QATag(ti);
         tagItem.addCallback(tItem ->
                 EventUtils.post(new TItemQASelectionEvent(tItem)));
+        tagItem.addDelCallback(this::removeQANotice);
         NoticeQA noticeQA = new NoticeQA(ti, tagItem);
         noticeDeque.push(noticeQA);
         wrap.addComponent(noticeQA.tagItem);
@@ -104,16 +107,21 @@ public class NoticeQAPanel extends KibiPanel {
         wrap.removeComponent(noticeQA.tagItem);
     }
 
-    public void removeQANotice(NoticeQA noticeQA) {
-        wrap.removeComponent(noticeQA.tagItem);
-        noticeDeque.remove(noticeQA);
+    public void removeQANotice(TItem ti) {
+        noticeDeque.stream()
+                .filter(noticeQA -> equalsId(noticeQA.item, ti))
+                .findFirst()
+                .ifPresent(noticeQA -> {
+                    wrap.removeComponent(noticeQA.tagItem);
+                    noticeDeque.remove(noticeQA);
+                });
     }
 
     private class NoticeQA {
         public TItem item;
-        public TagItem tagItem;
+        public QATag tagItem;
 
-        public NoticeQA(TItem item, TagItem tagItem) {
+        public NoticeQA(TItem item, QATag tagItem) {
             this.item = item;
             this.tagItem = tagItem;
         }

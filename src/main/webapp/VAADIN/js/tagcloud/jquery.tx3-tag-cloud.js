@@ -17,14 +17,14 @@
         $.each(element.find("li"), function () {
             var percent = 0.5;
             var dataWeight = getDataWeight(this);
-            if (dataWeight != undefined && dataWeight != NaN && dataWeight > 1) {
+            if (dataWeight != undefined && !isNaN(dataWeight) && dataWeight > 1) {
                 if (dataWeight > 2) {
                     var log = Math.log(dataWeight);
                     percent = log - (log/6);
                 } else percent = 0.75;
             }
             var fontSize = percent * settings['multiplier'];
-            console.log("fontSize: " + fontSize);
+            console.log("fontSize: " + fontSize + ", tag: " + $(this).text() + ", weight: " + dataWeight);
             $(this).css('font-size', fontSize + "em");
         });
     }

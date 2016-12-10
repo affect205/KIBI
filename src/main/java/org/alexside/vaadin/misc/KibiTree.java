@@ -187,7 +187,7 @@ public class KibiTree extends KibiPanel {
                     // at first persist item to storage to get unique id
                     dataProvider.saveTItem(ti);
                     Item added = addContainerItem(
-                            (HierarchicalContainer)tree.getContainerDataSource(), ti);
+                            (HierarchicalContainer)tree.getContainerDataSource(), ti, true);
                     if (added == null) return;
                     tree.expandItem(ti.getId());
                     tree.setChildrenAllowed(ti.getId(), true);
@@ -195,7 +195,7 @@ public class KibiTree extends KibiPanel {
                     TItem ti = new Notice("Запись_" + Instant.now().toEpochMilli(), "", (Category) selected);
                     dataProvider.saveTItem(ti);
                     Item added = addContainerItem(
-                            (HierarchicalContainer)tree.getContainerDataSource(), ti);
+                            (HierarchicalContainer)tree.getContainerDataSource(), ti, true);
                     if (added == null) return;
                     tree.setChildrenAllowed(ti.getId(), false);
                 } else if (action == delete) {
@@ -259,6 +259,10 @@ public class KibiTree extends KibiPanel {
     }
 
     private Item addContainerItem(HierarchicalContainer container, TItem ti) {
+        return addContainerItem(container, ti, false);
+    }
+
+    private Item addContainerItem(HierarchicalContainer container, TItem ti, boolean initParent) {
         if (ti == null) return null;
         Item item = container.addItem(ti.getId());
         if (item == null) return null;
@@ -271,6 +275,10 @@ public class KibiTree extends KibiPanel {
         item.getItemProperty("kind").setValue(ti.getKind());
         item.getItemProperty("content").setValue(ti.getContentMeta());
         item.getItemProperty("object").setValue(ti);
+
+        if (initParent) {
+            initContainerHierarchy(container, ti);
+        }
 
         return item;
     }

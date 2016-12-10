@@ -82,6 +82,11 @@ public class Notice extends TItem {
     }
 
     @Override
+    public void removeTag(Tag tag) {
+        tags.remove(tag);
+    }
+
+    @Override
     public String toString() {
         return "Notice{" +
                 "id=" + _id +

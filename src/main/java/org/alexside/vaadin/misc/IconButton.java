@@ -75,4 +75,6 @@ public class IconButton extends HorizontalLayout {
     public static IconButton noticeButton() { return new IconButton(FontAwesome.EDIT, ""); }
 
     public static IconButton clearButton() { return new IconButton(FontAwesome.CLOSE, "Очистить"); }
+
+    public static IconButton deleteButton() { return new IconButton(FontAwesome.CLOSE, "Удалить"); }
 }

@@ -1,5 +1,6 @@
 package org.alexside.entity;
 
+import org.alexside.interfaces.INamed;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +14,7 @@ import java.util.List;
  * Created by abalyshev on 30.11.16.
  */
 @Document(collection = "tags")
-public class Tag {
+public class Tag implements INamed {
     @Id
     protected String _id;
     @Field
@@ -47,6 +48,7 @@ public class Tag {
         this._id = id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -80,5 +82,12 @@ public class Tag {
         int result = _id != null ? _id.hashCode() : 0;
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         return result;
+    }
+
+    public static boolean equalsId(Tag tag1, Tag tag2) {
+        if (tag1 == null) return tag2 == null;
+        if (tag2 == null) return false;
+        if (tag1.getId() == null) return tag2.getId() == null;
+        return tag1.getId().equals(tag2.getId());
     }
 }
