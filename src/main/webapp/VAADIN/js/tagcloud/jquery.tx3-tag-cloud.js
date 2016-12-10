@@ -3,7 +3,7 @@
     $.fn.tx3TagCloud = function (options) {
         console.log("tag cloud main func...");
         settings = $.extend({
-            multiplier: 1
+            multiplier: 2.5
         }, options);
         main(this);
     };
@@ -15,16 +15,15 @@
 
     function addListElementFontSize(element) {
         $.each(element.find("li"), function () {
-            var percent = 0.5;
+            var percent = 0.42;
             var dataWeight = getDataWeight(this);
             if (dataWeight != undefined && !isNaN(dataWeight) && dataWeight > 1) {
                 if (dataWeight > 2) {
-                    var log = Math.log(dataWeight);
-                    percent = log - (log/6);
-                } else percent = 0.75;
+                    percent = Math.log(dataWeight) - Math.log10(dataWeight);
+                } else percent = 0.56;
             }
             var fontSize = percent * settings['multiplier'];
-            console.log("fontSize: " + fontSize + ", tag: " + $(this).text() + ", weight: " + dataWeight);
+            console.log("percent: " + percent + ", fontSize: " + fontSize + ", tag: " + $(this).text() + ", weight: " + dataWeight);
             $(this).css('font-size', fontSize + "em");
         });
     }
