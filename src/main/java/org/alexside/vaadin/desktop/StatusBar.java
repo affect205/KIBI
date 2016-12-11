@@ -29,7 +29,6 @@ public class StatusBar extends HorizontalLayout {
     @PostConstruct
     public void onInit() {
         setSizeFull();
-        setHeight("22px");
         setMargin(false);
         setSpacing(true);
         eventBus = EventUtils.getEventBusInstance();
@@ -37,7 +36,6 @@ public class StatusBar extends HorizontalLayout {
 
         statusLabel = new Label(FontAwesome.COMMENT_O.getHtml(), ContentMode.HTML);
         statusLabel.setSizeFull();
-        statusLabel.setHeight("18px");
         statusLabel.addStyleName(STATUS_LABEL);
 
         addComponents(statusLabel);

@@ -69,6 +69,7 @@ public class DesktopPanel extends KibiPanel {
         contentLayout.setExpandRatio(viewLayout, 3);
 
         addToBottomToolbar(statusBar, Alignment.BOTTOM_LEFT);
+        getBottomToolbar().removeStyleName("v-panel-caption");
         setContentAlt(contentLayout);
     }
 }
