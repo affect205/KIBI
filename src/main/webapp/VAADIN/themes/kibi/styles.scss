@@ -85,10 +85,19 @@ $v-layout-margin-left: 7px;
 }
 
 .status_label {
-    line-height: 20px !important;
     font-size: 12px;
 }
 
 .status_label .v-icon {
+    font-size: 14px;
+}
+
+.v-tree-node-caption {
+    //line-height: 23px !important;
+    height: 21px !important;
+    font-size: 14px !important;
+}
+
+.v-tree-node-caption .v-icon {
     font-size: 14px;
 }

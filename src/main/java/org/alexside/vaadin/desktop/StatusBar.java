@@ -14,6 +14,8 @@ import org.alexside.utils.EventUtils;
 
 import javax.annotation.PostConstruct;
 
+import static org.alexside.utils.ThemeUtils.STATUS_LABEL;
+
 /**
  * Created by Alex on 03.12.2016.
  */
@@ -27,7 +29,7 @@ public class StatusBar extends HorizontalLayout {
     @PostConstruct
     public void onInit() {
         setSizeFull();
-        setHeight("24px");
+        setHeight("22px");
         setMargin(false);
         setSpacing(true);
         eventBus = EventUtils.getEventBusInstance();
@@ -35,8 +37,8 @@ public class StatusBar extends HorizontalLayout {
 
         statusLabel = new Label(FontAwesome.COMMENT_O.getHtml(), ContentMode.HTML);
         statusLabel.setSizeFull();
-        statusLabel.setHeight("20px");
-        statusLabel.addStyleName("status_label");
+        statusLabel.setHeight("18px");
+        statusLabel.addStyleName(STATUS_LABEL);
 
         addComponents(statusLabel);
         setComponentAlignment(statusLabel, Alignment.TOP_LEFT);

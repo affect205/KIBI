@@ -12,5 +12,5 @@ public class ThemeUtils {
     public static final String TAG_CLOSE = "tag_close";
     public static final String MENU_PROFILE = "profile_menu";
     public static final String LAYOUT_OUTLINED = "outlined";
-
+    public static final String STATUS_LABEL = "status_label";
 }

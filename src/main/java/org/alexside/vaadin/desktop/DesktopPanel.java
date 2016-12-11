@@ -66,7 +66,7 @@ public class DesktopPanel extends KibiPanel {
         contentLayout.setSizeFull();
         contentLayout.setSpacing(true);
         contentLayout.setExpandRatio(kibiTree, 1);
-        contentLayout.setExpandRatio(viewLayout, 4);
+        contentLayout.setExpandRatio(viewLayout, 3);
 
         addToBottomToolbar(statusBar, Alignment.BOTTOM_LEFT);
         setContentAlt(contentLayout);

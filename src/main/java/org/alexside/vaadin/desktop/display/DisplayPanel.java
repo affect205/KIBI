@@ -95,7 +95,7 @@ public class DisplayPanel extends KibiPanel {
         viewRTA = new RichTextArea();
         viewRTA.setSizeFull();
         //viewRTA.setValue(html);
-        viewRTA.addStyleName("no-toolbar");
+        //viewRTA.addStyleName("no-toolbar");
         viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();
         viewLayout.setExpandRatio(viewRTA, 1);
