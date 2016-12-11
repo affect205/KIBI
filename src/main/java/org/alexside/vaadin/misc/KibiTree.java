@@ -52,6 +52,7 @@ public class KibiTree extends KibiPanel {
 
     protected EventBus eventBus;
 
+    protected TextField searchField;
     protected Tree tree;
 
     protected Action addCategory = new Action("Добавить категорию", FontAwesome.FOLDER);
@@ -88,7 +89,7 @@ public class KibiTree extends KibiPanel {
         data.forEach(tItem -> initContainerHierarchy(container, tItem));
         sortContainer(container);
 
-        TextField searchField = new TextField();
+        searchField = new TextField();
         searchField.setSizeFull();
         searchField.addStyleName(HEADER_BUTTON);
         searchField.addValueChangeListener(event -> {
@@ -100,6 +101,7 @@ public class KibiTree extends KibiPanel {
 
         IconButton clearButton = IconButton.clearButton();
         clearButton.addClickListener(event -> {
+            searchField.setInputPrompt("");
             container.removeAllContainerFilters();
         });
 
@@ -247,6 +249,7 @@ public class KibiTree extends KibiPanel {
         container.removeAllContainerFilters();
         Tag tag = event.getTag();
         container.addContainerFilter(new FilterByTag("object", tag));
+        searchField.setInputPrompt("#" + tag.getName());
     }
 
     private void initContainer(HierarchicalContainer container, TItem ti) {

@@ -90,13 +90,15 @@ public class DisplayPanel extends KibiPanel {
 
         editLayout = new VerticalLayout(editTA);
         editLayout.setSizeFull();
+        editLayout.setExpandRatio(editTA, 1);
 
         viewRTA = new RichTextArea();
         viewRTA.setSizeFull();
         //viewRTA.setValue(html);
-        //viewRTA.addStyleName("no-toolbar");
+        viewRTA.addStyleName("no-toolbar");
         viewLayout = new VerticalLayout(viewRTA);
         viewLayout.setSizeFull();
+        viewLayout.setExpandRatio(viewRTA, 1);
 
         Button saveButton = new Button("Сохранить");
         saveButton.addStyleName(ValoTheme.BUTTON_TINY);
