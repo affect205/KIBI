@@ -112,7 +112,9 @@ public class LoginPanel extends KibiPanel {
 
     private ActionResponse login(String login, String password) {
         try {
-            login = "alex"; password = "pass";
+            if (!"guest".equals(login)) {
+                login = "alex"; password = "pass";
+            }
             if (!userService.isExists(login, password)) {
                 return ActionResponse.error(Strings.ERROR_USER_NOT_EXISTS);
             }

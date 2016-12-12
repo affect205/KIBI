@@ -4,6 +4,7 @@ import org.alexside.enums.TreeKind;
 import org.alexside.interfaces.INamed;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Reference;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -28,6 +29,9 @@ public abstract class TItem implements INamed {
     protected TreeKind kind;
     @Reference
     protected TItem parent;
+    @Indexed
+    @Reference
+    protected User user;
 
     public TItem() {}
 
@@ -105,6 +109,10 @@ public abstract class TItem implements INamed {
     public void addTag(Tag tag) {}
 
     public void removeTag(Tag tag) {}
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
 
     @Override
     public String toString() {

@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection="users")
 public class User {
     @Id
-    private String id;
+    private String _id;
     @Field
     private String login;
     @Field
@@ -43,6 +43,10 @@ public class User {
 
     public void setEmail(String email) { this.email = email; }
 
+    public String getId() { return _id; }
+
+    public void setId(String id) { this._id = id; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,9 +69,21 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id='" + id + '\'' +
+                "id='" + _id + '\'' +
                 ", login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 '}';
+    }
+
+    public static boolean equalsId(User u1, User u2) {
+        return equalsId(u1, u2, false);
+    }
+
+    public static boolean equalsId(User u1, User u2, boolean nullable) {
+        if (!nullable && (u1 == null || u2 == null)) return false;
+        if (u1 == null) return u2 == null;
+        if (u2 == null) return false;
+        if (u1.getId() == null) return u2.getId() == null;
+        return u1.getId().equals(u2.getId());
     }
 }

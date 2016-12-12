@@ -1,6 +1,7 @@
 package org.alexside.service;
 
 import org.alexside.entity.TItem;
+import org.alexside.entity.User;
 import org.mongodb.morphia.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,10 +27,12 @@ public class TItemService {
     @Autowired
     private Datastore datastore;
 
-    public Set<TItem> findAll() {
+    public Set<TItem> findAll(User user) {
         Set<TItem> result = new HashSet<>();
         try {
-            result = mongoTemplate.findAll(TItem.class).stream().collect(Collectors.toSet());
+            result = mongoTemplate.findAll(TItem.class).stream()
+                    .filter(ti -> User.equalsId(user, ti.getUser()))
+                    .collect(Collectors.toSet());
             for (TItem ti : result) {
                 if (ti.isCategory()) {
                     List<TItem> children = result.stream()

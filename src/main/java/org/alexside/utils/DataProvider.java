@@ -1,51 +1,68 @@
 package org.alexside.utils;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 import org.alexside.entity.TItem;
 import org.alexside.entity.Tag;
+import org.alexside.entity.User;
 import org.alexside.service.TItemService;
 import org.alexside.service.TagService;
+import org.alexside.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static org.alexside.utils.SpringUtils.SCOPE_SINGLETON;
 
 /**
  * Created by Alex on 29.10.2016.
  */
 @SpringComponent
-@Scope(SCOPE_SINGLETON)
+@ViewScope
 public class DataProvider {
+    private static Logger log = Logger.getLogger(DataProvider.class.getName());
 
     @Autowired
     private TItemService itemService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private TagService tagService;
 
     private Set<TItem> dataCache;
     private Set<Tag> tagCache;
+    private User userCache;
 
     @PostConstruct
     public void onInit() {
-        dataCache = itemService.findAll();
+        User sessionUser = AuthUtils.getUser();
+        log.info(String.format("[DataProvider::onInit] login = %s, password = %s",
+                sessionUser.getLogin(), sessionUser.getPassword()));
+        userCache = userService.findUser(sessionUser.getLogin(), sessionUser.getPassword());
+        dataCache = itemService.findAll(userCache);
         tagCache = tagService.findAll();
+    }
+
+    @PreDestroy
+    public void onDestroy() {
+        userCache = null;
     }
 
     public Set<TItem> getTreeData() {
         if (dataCache.isEmpty()) {
-            dataCache = itemService.findAll();
+            dataCache = itemService.findAll(userCache);
         }
         return dataCache;
     }
 
     public void saveTItem(TItem ti) {
-        if (ti == null) return;
+        if (ti == null || userCache == null) return;
+        ti.setUser(userCache);
         itemService.saveTItem(ti);
         dataCache.add(ti);
         tagCache.addAll(ti.getTags());
@@ -98,4 +115,6 @@ public class DataProvider {
         if (id == null) return null;
         return tagCache.stream().filter(tag -> id.equals(tag.getId())).findAny();
     }
+
+    public User getUserCache() { return userCache; }
 }
