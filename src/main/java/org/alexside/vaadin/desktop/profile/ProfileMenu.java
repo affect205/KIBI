@@ -9,6 +9,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
 import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.util.Optional;
@@ -21,6 +22,9 @@ import static org.alexside.utils.ThemeUtils.MENU_PROFILE;
 @SpringComponent
 @ViewScope
 public class ProfileMenu extends HorizontalLayout {
+
+    @Autowired
+    private ProfilePanel profilePanel;
 
     @PostConstruct
     public void onInit() {
@@ -38,7 +42,9 @@ public class ProfileMenu extends HorizontalLayout {
                 opt.get().getLogin() : "??");
 
         MenuBar.MenuItem rootItem = menuBar.addItem(text, FontAwesome.USER, null);
-        rootItem.addItem("Профиль", (MenuBar.Command) selectedItem -> {});
+        rootItem.addItem("Профиль", (MenuBar.Command) selectedItem -> {
+            profilePanel.initData(AuthUtils.getUser());
+        });
         rootItem.addItem("Выйти", (MenuBar.Command) selectedItem -> {
             UI.getCurrent().getPage().reload();
             UI.getCurrent().getSession().close();
