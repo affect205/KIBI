@@ -4,6 +4,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
 import org.alexside.entity.User;
+import org.alexside.utils.MailUtils;
 
 import javax.annotation.PostConstruct;
 
@@ -53,6 +54,12 @@ public class ProfilePanel extends Window{
         FormLayout commonWrap = new FormLayout(loginField, passCheckbox,
                 passFieldOne, passFieldTwo, emailField, avatarUpload);
         commonWrap.setSizeFull();
+
+        Button mailButton = new Button("Отправить");
+        mailButton.addClickListener(event -> {
+            MailUtils.sendMail("Kibi - подтверждение регистрации", "Подтверждите регистрацию", "abalyshev@glosav.ru");
+        });
+        commonWrap.addComponentAsFirst(mailButton);
 
         TabSheet tabSheet = new TabSheet();
         tabSheet.addTab(commonWrap, user != null ? "Общие" : "Регистрация");
