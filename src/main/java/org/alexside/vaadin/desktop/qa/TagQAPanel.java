@@ -56,7 +56,6 @@ public class TagQAPanel extends KibiPanel {
 
         TextField tagField = new TextField();
         tagField.setSizeFull();
-        tagField.setWidth("240px");
 
         IconButton addButton = IconButton.addTagButton();
         addButton.addClickListener(event -> {
@@ -110,8 +109,10 @@ public class TagQAPanel extends KibiPanel {
         captionWrap.setSpacing(true);
 
         HorizontalLayout tagWrap = new HorizontalLayout(tagField, addButton);
+        tagWrap.setSizeFull();
         tagWrap.setSpacing(true);
         tagWrap.setHeight("60%");
+        tagWrap.setExpandRatio(tagField, 1);
 
         addToTopToolbar(captionWrap, Alignment.TOP_LEFT);
         addToTopToolbar(tagWrap, Alignment.TOP_RIGHT);
