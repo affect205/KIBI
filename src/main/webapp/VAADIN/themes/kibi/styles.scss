@@ -102,3 +102,12 @@ $v-layout-margin-left: 7px;
 .v-tree-node-caption .v-icon {
     font-size: 14px;
 }
+
+.avatar_panel {
+    border: 1px solid darkgray;
+    border-radius: 3px;
+}
+
+.avatar_panel img {
+    height: 78px !important;
+}
