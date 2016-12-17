@@ -9,6 +9,7 @@ import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.lang.Strings;
 import org.alexside.service.UserService;
 import org.alexside.utils.VaadinUtils;
+import org.alexside.vaadin.desktop.profile.ProfilePanel;
 import org.alexside.vaadin.misc.ActionResponse;
 import org.alexside.vaadin.misc.KibiPanel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,13 @@ import java.util.logging.Logger;
 @SpringComponent
 @ViewScope
 public class LoginPanel extends KibiPanel {
-
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ProfilePanel profilePanel;
 
     private CustomLayout layout;
 
@@ -75,18 +78,20 @@ public class LoginPanel extends KibiPanel {
         registerButton.setStyleName(BaseTheme.BUTTON_LINK);
         registerButton.addStyleName("register");
         registerButton.addClickListener(clickEvent -> {
-            String login = loginField.getValue();
-            String password = passwordField.getValue();
-            log.info(String.format("[login] login = %s, password = %s", login, password));
-            ActionResponse resp = register(login, password);
-            if (resp.success()) {
-                UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
-                Notification.show(resp.getMessage());
-            } else {
-                Notification.show(resp.getMessage());
-            }
+            profilePanel.initData();
+            profilePanel.addCallback(v -> {
+                String login = loginField.getValue();
+                String password = passwordField.getValue();
+                log.info(String.format("[login] login = %s, password = %s", login, password));
+                ActionResponse resp = register(login, password);
+                if (resp.success()) {
+                    UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
+                    Notification.show(resp.getMessage());
+                } else {
+                    Notification.show(resp.getMessage());
+                }
+            });
         });
-
         Button forgotButton = new Button("Забыли пароль?");
         forgotButton.setIcon(FontAwesome.INFO_CIRCLE);
         forgotButton.setStyleName(BaseTheme.BUTTON_LINK);

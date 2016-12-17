@@ -43,7 +43,7 @@ public class ProfileMenu extends HorizontalLayout {
 
         MenuBar.MenuItem rootItem = menuBar.addItem(text, FontAwesome.USER, null);
         rootItem.addItem("Профиль", (MenuBar.Command) selectedItem -> {
-            profilePanel.initData(AuthUtils.getUser());
+            profilePanel.initData();
         });
         rootItem.addItem("Выйти", (MenuBar.Command) selectedItem -> {
             UI.getCurrent().getPage().reload();
