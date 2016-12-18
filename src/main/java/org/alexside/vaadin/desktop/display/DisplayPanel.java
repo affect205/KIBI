@@ -101,6 +101,7 @@ public class DisplayPanel extends KibiPanel {
         viewLayout.setExpandRatio(viewRTA, 1);
 
         Button saveButton = new Button("Сохранить");
+        saveButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         saveButton.addStyleName(ValoTheme.BUTTON_TINY);
         saveButton.addClickListener(event -> {
             try {
