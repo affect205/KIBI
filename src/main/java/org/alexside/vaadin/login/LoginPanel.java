@@ -6,8 +6,9 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
+import org.alexside.entity.User;
 import org.alexside.lang.Strings;
-import org.alexside.service.UserService;
+import org.alexside.utils.DataProvider;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.desktop.profile.ProfilePanel;
 import org.alexside.vaadin.misc.ActionResponse;
@@ -31,7 +32,7 @@ public class LoginPanel extends KibiPanel {
     private static Logger log = Logger.getLogger(LoginPanel.class.getName());
 
     @Autowired
-    private UserService userService;
+    private DataProvider dataProvider;
 
     @Autowired
     private ProfilePanel profilePanel;
@@ -79,16 +80,16 @@ public class LoginPanel extends KibiPanel {
         registerButton.addStyleName("register");
         registerButton.addClickListener(clickEvent -> {
             profilePanel.initData();
-            profilePanel.addCallback(v -> {
-                String login = loginField.getValue();
-                String password = passwordField.getValue();
-                log.info(String.format("[login] login = %s, password = %s", login, password));
-                ActionResponse resp = register(login, password);
-                if (resp.success()) {
-                    UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
-                    Notification.show(resp.getMessage());
-                } else {
-                    Notification.show(resp.getMessage());
+            profilePanel.addSaveCallback(user -> {
+                if (user != null) {
+                    log.info(String.format("[login] login = %s, password = %s", user.getLogin(), user.getPassword()));
+                    ActionResponse resp = register(user);
+                    if (resp.success()) {
+                        UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
+                        Notification.show(resp.getMessage());
+                    } else {
+                        Notification.show(resp.getMessage());
+                    }
                 }
             });
         });
@@ -120,8 +121,8 @@ public class LoginPanel extends KibiPanel {
 //            if (!"guest".equals(login)) {
 //                login = "alex"; password = "pass";
 //            }
-            login = "alex"; password = "pass";
-            if (!userService.isExists(login, password)) {
+            login = "alex22"; password = "password";
+            if (dataProvider.getUserCache(login, password) == null) {
                 return ActionResponse.error(Strings.ERROR_USER_NOT_EXISTS);
             }
             Authentication token = new UsernamePasswordAuthenticationToken(login, password);
@@ -134,19 +135,20 @@ public class LoginPanel extends KibiPanel {
 
     }
 
-    private ActionResponse register(String login, String password) {
-        try {
-            if ("".equals(login.trim())) throw new Exception(Strings.ERROR_WRONG_LOGIN);
-            if ("".equals(password.trim())) throw new Exception(Strings.ERROR_WRONG_PASSWORD);
-            if (userService.isExists(login, password)) throw new Exception(Strings.ERROR_USER_EXISTS);
-
-            userService.addUser(login, password);
-            Authentication token = new UsernamePasswordAuthenticationToken(login, password);
-            VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
-            SecurityContextHolder.getContext().setAuthentication(token);
-            return ActionResponse.success(Strings.SUCCESS_LOGIN);
-        } catch (Exception e) {
-            return ActionResponse.error(e.getMessage());
-        }
+    private ActionResponse register(User user) {
+//        try {
+//            if ("".equals(login.trim())) throw new Exception(Strings.ERROR_WRONG_LOGIN);
+//            if ("".equals(password.trim())) throw new Exception(Strings.ERROR_WRONG_PASSWORD);
+//            if (dataProvider.getUserCache(login, password) == null) throw new Exception(Strings.ERROR_USER_EXISTS);
+//
+//            //dataProvider.addUser(login, password);
+//            Authentication token = new UsernamePasswordAuthenticationToken(login, password);
+//            VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+//            SecurityContextHolder.getContext().setAuthentication(token);
+//            return ActionResponse.success(Strings.SUCCESS_LOGIN);
+//        } catch (Exception e) {
+//            return ActionResponse.error(e.getMessage());
+//        }
+        return null;
     }
 }

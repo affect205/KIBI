@@ -5,12 +5,11 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.UIScope;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import org.alexside.entity.User;
-import org.alexside.service.UserService;
-import org.alexside.utils.AuthUtils;
+import org.alexside.utils.DataProvider;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -28,11 +28,11 @@ import java.util.function.Consumer;
  * Created by Alex on 11.12.2016.
  */
 @SpringComponent
-@UIScope
+@ViewScope
 public class ProfilePanel extends Window{
 
     @Autowired
-    private UserService userService;
+    private DataProvider dataProvider;
 
     private TabSheet tabSheet;
     private TabSheet.Tab commonTab;
@@ -47,7 +47,7 @@ public class ProfilePanel extends Window{
     private User user;
     private FileUploader fileUploader;
 
-    private Optional<Consumer<Void>> callback;
+    private Optional<Consumer<User>> saveCallback;
     private Button saveButton;
 
     public ProfilePanel() {
@@ -58,8 +58,8 @@ public class ProfilePanel extends Window{
 
     @PostConstruct
     public void onInit() {
-        user = AuthUtils.getUser(userService);
-        callback = Optional.empty();
+        user = dataProvider.getUserCache();
+        saveCallback = Optional.empty();
 
         fileUploader = new FileUploader();
 
@@ -111,7 +111,12 @@ public class ProfilePanel extends Window{
 
         saveButton = new Button("Сохранить");
         saveButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        saveButton.addClickListener(event -> callback.ifPresent(c -> c.accept(null)));
+        saveButton.addClickListener(event -> {
+            if (saveProfile()) {
+                close();
+                saveCallback.ifPresent(c -> c.accept(user));
+            }
+        });
 
         HorizontalLayout footer = new HorizontalLayout(saveButton);
         footer.setSizeFull();
@@ -126,21 +131,40 @@ public class ProfilePanel extends Window{
         setContent(wrap);
     }
 
+    public boolean saveProfile() {
+        if (!Objects.equals(passFieldOne.getValue(), passFieldTwo.getValue()))
+            Notification.show("Пароль не подтвержден", Notification.Type.ERROR_MESSAGE);
+        if (passFieldOne.getValue().trim().length() < 8)
+            Notification.show("Пароль не может быть меньше 8 символов", Notification.Type.ERROR_MESSAGE);
+
+        if (user == null) {
+            user = new User(loginField.getValue(), passFieldOne.getValue().trim());
+            user.setEmail(emailField.getValue());
+            return true;
+        } else if (user.getId() != null) {
+            user.setLogin(loginField.getValue());
+            user.setPassword(emailField.getValue());
+            if (passCheckbox.getValue()) user.setPassword(passFieldOne.getValue().trim());
+            return true;
+        }
+        return false;
+    }
+
     public void initData() {
-        user = AuthUtils.getUser(userService);
+        user = dataProvider.getUserCache();
         initForm();
         UI.getCurrent().addWindow(this);
     }
 
-    public void addCallback(Consumer<Void> calback) {
-        this.callback = Optional.ofNullable(calback);
+    public void addSaveCallback(Consumer<User> calback) {
+        this.saveCallback = Optional.ofNullable(calback);
     }
 
     private void initForm() {
         clearAll();
         commonTab.setCaption(user == null ? "Регистрация" : "Общие");
-        if (user != null) loginField.setValue(user.getPassword());
-        if (user != null) passFieldOne.setValue(user.getLogin());
+        if (user != null) loginField.setValue(user.getLogin());
+        if (user != null) passFieldOne.setValue(user.getPassword());
         if (user != null) passFieldTwo.setValue(user.getPassword());
         if (user != null) emailField.setValue(user.getEmail());
         if (user != null) {

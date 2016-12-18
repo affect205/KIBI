@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.alexside.entity.User;
-import org.alexside.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,14 +31,6 @@ public class AuthUtils {
             return null;
         }
         return new User(auth.getPrincipal().toString(), auth.getCredentials().toString());
-    }
-
-    public static User getUser(UserService userService) {
-        User sessionUser = AuthUtils.getUser();
-        if (sessionUser != null) {
-            return userService.findUser(sessionUser.getLogin(), sessionUser.getPassword());
-        }
-        return null;
     }
 
     public static boolean isExists(String login, String password) {

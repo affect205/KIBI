@@ -1,7 +1,7 @@
 package org.alexside.utils;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.spring.annotation.UIScope;
 import org.alexside.entity.TItem;
 import org.alexside.entity.Tag;
 import org.alexside.entity.User;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Created by Alex on 29.10.2016.
  */
 @SpringComponent
-@ViewScope
+@UIScope
 public class DataProvider {
     private static Logger log = Logger.getLogger(DataProvider.class.getName());
 
@@ -41,9 +41,11 @@ public class DataProvider {
     @PostConstruct
     public void onInit() {
         User sessionUser = AuthUtils.getUser();
-        log.info(String.format("[DataProvider::onInit] login = %s, password = %s",
-                sessionUser.getLogin(), sessionUser.getPassword()));
-        userCache = userService.findUser(sessionUser.getLogin(), sessionUser.getPassword());
+        if (sessionUser != null) {
+            log.info(String.format("[DataProvider::onInit] login = %s, password = %s",
+                    sessionUser.getLogin(), sessionUser.getPassword()));
+            userCache = userService.findUser(sessionUser.getLogin(), sessionUser.getPassword());
+        }
         dataCache = itemService.findAll(userCache);
         tagCache = tagService.findAll();
     }
@@ -51,6 +53,29 @@ public class DataProvider {
     @PreDestroy
     public void onDestroy() {
         userCache = null;
+    }
+
+    public User getUserCache() {
+        if (userCache == null) {
+            User sessionUser = AuthUtils.getUser();
+            if (sessionUser != null) {
+                userCache = userService.findUser(sessionUser.getLogin(), sessionUser.getPassword());
+            }
+        }
+        return userCache;
+    }
+
+    public User getUserCache(String login, String password) {
+        if (userCache == null) {
+            userCache = userService.findUser(login, password);
+        }
+        return userCache;
+    }
+
+    public void saveUser(User user) {
+        if (user == null) return;
+        userService.saveUser(user);
+        userCache = user;
     }
 
     public Set<TItem> getTreeData() {
@@ -115,6 +140,4 @@ public class DataProvider {
         if (id == null) return null;
         return tagCache.stream().filter(tag -> id.equals(tag.getId())).findAny();
     }
-
-    public User getUserCache() { return userCache; }
 }

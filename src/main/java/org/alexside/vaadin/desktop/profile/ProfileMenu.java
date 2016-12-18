@@ -3,12 +3,10 @@ package org.alexside.vaadin.desktop.profile;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.*;
 import org.alexside.entity.User;
 import org.alexside.utils.AuthUtils;
+import org.alexside.utils.DataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +20,9 @@ import static org.alexside.utils.ThemeUtils.MENU_PROFILE;
 @SpringComponent
 @ViewScope
 public class ProfileMenu extends HorizontalLayout {
+
+    @Autowired
+    private DataProvider dataProvider;
 
     @Autowired
     private ProfilePanel profilePanel;
@@ -44,6 +45,10 @@ public class ProfileMenu extends HorizontalLayout {
         MenuBar.MenuItem rootItem = menuBar.addItem(text, FontAwesome.USER, null);
         rootItem.addItem("Профиль", (MenuBar.Command) selectedItem -> {
             profilePanel.initData();
+            profilePanel.addSaveCallback(user -> {
+                dataProvider.saveUser(user);
+                Notification.show("Профиль сохранен");
+            });
         });
         rootItem.addItem("Выйти", (MenuBar.Command) selectedItem -> {
             UI.getCurrent().getPage().reload();

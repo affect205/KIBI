@@ -36,4 +36,9 @@ public class UserService {
     public void addUser(final String login, final String password) {
         mongoTemplate.insert(new User(login, password));
     }
+
+    public void saveUser(User user) {
+        if (user == null) return;
+        mongoTemplate.save(user);
+    }
 }
