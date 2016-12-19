@@ -202,6 +202,8 @@ public class ProfilePanel extends Window{
 
         public FileUploader() {
             path = VaadinServlet.getCurrent().getServletContext().getRealPath("/VAADIN/tmp/uploads/");
+            File file = new File(path);
+            if (!file.exists()) file.mkdirs();
 
             avatar = new Embedded();
             avatar.setHeight("60px");
