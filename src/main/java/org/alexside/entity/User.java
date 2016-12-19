@@ -1,8 +1,11 @@
 package org.alexside.entity;
 
+import org.alexside.enums.UserStatus;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.Date;
 
 /**
  * Created by abalyshev on 20.10.16.
@@ -17,6 +20,10 @@ public class User {
     private String password;
     @Field
     private String email;
+    @Field
+    private UserStatus status;
+    @Field
+    private Date createDate;
 
     public User(String login, String password) {
         this.login = login;
@@ -46,6 +53,14 @@ public class User {
     public String getId() { return _id; }
 
     public void setId(String id) { this._id = id; }
+
+    public UserStatus getStatus() { return status; }
+
+    public void setStatus(UserStatus status) { this.status = status; }
+
+    public Date getCreateDate() { return createDate; }
+
+    public void setCreateDate(Date createDate) { this.createDate = createDate; }
 
     @Override
     public boolean equals(Object o) {

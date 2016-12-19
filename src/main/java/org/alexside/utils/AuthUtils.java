@@ -3,10 +3,7 @@ package org.alexside.utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.alexside.entity.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,11 +12,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * Created by abalyshev on 20.10.16.
  */
 public class AuthUtils {
+    private static Logger log = Logger.getLogger(AuthUtils.class.getName());
 
     private static final long TOKEN_EXPIRE_MILLIS = TimeUnit.DAYS.toMillis(10);
 
@@ -82,7 +81,23 @@ public class AuthUtils {
     }
 
     public static UserToken parseJWTToken(String token) {
-        return null;
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(key)
+                    .parseClaimsJws(token)
+                    .getBody();
+            String userId = claims.get("userId", String.class);
+            String login = claims.get("login", String.class);
+            String password = claims.get("password", String.class);
+            String email = claims.get("email", String.class);
+            if (userId != null && login != null && password != null && email != null)
+                return new UserToken(userId, login, password, email);
+            else
+                return null;
+        } catch (Exception e) {
+            log.warning(e.getMessage());
+            return null;
+        }
     }
 
     public static class UserToken {

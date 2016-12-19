@@ -7,7 +7,9 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
 import org.alexside.entity.User;
+import org.alexside.enums.UserStatus;
 import org.alexside.lang.Strings;
+import org.alexside.utils.AuthUtils;
 import org.alexside.utils.DataProvider;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.desktop.profile.ProfilePanel;
@@ -21,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.time.Instant;
+import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -136,6 +140,17 @@ public class LoginPanel extends KibiPanel {
     }
 
     private ActionResponse register(User user) {
+        Instant now = Instant.now();
+
+        user.setStatus(UserStatus.NEW);
+        user.setCreateDate(new Date(now.toEpochMilli()));
+        dataProvider.saveUser(user);
+
+        String token = AuthUtils.createJWTToken(user, now.toEpochMilli());
+        AuthUtils.UserToken userToken = AuthUtils.parseJWTToken(token);
+        String test = "";
+
+
 //        try {
 //            if ("".equals(login.trim())) throw new Exception(Strings.ERROR_WRONG_LOGIN);
 //            if ("".equals(password.trim())) throw new Exception(Strings.ERROR_WRONG_PASSWORD);
