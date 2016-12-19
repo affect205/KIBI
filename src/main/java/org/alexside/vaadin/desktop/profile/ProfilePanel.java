@@ -143,7 +143,7 @@ public class ProfilePanel extends Window{
             return true;
         } else if (user.getId() != null) {
             user.setLogin(loginField.getValue());
-            user.setPassword(emailField.getValue());
+            user.setEmail(emailField.getValue());
             if (passCheckbox.getValue()) user.setPassword(passFieldOne.getValue().trim());
             return true;
         }

@@ -5,7 +5,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
-import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import org.alexside.entity.User;
 import org.alexside.enums.UserStatus;
 import org.alexside.lang.Strings;
@@ -66,6 +66,8 @@ public class LoginPanel extends KibiPanel {
         passwordField.setHeight("30px");
 
         Button submitButton = new Button("Войти");
+        submitButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        submitButton.addStyleName(ValoTheme.BUTTON_SMALL);
         submitButton.addClickListener(clickEvent -> {
             String login = loginField.getValue();
             String password = passwordField.getValue();
@@ -80,8 +82,10 @@ public class LoginPanel extends KibiPanel {
         });
 
         Button registerButton = new Button("Регистрация");
-        registerButton.setStyleName(BaseTheme.BUTTON_LINK);
-        registerButton.addStyleName("register");
+//        registerButton.setStyleName(BaseTheme.BUTTON_LINK);
+//        registerButton.addStyleName("register");
+        registerButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        registerButton.addStyleName(ValoTheme.BUTTON_SMALL);
         registerButton.addClickListener(clickEvent -> {
             profilePanel.initData();
             profilePanel.addSaveCallback(user -> {
@@ -99,7 +103,10 @@ public class LoginPanel extends KibiPanel {
         });
         Button forgotButton = new Button("Забыли пароль?");
         forgotButton.setIcon(FontAwesome.INFO_CIRCLE);
-        forgotButton.setStyleName(BaseTheme.BUTTON_LINK);
+        forgotButton.setWidth("100%");
+        forgotButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        forgotButton.addStyleName(ValoTheme.BUTTON_SMALL);
+//        forgotButton.setStyleName(BaseTheme.BUTTON_LINK);
         forgotButton.addStyleName("register");
         forgotButton.addClickListener(clickEvent -> {
             log.info("[forgot] reset password...");

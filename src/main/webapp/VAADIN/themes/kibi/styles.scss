@@ -1,14 +1,19 @@
 $v-app-loading-text: "Loading...";
 $v-font-family: "Palatino Linotype", "Book Antiqua", serif;
-$v-layout-margin-top: 7px;
-$v-layout-margin-right: 7px;
-$v-layout-margin-bottom: 7px;
-$v-layout-margin-left: 7px;
-
+$v-font-size: 14px;
+$v-layout-margin-top: 6px;
+$v-layout-margin-right: 6px;
+$v-layout-margin-bottom: 6px;
+$v-layout-margin-left: 6px;
+$v-layout-spacing-horizontal: 6px;
 @import "../valo/valo";
 
 .kibi {
     @include valo;
+}
+
+.v-panel-caption input[type="text"] {
+    height: 22px !important;
 }
 
 .v-label-register_label {
@@ -28,7 +33,7 @@ $v-layout-margin-left: 7px;
 
 .v-icon {
     color: darkgray;
-    font-size: 20px;
+    font-size: 14px;
 }
 
 .no-toolbar .gwt-RichTextToolbar-bottom {
@@ -56,7 +61,7 @@ $v-layout-margin-left: 7px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
     margin: 7px 0px 0px 7px;
     padding: 6px;
-    font-size: 14px;
+    font-size: 12px;
     color: #1b87e3;
 }
 
@@ -65,12 +70,12 @@ $v-layout-margin-left: 7px;
 }
 
 .tag_item .tag_close .v-icon {
-    font-size: 14px;
+    font-size: 12px;
     color: darkgray;
 }
 
 .tag_item .tag_icon .v-icon {
-    font-size: 14px;
+    font-size: 12px;
     color: #1b87e3;
 }
 
@@ -93,15 +98,15 @@ $v-layout-margin-left: 7px;
     font-size: 14px;
 }
 
-.v-tree-node-caption {
-    //line-height: 23px !important;
-    height: 21px !important;
-    font-size: 14px !important;
-}
+//.v-tree-node-caption {
+//    //line-height: 23px !important;
+//    height: 21px !important;
+//    font-size: 14px !important;
+//}
 
-.v-tree-node-caption .v-icon {
-    font-size: 14px;
-}
+//.v-tree-node-caption .v-icon {
+//    font-size: 14px;
+//}
 
 .avatar_panel {
     border: 1px solid darkgray;
