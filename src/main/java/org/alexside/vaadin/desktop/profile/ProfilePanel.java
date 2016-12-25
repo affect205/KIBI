@@ -132,10 +132,14 @@ public class ProfilePanel extends Window{
     }
 
     public boolean saveProfile() {
-        if (!Objects.equals(passFieldOne.getValue(), passFieldTwo.getValue()))
+        if (!Objects.equals(passFieldOne.getValue(), passFieldTwo.getValue())) {
             Notification.show("Пароль не подтвержден", Notification.Type.ERROR_MESSAGE);
-        if (passFieldOne.getValue().trim().length() < 8)
+            return false;
+        }
+        if (passFieldOne.getValue().trim().length() < 8) {
             Notification.show("Пароль не может быть меньше 8 символов", Notification.Type.ERROR_MESSAGE);
+            return false;
+        }
 
         if (user == null) {
             user = new User(loginField.getValue(), passFieldOne.getValue().trim());
