@@ -11,6 +11,7 @@ import org.alexside.enums.UserStatus;
 import org.alexside.lang.Strings;
 import org.alexside.utils.AuthUtils;
 import org.alexside.utils.DataProvider;
+import org.alexside.service.MailService;
 import org.alexside.utils.VaadinUtils;
 import org.alexside.vaadin.desktop.profile.ProfilePanel;
 import org.alexside.vaadin.misc.ActionResponse;
@@ -40,6 +41,9 @@ public class LoginPanel extends KibiPanel {
 
     @Autowired
     private ProfilePanel profilePanel;
+
+    @Autowired
+    private MailService mailService;
 
     private CustomLayout layout;
 
@@ -92,12 +96,12 @@ public class LoginPanel extends KibiPanel {
                 if (user != null) {
                     log.info(String.format("[login] login = %s, password = %s", user.getLogin(), user.getPassword()));
                     ActionResponse resp = register(user);
-                    if (resp.success()) {
-                        UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
-                        Notification.show(resp.getMessage());
-                    } else {
-                        Notification.show(resp.getMessage());
-                    }
+//                    if (resp.success()) {
+//                        UI.getCurrent().getNavigator().navigateTo(VaadinUtils.VIEW_DESKTOP);
+//                        Notification.show(resp.getMessage());
+//                    } else {
+//                        Notification.show(resp.getMessage());
+//                    }
                 }
             });
         });
@@ -154,8 +158,16 @@ public class LoginPanel extends KibiPanel {
         dataProvider.saveUser(user);
 
         String token = AuthUtils.createJWTToken(user, now.toEpochMilli());
-        AuthUtils.UserToken userToken = AuthUtils.parseJWTToken(token);
-        String test = "";
+//        AuthUtils.UserToken userToken = AuthUtils.parseJWTToken(token);
+//        String test = "";
+
+        String content = String.format("Click here to finish user registration:<br>" +
+                "<a href=\"http://127.0.0.1:8282/kibi/#!login?user=%s\">%s</a>", token, token);
+        try {
+            mailService.sendMail("User registration", content, "alexbaluomega7@gmail.com");
+        } catch (Exception e) {
+            Notification.show(String.format("Ошибка регистрации: %s", e.getMessage()), Notification.Type.ERROR_MESSAGE);
+        }
 
 
 //        try {

@@ -17,6 +17,8 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static org.alexside.enums.UserStatus.REGISTERED;
+
 /**
  * Created by Alex on 29.10.2016.
  */
@@ -59,7 +61,8 @@ public class DataProvider {
         if (userCache == null) {
             User sessionUser = AuthUtils.getUser();
             if (sessionUser != null) {
-                userCache = userService.findUser(sessionUser.getLogin(), sessionUser.getPassword());
+                User user = userService.findUser(sessionUser.getLogin(), sessionUser.getPassword());
+                if (user != null && user.getStatus() == REGISTERED) userCache = user;
             }
         }
         return userCache;
@@ -67,7 +70,8 @@ public class DataProvider {
 
     public User getUserCache(String login, String password) {
         if (userCache == null) {
-            userCache = userService.findUser(login, password);
+            User user = userService.findUser(login, password);
+            if (user != null && user.getStatus() == REGISTERED) userCache = user;
         }
         return userCache;
     }
@@ -75,7 +79,7 @@ public class DataProvider {
     public void saveUser(User user) {
         if (user == null) return;
         userService.saveUser(user);
-        userCache = user;
+        if (user.getStatus() == REGISTERED) userCache = user;
     }
 
     public Set<TItem> getTreeData() {
