@@ -3,6 +3,9 @@ package org.alexside;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
+
 /**
  * Created by abalyshev on 08.02.17.
  */
@@ -84,9 +87,20 @@ public class DumPi {
         System.out.printf("pi:   %s\n", pi4b);
         System.out.printf("bits: %s\n", toBitString(bitMask));
         System.out.printf("bitMask size: %s\n", bitMask.size());
-        String reduced = reduceNills(3, 4, toBitString(bitMask));
+        String bitMaskStr = toBitString(bitMask);
+        String reduced = reduceNills(3, 4, bitMaskStr);
         System.out.printf("bits (reduced): %s\n", reduced);
         System.out.printf("bitMask size (reduced): %s\n", reduced.length());
+        List<String> reduced2 = reduceNills2(bitMaskStr);
+        System.out.printf("bits (reduced2): %s\n", Arrays.toString(reduced2.toArray()));
+        System.out.printf("bitMask size (reduced2): %s\n", getReducedSize(reduced2));
+        String restored = restoreNills(reduced2);
+        //System.out.printf("restored bits (reduced2): %s\n", restored);
+        System.out.printf("%s\n", bitMaskStr);
+        System.out.printf("%s\n", restored);
+        System.out.printf("Is restored: %s, size1: %sm size2: %s\n", Objects.equals(bitMaskStr, restored), bitMaskStr.length(), restored.length());
+
+
         System.out.printf("bytes: %s\n", characters.size()*2);
 
 //        DATA.chars().forEach(p -> {
@@ -199,9 +213,38 @@ public class DumPi {
         return result.substring(0, result.lastIndexOf("1"));
     }
 
-    private static String restoreNills(int min, int n, String seq) {
-        if (seq.length() < 10) return seq;
-        return "";
+    private static List<String> reduceNills2(String seq) {
+        List<String> result = new ArrayList<>();
+        if (seq.length() < 10) {
+            result.add(seq);
+            return result;
+        }
+        String[] split = seq.split("1");
+        IntStream.range(0, split.length).forEach(ndx -> {
+            String bin = split[ndx].length() > 0 ? Integer.toBinaryString(split[ndx].length()) : "";
+            result.add(bin + (ndx == split.length-1 ? "" : "1"));
+        });
+        return result;
+    }
+
+    private static int getReducedSize(List<String> reduced) {
+        return reduced.stream().map(String::length).reduce((x, y) -> x + y).orElse(-1);
+    }
+
+    private static String restoreNills(List<String> seq) {
+        StringBuilder sb = new StringBuilder();
+        IntStream.range(0, seq.size()).forEach(ndx -> {
+            String bin = seq.get(ndx).substring(0, seq.get(ndx).lastIndexOf("1"));
+            if (!bin.isEmpty()) {
+                final String[] bits = {""};
+                IntStream.range(0, Integer.parseInt(bin, 2)).forEach(ndx2 -> bits[0] += "0");
+                sb.append(bits[0]);
+                //System.out.printf("%s -> %s\n", bin, bits[0]);
+            }
+            if (ndx < seq.size() - 1)
+                sb.append("1");
+        });
+        return sb.toString();
     }
 }
 
