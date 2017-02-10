@@ -29,7 +29,7 @@ public class DumPi {
             "Sun's vice-president Rich Green said that Sun's ideal role with regard to Java was as an \"evangelist\".[34] Following Oracle Corporation's acquisition of Sun Microsystems in 2009–10, Oracle has described itself as the \"steward of Java technology with a relentless commitment to fostering a community of participation and transparency\".[35] This did not prevent Oracle from filing a lawsuit against Google shortly after that for using Java inside the Android SDK (see Google section below). Java software runs on everything from laptops to data centers, game consoles to scientific supercomputers.[36] On April 2, 2010, James Gosling resigned from Oracle.[37]";
     private static final String DATA_TEST = "Hello,everyone.My names is Alex";
     public static void main(String[] args) {
-        String pi4b = piSpigot(2048).substring(2);
+        String pi4b = piSpigot(35000);
         System.out.println(pi4b);
 
         List<Boolean> bitMask = new ArrayList<>();
@@ -39,8 +39,8 @@ public class DumPi {
         int[] piDigits = toIntArray(pi4b);
         char[] data = DATA_EN.toCharArray();
 
-        for (char c : data) {
-            if (curIndex >= piDigits.length) break;
+        for (int ndx = 0; ndx < data.length; ++ndx) {
+            char c = data[ndx];
             List<Boolean> charBitMask = new ArrayList<>();
             List<Integer> piSeq = new ArrayList<>();
 
@@ -48,6 +48,7 @@ public class DumPi {
             for (int i : charInt) {
                 while(curIndex < piDigits.length) {
                     int piDigit = piDigits[curIndex++];
+                    if (curIndex >= piDigits.length) curIndex = 0;
                     piSeq.add(piDigit);
                     if (i == piDigit) {
                         charBitMask.add(true);
@@ -57,8 +58,8 @@ public class DumPi {
                     }
                 }
             }
-            System.out.printf("char = %s, code = %s, bitMask = %s, bitMaskLen = %s, piSeq = %s\n",
-                    c, Arrays.toString(charInt), toBitString(charBitMask), charBitMask.size(), toIntString(piSeq));
+            System.out.printf("%s: char = %s, code = %s, bitMask = %s, bitMaskLen = %s, piSeq = %s\n",
+                    ndx, c, Arrays.toString(charInt), toBitString(charBitMask), charBitMask.size(), toIntString(piSeq));
             bitMask.addAll(charBitMask);
             characters.add(c);
         }
@@ -85,28 +86,19 @@ public class DumPi {
 
         System.out.println("-------------------------------------------------------");
         System.out.printf("pi:   %s\n", pi4b);
-        System.out.printf("bits: %s\n", toBitString(bitMask));
-        System.out.printf("bitMask size: %s\n", bitMask.size());
         String bitMaskStr = toBitString(bitMask);
-        String reduced = reduceNills(3, 4, bitMaskStr);
-        System.out.printf("bits (reduced): %s\n", reduced);
-        System.out.printf("bitMask size (reduced): %s\n", reduced.length());
+        System.out.printf("bits: %s\n", bitMaskStr);
+        System.out.printf("units: %s, zeros: %s\n", bitMaskStr.replaceAll("0", "").length(), bitMaskStr.replaceAll("1", "").length());
+        System.out.printf("bitMask size: %s\n", bitMask.size());
         List<String> reduced2 = reduceNills2(bitMaskStr);
-        System.out.printf("bits (reduced2): %s\n", Arrays.toString(reduced2.toArray()));
-        System.out.printf("bitMask size (reduced2): %s\n", getReducedSize(reduced2));
+        System.out.printf("bits (reduced): %s\n", Arrays.toString(reduced2.toArray()));
+        int bitMaskSize = getReducedSize(reduced2);
+        System.out.printf("bitMask size (reduced): %s\n", bitMaskSize);
         String restored = restoreNills(reduced2);
-        //System.out.printf("restored bits (reduced2): %s\n", restored);
-        System.out.printf("%s\n", bitMaskStr);
-        System.out.printf("%s\n", restored);
-        System.out.printf("Is restored: %s, size1: %sm size2: %s\n", Objects.equals(bitMaskStr, restored), bitMaskStr.length(), restored.length());
-
-
-        System.out.printf("bytes: %s\n", characters.size()*2);
-
-//        DATA.chars().forEach(p -> {
-//            System.out.printf("%s -> %s\n", (char)p, p);
-//        });
-
+        System.out.printf("source   bits: %s\n", bitMaskStr);
+        System.out.printf("restored bits: %s\n", restored);
+        System.out.printf("Has restored: %s, srcSize: %s rstSize: %s\n",
+                Objects.equals(bitMaskStr, restored), characters.size()*2, bitMaskSize/8);
     }
 
     public static String piSpigot(final int n) {
@@ -153,7 +145,7 @@ public class DumPi {
             pi.append(q);	// сохраняем найденную цифру
         }
         if (pi.length() >= 2) {
-            pi.insert(1, '.');	// добавляем в строчку точку после 3
+            //pi.insert(1, '.');	// добавляем в строчку точку после 3
         }
         return pi.toString();
     }
@@ -185,46 +177,42 @@ public class DumPi {
         return new byte[] {};
     }
 
-    /**
-     * Сокращение строки путем выпиливания нулей перед 1
-     * @param min - порог нулей, которые не будут сокращаться
-     * @param n - кол-во нулей для выпиливания
-     * @param seq - строка с 0 и 1
-     * @return
-     */
-    private static String reduceNills(int min, int n, String seq) {
-        if (seq.length() < 10) return seq;
-        StringBuilder sb = new StringBuilder();
-        for (String s : seq.split("1")) {
-            String r = s;
-            if (!s.isEmpty()) {
-                try {
-                    if ((s.length() - n) > min) {
-                        r = s.substring(0, n);
-                    }
-                } catch (Throwable e) {
-                    String bad = "";
-                }
-            }
-            sb.append(r);
-            sb.append("1");
-        }
-        String result = sb.toString();
-        return result.substring(0, result.lastIndexOf("1"));
-    }
-
     private static List<String> reduceNills2(String seq) {
         List<String> result = new ArrayList<>();
         if (seq.length() < 10) {
             result.add(seq);
             return result;
         }
-        String[] split = seq.split("1");
-        IntStream.range(0, split.length).forEach(ndx -> {
-            String bin = split[ndx].length() > 0 ? Integer.toBinaryString(split[ndx].length()) : "";
-            result.add(bin + (ndx == split.length-1 ? "" : "1"));
-        });
+        //String[] split = seq.split("1");
+        String[] split = splitSequence(seq);
+        System.out.println(Arrays.toString(split));
+        if (split.length == 0) {
+
+        } else {
+            IntStream.range(0, split.length).forEach(ndx -> {
+                String bin = split[ndx].length() > 0 ? Integer.toBinaryString(split[ndx].length()) : "";
+                result.add(bin + (ndx == split.length-1 ? "" : "1"));
+            });
+        }
         return result;
+    }
+
+    private static String[] splitSequence(String seq) {
+        List<String> result = new ArrayList<>();
+        String buffer = "";
+        try {
+            for (int ndx=0; ndx < seq.length(); ++ndx) {
+                if (seq.charAt(ndx) == '1') {
+                    result.add(buffer);
+                    buffer = "";
+                } else if (seq.charAt(ndx) == '0') {
+                    buffer += '0';
+                }
+            }
+        } finally {
+            result.add(buffer);
+        }
+        return result.toArray(new String[result.size()]);
     }
 
     private static int getReducedSize(List<String> reduced) {
@@ -234,7 +222,8 @@ public class DumPi {
     private static String restoreNills(List<String> seq) {
         StringBuilder sb = new StringBuilder();
         IntStream.range(0, seq.size()).forEach(ndx -> {
-            String bin = seq.get(ndx).substring(0, seq.get(ndx).lastIndexOf("1"));
+            int endNdx = ndx < seq.size() - 1 ? seq.get(ndx).lastIndexOf("1") : seq.get(ndx).length();
+            String bin = seq.get(ndx).substring(0, endNdx);
             if (!bin.isEmpty()) {
                 final String[] bits = {""};
                 IntStream.range(0, Integer.parseInt(bin, 2)).forEach(ndx2 -> bits[0] += "0");
