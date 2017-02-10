@@ -29,9 +29,15 @@ public class DumPi {
             "Sun's vice-president Rich Green said that Sun's ideal role with regard to Java was as an \"evangelist\".[34] Following Oracle Corporation's acquisition of Sun Microsystems in 2009–10, Oracle has described itself as the \"steward of Java technology with a relentless commitment to fostering a community of participation and transparency\".[35] This did not prevent Oracle from filing a lawsuit against Google shortly after that for using Java inside the Android SDK (see Google section below). Java software runs on everything from laptops to data centers, game consoles to scientific supercomputers.[36] On April 2, 2010, James Gosling resigned from Oracle.[37]";
     private static final String DATA_TEST = "Hello,everyone.My names is Alex";
     public static void main(String[] args) {
-        String pi4b = piSpigot(35000);
-        System.out.println(pi4b);
+        String pi4b = piSpigot(2048);
+        byte[] bytes = DATA_EN.getBytes();
+        IntStream.range(0, bytes.length).forEach(ndx -> {
+            System.out.printf("ndx: %s, byte: %s, bits: %s\n", ndx, bytes[ndx], Byte.parseByte(String.valueOf(bytes[ndx]), 2));
+        });
+        //compressData(pi4b);
+    }
 
+    private static void compressData(String pi4b) {
         List<Boolean> bitMask = new ArrayList<>();
         List<Character> characters = new ArrayList<>();
 
@@ -64,26 +70,7 @@ public class DumPi {
             characters.add(c);
         }
 
-//        for (int intChar : toIntArray(pi4b)) {
-//            if (curIndex >= data.length) break;
-//
-//            List<Boolean> digitBitMask = new ArrayList<>();
-//
-//            int[] cInt = toIntArray(data[curIndex]);
-//
-//
-//            for (char c : String.valueOf(intChar).toCharArray()) {
-//
-//            }
-//            if (digit == data[curIndex++]) {
-//                digitBitMask.add(true);
-//                break;
-//            } else digitBitMask.add(false);
-//
-//            System.out.printf("%s -> %s -> %s\n", (char)intChar, intChar, toBitString(digitBitMask));
-//            bitMask.addAll(digitBitMask);
-//        }
-
+        System.out.println(pi4b);
         System.out.println("-------------------------------------------------------");
         System.out.printf("pi:   %s\n", pi4b);
         String bitMaskStr = toBitString(bitMask);
