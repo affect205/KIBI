@@ -30,7 +30,7 @@ public class DumPi {
     private static final String DATA_TEST = "Hi, everyone. My names is Alex";
     public static void main(String[] args) {
         byte[] digest = piBytes(1024);
-        byte[] source = DATA_TEST.getBytes();
+        byte[] source = DATA_EN.getBytes();
         byte[] bitMask = compressData(digest, source);
 
         System.out.printf("digest (binary): %s\n", toBitString(digest));
@@ -44,6 +44,10 @@ public class DumPi {
         System.out.printf("bitmask (binary): %s\n", toBitString(bitMask));
         System.out.printf("bitmask (hex)   : %s\n", Arrays.toString(bitMask));
         System.out.printf("bitmask length: %s\n", bitMask.length);
+
+        List<String> reduced = reduceNills2(toBitString(bitMask));
+        System.out.printf("bitmask reduced (binary): %s\n", Arrays.toString(reduced.toArray(new String[reduced.size()])));
+        System.out.printf("bitmask reduced length: %s\n", getReducedSize(reduced)/8);
 
         byte b = -111;
         byte b2 = -111;
@@ -367,14 +371,14 @@ public class DumPi {
                 .range(0, bytes.length)
                 .mapToObj(ndx -> bytes[ndx])
                 .map(String::valueOf)
-                .reduce("", (s1, s2) -> s1 + ", " + s2);
+                .reduce("", (s1, s2) -> s1 + s2);
     }
     private static String toBitString(byte[] bytes) {
         return IntStream
                 .range(0, bytes.length)
                 .mapToObj(ndx -> bytes[ndx])
                 .map(b -> Integer.toBinaryString(b & 0xff))
-                .reduce("", (s1, s2) -> s1 + ", " + s2);
+                .reduce("", (s1, s2) -> s1 + s2);
     }
     private static String toIntString(List<Integer> list) {
         return list.stream().map(String::valueOf).reduce("", String::concat);
