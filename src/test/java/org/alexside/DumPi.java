@@ -1,9 +1,9 @@
 package org.alexside;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 /**
@@ -27,70 +27,291 @@ public class DumPi {
             "On November 13, 2006, Sun released much of its Java virtual machine (JVM) as free and open-source software, (FOSS), under the terms of the GNU General Public License (GPL). On May 8, 2007, Sun finished the process, making all of its JVM's core code available under free software/open-source distribution terms, aside from a small portion of code to which Sun did not hold the copyright.[33]\n" +
             "\n" +
             "Sun's vice-president Rich Green said that Sun's ideal role with regard to Java was as an \"evangelist\".[34] Following Oracle Corporation's acquisition of Sun Microsystems in 2009–10, Oracle has described itself as the \"steward of Java technology with a relentless commitment to fostering a community of participation and transparency\".[35] This did not prevent Oracle from filing a lawsuit against Google shortly after that for using Java inside the Android SDK (see Google section below). Java software runs on everything from laptops to data centers, game consoles to scientific supercomputers.[36] On April 2, 2010, James Gosling resigned from Oracle.[37]";
-    private static final String DATA_TEST = "Hello,everyone.My names is Alex";
+    private static final String DATA_TEST = "Hi, everyone. My names is Alex";
     public static void main(String[] args) {
-        String pi4b = piSpigot(2048);
-        byte[] bytes = DATA_EN.getBytes();
-        IntStream.range(0, bytes.length).forEach(ndx -> {
-            System.out.printf("ndx: %s, byte: %s, bits: %s\n", ndx, bytes[ndx], Byte.parseByte(String.valueOf(bytes[ndx]), 2));
-        });
+        byte[] digest = piBytes(1024);
+        byte[] source = DATA_TEST.getBytes();
+        byte[] bitMask = compressData(digest, source);
+
+        System.out.printf("digest (binary): %s\n", toBitString(digest));
+        System.out.printf("digest (hex)   : %s\n", Arrays.toString(digest));
+        System.out.printf("digest length: %s\n", digest.length);
+
+        System.out.printf("source (binary) : %s\n", toBitString(source));
+        System.out.printf("source (hex)    : %s\n", Arrays.toString(source));
+        System.out.printf("source  length: %s\n", source.length);
+
+        System.out.printf("bitmask (binary): %s\n", toBitString(bitMask));
+        System.out.printf("bitmask (hex)   : %s\n", Arrays.toString(bitMask));
+        System.out.printf("bitmask length: %s\n", bitMask.length);
+
+        byte b = -111;
+        byte b2 = -111;
+        byte[] split = splitByBits(b,1);
+//        System.out.println(isMask(split[0], b2, 0));
+//        System.out.println(isMask(split[1], b2, 1));
+//        System.out.println(Integer.toBinaryString(b & 0xff));
+//        System.out.println(Integer.toBinaryString(
+//                concatByBits(split[0], split[1]) & 0xff));
+//        System.out.println(Integer.toBinaryString((byte)((b >> 4) & (byte)0x0F) & 0xff));
+//        System.out.println(Integer.toBinaryString(split[0] & 0xff));
+//        System.out.println(Integer.toBinaryString((b & 0x0F) & 0xff));
+//        System.out.println(Integer.toBinaryString(split[1] & 0xff));
+
+//        System.out.println(Arrays.toString("0021371097147847832".split("(?<=\\G.{3})")));
+//        System.out.println(pi4b);
+//        System.out.println("-------------------------------------------------------");
+//        System.out.printf("pi:   %s\n", pi4b);
+//        String bitMaskStr = toBitString(bitMask);
+//        System.out.printf("bits: %s\n", bitMaskStr);
+//        System.out.printf("units: %s, zeros: %s\n", bitMaskStr.replaceAll("0", "").length(), bitMaskStr.replaceAll("1", "").length());
+//        System.out.printf("bitMask size: %s\n", bitMask.size());
+//        List<String> reduced2 = reduceNills2(bitMaskStr);
+//        System.out.printf("bits (reduced): %s\n", Arrays.toString(reduced2.toArray()));
+//        int bitMaskSize = getReducedSize(reduced2);
+//        System.out.printf("bitMask size (reduced): %s\n", bitMaskSize);
+//        String restored = restoreNills(reduced2);
+//        System.out.printf("source   bits: %s\n", bitMaskStr);
+//        System.out.printf("restored bits: %s\n", restored);
+//        System.out.printf("Has restored: %s, srcSize: %s rstSize: %s\n",
+//                Objects.equals(bitMaskStr, restored), characters.size()*2, bitMaskSize/8);
+
+//        byte b1 = -124;
+//        System.out.printf("%s -> %s\n", b1, Integer.toBinaryString(b1 & 0xff));
         //compressData(pi4b);
     }
 
-    private static void compressData(String pi4b) {
-        List<Boolean> bitMask = new ArrayList<>();
-        List<Character> characters = new ArrayList<>();
-
-        int curIndex = 0;
-        int[] piDigits = toIntArray(pi4b);
-        char[] data = DATA_EN.toCharArray();
-
-        for (int ndx = 0; ndx < data.length; ++ndx) {
-            char c = data[ndx];
-            List<Boolean> charBitMask = new ArrayList<>();
-            List<Integer> piSeq = new ArrayList<>();
-
-            int[] charInt = toIntArray(c);
-            for (int i : charInt) {
-                while(curIndex < piDigits.length) {
-                    int piDigit = piDigits[curIndex++];
-                    if (curIndex >= piDigits.length) curIndex = 0;
-                    piSeq.add(piDigit);
-                    if (i == piDigit) {
-                        charBitMask.add(true);
-                        break;
-                    } else {
-                        charBitMask.add(false);
-                    }
-                }
-            }
-            System.out.printf("%s: char = %s, code = %s, bitMask = %s, bitMaskLen = %s, piSeq = %s\n",
-                    ndx, c, Arrays.toString(charInt), toBitString(charBitMask), charBitMask.size(), toIntString(piSeq));
-            bitMask.addAll(charBitMask);
-            characters.add(c);
-        }
-
-        System.out.println(pi4b);
-        System.out.println("-------------------------------------------------------");
-        System.out.printf("pi:   %s\n", pi4b);
-        String bitMaskStr = toBitString(bitMask);
-        System.out.printf("bits: %s\n", bitMaskStr);
-        System.out.printf("units: %s, zeros: %s\n", bitMaskStr.replaceAll("0", "").length(), bitMaskStr.replaceAll("1", "").length());
-        System.out.printf("bitMask size: %s\n", bitMask.size());
-        List<String> reduced2 = reduceNills2(bitMaskStr);
-        System.out.printf("bits (reduced): %s\n", Arrays.toString(reduced2.toArray()));
-        int bitMaskSize = getReducedSize(reduced2);
-        System.out.printf("bitMask size (reduced): %s\n", bitMaskSize);
-        String restored = restoreNills(reduced2);
-        System.out.printf("source   bits: %s\n", bitMaskStr);
-        System.out.printf("restored bits: %s\n", restored);
-        System.out.printf("Has restored: %s, srcSize: %s rstSize: %s\n",
-                Objects.equals(bitMaskStr, restored), characters.size()*2, bitMaskSize/8);
+    private static void printBytes(byte[] bytes) {
+        IntStream.range(0, bytes.length).forEach(ndx -> {
+            System.out.printf("ndx: %s, byte: %s, bits: %s\n",
+                    ndx, bytes[ndx], Integer.toBinaryString(bytes[ndx] & 0xff));
+        });
     }
 
-    public static String piSpigot(final int n) {
+    private static byte[] compressData(byte[] digest, byte[] source) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(); // битовая маска в формате byte[]
+        int digestNdx = 0;// текущий байт дайджеста
+        int imposedBits = 0; // текущая позиция наложенния битов для source[ndx](пока 0 и 1 т.е. накладываем по 4 бита)
+        boolean imposed; // флаг успешного наложения маски
+
+        System.out.println("// ---------------------------------------------------------------------------------------");
+        for (int ndx=0; ndx < source.length; ++ndx) {
+            imposed = false;
+            StringBuilder bitMask = new StringBuilder();
+            byte[] bitChunks = new byte[8];
+            int chunkCnt = 0;
+            while(!imposed) {
+                digestNdx = digestNdx >= digest.length ? 0 : digestNdx;
+                byte[] dBits = splitByBits(digest[digestNdx++]);
+                for (int i=0; i < dBits.length; ++i) {
+                    bitChunks[chunkCnt++] = dBits[i];
+                    if (isMask(dBits[i], source[ndx], imposedBits)) {
+                        imposedBits++;
+                        bitMask.append("1");
+                    } else {
+                        bitMask.append("0");
+                    }
+                }
+                if (bitMask.toString().length() >= 8) {
+                    // считали 8 бит - конкатенируем байт, добавляем в буфер
+                    String s = bitMask.toString().substring(0, 8);
+                    byte b = (byte)Integer.parseInt(s, 2);
+                    System.out.printf("ndx: %s, src -> %s, src bits -> %s, src chunks -> %s, bit mask -> %s, byte mask -> %s, byte chunks -> %s\n",
+                            ndx,
+                            source[ndx],
+                            Integer.toBinaryString(source[ndx] & 0xff),
+                            Arrays.toString(splitByBits(source[ndx])),
+                            s,
+                            b,
+                            Arrays.toString(bitChunks));
+                    baos.write(b);
+                    chunkCnt = 0;
+                    bitMask.setLength(0);
+                }
+                if (imposedBits >= 2) {
+                    imposed = true;
+                    imposedBits = 0;
+                }
+            }
+        }
+        return baos.toByteArray();
+    }
+
+    private static boolean isMask(byte digest, byte source, int bit) {
+        if (bit % 2 == 0) {
+            return digest == (byte)((source >> 4) & (byte)0x0F);
+        }
+        return digest == (byte)(source & 0x0f);
+    }
+
+    private static byte[] splitByBits(byte b, int bits) {
+        //byte[] split = new byte[8/bits];
+        //final byte b = (byte) ((low << 4) | high);
+        byte low = (byte) ((b >> 4) & (byte)0x0F);
+        byte high = (byte) (b & 0x0F);
+        return new byte[] { low, high };
+    }
+
+    private static byte[] splitByBits(byte b) {
+        return splitByBits(b, 1);
+    }
+
+    private static byte concatByBits(byte low, byte high) {
+        return (byte) ((low << 4) | high);
+    }
+
+    public static boolean isSet(byte value, int bit) {
+        int b = (int)value & 0xff;
+        b >>= bit;
+        b &= 0x01;
+        if( b != 0 ) {
+            return true;
+        }
+        return false;
+    }
+
+    public static byte setBit(byte value, int bit) {
+        int b = (int)value;
+        b |= (1 << bit);
+        return (byte)(b & 0xff);
+    }
+
+    public static byte clearBit(byte value, int bit) {
+        int b = (int)value;
+        b &= ~(1 << bit);
+        return (byte)(b & 0xff);
+    }
+
+    public enum BitMask {
+        BIT1(1), BIT2(2), BIT4(4), BIT8(8);
+        private int bits;
+        BitMask(int bits) { this.bits = bits; }
+        public int getBits() { return bits; }
+    }
+
+//    private static void compressData(String pi4b) {
+//        List<Boolean> bitMask = new ArrayList<>();
+//        List<Character> characters = new ArrayList<>();
+//
+//        int curIndex = 0;
+//        int[] piDigits = toIntArray(pi4b);
+//        char[] data = DATA_EN.toCharArray();
+//
+//        for (int ndx = 0; ndx < data.length; ++ndx) {
+//            char c = data[ndx];
+//            List<Boolean> charBitMask = new ArrayList<>();
+//            List<Integer> piSeq = new ArrayList<>();
+//
+//            int[] charInt = toIntArray(c);
+//            for (int i : charInt) {
+//                while(curIndex < piDigits.length) {
+//                    int piDigit = piDigits[curIndex++];
+//                    if (curIndex >= piDigits.length) curIndex = 0;
+//                    piSeq.add(piDigit);
+//                    if (i == piDigit) {
+//                        charBitMask.add(true);
+//                        break;
+//                    } else {
+//                        charBitMask.add(false);
+//                    }
+//                }
+//            }
+//            System.out.printf("%s: char = %s, code = %s, bitMask = %s, bitMaskLen = %s, piSeq = %s\n",
+//                    ndx, c, Arrays.toString(charInt), toBitString(charBitMask), charBitMask.size(), toIntString(piSeq));
+//            bitMask.addAll(charBitMask);
+//            characters.add(c);
+//        }
+//
+//        System.out.println(pi4b);
+//        System.out.println("-------------------------------------------------------");
+//        System.out.printf("pi:   %s\n", pi4b);
+//        String bitMaskStr = toBitString(bitMask);
+//        System.out.printf("bits: %s\n", bitMaskStr);
+//        System.out.printf("units: %s, zeros: %s\n", bitMaskStr.replaceAll("0", "").length(), bitMaskStr.replaceAll("1", "").length());
+//        System.out.printf("bitMask size: %s\n", bitMask.size());
+//        List<String> reduced2 = reduceNills2(bitMaskStr);
+//        System.out.printf("bits (reduced): %s\n", Arrays.toString(reduced2.toArray()));
+//        int bitMaskSize = getReducedSize(reduced2);
+//        System.out.printf("bitMask size (reduced): %s\n", bitMaskSize);
+//        String restored = restoreNills(reduced2);
+//        System.out.printf("source   bits: %s\n", bitMaskStr);
+//        System.out.printf("restored bits: %s\n", restored);
+//        System.out.printf("Has restored: %s, srcSize: %s rstSize: %s\n",
+//                Objects.equals(bitMaskStr, restored), characters.size()*2, bitMaskSize/8);
+//    }
+
+//    public static String piSpigot(final int n) {
+//        // найденные цифры сразу же будем записывать в StringBuilder
+//        StringBuilder pi = new StringBuilder(n);
+//        int boxes = n * 10 / 3;	// размер массива
+//        int reminders[] = new int[boxes];
+//        // инициализируем масив двойками
+//        for (int i = 0; i < boxes; i++) {
+//            reminders[i] = 2;
+//        }
+//        int heldDigits = 0;    // счётчик временно недействительных цифр
+//        for (int i = 0; i < n; i++) {
+//            int carriedOver = 0;    // перенос на следующий шаг
+//            int sum = 0;
+//            for (int j = boxes - 1; j >= 0; j--) {
+//                reminders[j] *= 10;
+//                sum = reminders[j] + carriedOver;
+//                int quotient = sum / (j * 2 + 1);   // результат деления суммы на знаменатель
+//                reminders[j] = sum % (j * 2 + 1);   // остаток от деления суммы на знаменатель
+//                carriedOver = quotient * j;   // j - числитель
+//            }
+//            reminders[0] = sum % 10;
+//            int q = sum / 10;	// новая цифра числа Пи
+//            // регулировка недействительных цифр
+//            if (q == 9) {
+//                heldDigits++;
+//            } else if (q == 10) {
+//                q = 0;
+//                for (int k = 1; k <= heldDigits; k++) {
+//                    int replaced = Integer.parseInt(pi.substring(i - k, i - k + 1));
+//                    if (replaced == 9) {
+//                        replaced = 0;
+//                    } else {
+//                        replaced++;
+//                    }
+//                    pi.deleteCharAt(i - k);
+//                    pi.insert(i - k, replaced);
+//                }
+//                heldDigits = 1;
+//            } else {
+//                heldDigits = 1;
+//            }
+//            pi.append(q);	// сохраняем найденную цифру
+//        }
+//        if (pi.length() >= 2) {
+//            //pi.insert(1, '.');	// добавляем в строчку точку после 3
+//        }
+//        return pi.toString();
+//    }
+
+    public static String[] splitByLen(String s, int len) {
+        String[] split = new String[len+1];
+        for (int i=0, ndx=0; i < s.length(); i += len, ++ndx) {
+            split[ndx] = s.substring(ndx, Math.max(ndx, s.length()));
+        }
+        return split;
+    }
+
+    public static byte[] splitOnBytes(String s, int len) {
+        byte[] split = new byte[s.length() / len + 1];
+        for (int i=0, ndx=0; i < s.length(); i += len, ++ndx) {
+            String strNum = s.substring(i, Math.min(i + len, s.length()));
+            byte byteNum = (byte) Integer.parseInt(strNum);
+            split[ndx] = byteNum;
+            System.out.printf("ndx: %s, num: %s, byte: %s, bits: %s\n",
+                    i, strNum, byteNum, Integer.toBinaryString(byteNum & 0xff));
+        }
+        return split;
+    }
+
+    public static byte[] piBytes(final int n) {
         // найденные цифры сразу же будем записывать в StringBuilder
-        StringBuilder pi = new StringBuilder(n);
+        StringBuilder pi = new StringBuilder();
         int boxes = n * 10 / 3;	// размер массива
         int reminders[] = new int[boxes];
         // инициализируем масив двойками
@@ -134,12 +355,26 @@ public class DumPi {
         if (pi.length() >= 2) {
             //pi.insert(1, '.');	// добавляем в строчку точку после 3
         }
-        return pi.toString();
+        return splitOnBytes(pi.toString(), 3);
     }
 
     private static String toStr(boolean v) { return v ? "1" : "0"; }
     private static String toBitString(List<Boolean> list) {
         return list.stream().map(v -> toStr(v)).reduce("", String::concat);
+    }
+    private static String toHexString(byte[] bytes) {
+        return IntStream
+                .range(0, bytes.length)
+                .mapToObj(ndx -> bytes[ndx])
+                .map(String::valueOf)
+                .reduce("", (s1, s2) -> s1 + ", " + s2);
+    }
+    private static String toBitString(byte[] bytes) {
+        return IntStream
+                .range(0, bytes.length)
+                .mapToObj(ndx -> bytes[ndx])
+                .map(b -> Integer.toBinaryString(b & 0xff))
+                .reduce("", (s1, s2) -> s1 + ", " + s2);
     }
     private static String toIntString(List<Integer> list) {
         return list.stream().map(String::valueOf).reduce("", String::concat);
@@ -154,14 +389,6 @@ public class DumPi {
     }
     private static int[] toIntArray(char c) {
         return toIntArray(String.valueOf((int)c));
-    }
-
-    private static String archive(byte[] bytes) {
-        return "";
-    }
-
-    private static byte[] extract(String digest) {
-        return new byte[] {};
     }
 
     private static List<String> reduceNills2(String seq) {
