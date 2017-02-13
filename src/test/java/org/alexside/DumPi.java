@@ -1,8 +1,10 @@
 package org.alexside;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -30,7 +32,7 @@ public class DumPi {
     private static final String DATA_TEST = "Hi, everyone. My names is Alex";
     public static void main(String[] args) {
         byte[] digest = piBytes(1024);
-        byte[] source = DATA_EN.getBytes();
+        byte[] source = DATA_TEST.getBytes();
         byte[] bitMask = compressData(digest, source);
 
         System.out.printf("digest (binary): %s\n", toBitString(digest));
@@ -47,11 +49,14 @@ public class DumPi {
 
         List<String> reduced = reduceNills2(toBitString(bitMask));
         System.out.printf("bitmask reduced (binary): %s\n", Arrays.toString(reduced.toArray(new String[reduced.size()])));
-        System.out.printf("bitmask reduced length: %s\n", getReducedSize(reduced)/8);
+        String reducedStr = reduced.stream().reduce("", (s1, s2) -> s1+s2);
+        String srcStr = toBitString(bitMask);
+        System.out.printf("bitmask reduced length: %s, byte length: %s, bitMask byte length: %s, src byte length: %s\n",
+                reducedStr.length()/8, reducedStr.getBytes().length, srcStr.getBytes().length, source.length);
 
-        byte b = -111;
-        byte b2 = -111;
-        byte[] split = splitByBits(b,1);
+//        byte b = -111;
+//        byte b2 = -111;
+//        byte[] split = splitByBits(b,1);
 //        System.out.println(isMask(split[0], b2, 0));
 //        System.out.println(isMask(split[1], b2, 1));
 //        System.out.println(Integer.toBinaryString(b & 0xff));
@@ -98,7 +103,6 @@ public class DumPi {
         int imposedBits = 0; // текущая позиция наложенния битов для source[ndx](пока 0 и 1 т.е. накладываем по 4 бита)
         boolean imposed; // флаг успешного наложения маски
 
-        System.out.println("// ---------------------------------------------------------------------------------------");
         for (int ndx=0; ndx < source.length; ++ndx) {
             imposed = false;
             StringBuilder bitMask = new StringBuilder();
@@ -149,8 +153,6 @@ public class DumPi {
     }
 
     private static byte[] splitByBits(byte b, int bits) {
-        //byte[] split = new byte[8/bits];
-        //final byte b = (byte) ((low << 4) | high);
         byte low = (byte) ((b >> 4) & (byte)0x0F);
         byte high = (byte) (b & 0x0F);
         return new byte[] { low, high };
@@ -162,6 +164,12 @@ public class DumPi {
 
     private static byte concatByBits(byte low, byte high) {
         return (byte) ((low << 4) | high);
+    }
+
+    public static String toBinaryString(byte b) {
+        StringBuilder buf = new StringBuilder();
+        IntStream.range(1, 9).forEach(bit -> buf.append(isSet(b, bit) ? "1" : "0"));
+        return buf.toString();
     }
 
     public static boolean isSet(byte value, int bit) {
@@ -377,7 +385,7 @@ public class DumPi {
         return IntStream
                 .range(0, bytes.length)
                 .mapToObj(ndx -> bytes[ndx])
-                .map(b -> Integer.toBinaryString(b & 0xff))
+                .map(b -> toBinaryString(b))
                 .reduce("", (s1, s2) -> s1 + s2);
     }
     private static String toIntString(List<Integer> list) {
@@ -395,15 +403,74 @@ public class DumPi {
         return toIntArray(String.valueOf((int)c));
     }
 
+    private static class BitBuffer {
+        private boolean[] bits;
+        private int ndx;
+        private BitBuffer() {
+            this.bits = new boolean[8];
+        }
+        public void set(boolean bit) {
+            if (ndx < bits.length) {
+                bits[ndx++] = bit;
+            }
+        }
+        public boolean isSet(int ndx) {
+            if (ndx < bits.length) return false;
+            return bits[ndx];
+        }
+        public boolean isFull() {
+            return ndx >= (bits.length-1);
+        }
+        public void clear() {
+            IntStream.range(0, bits.length).forEach(ndx -> bits[ndx] = false);
+            ndx = 0;
+        }
+        public byte toByte() {
+            StringBuilder buf = new StringBuilder();
+            IntStream.range(0, bits.length).forEach(ndx -> {
+                buf.append(bits[ndx] ? "1" : "0");
+            });
+            return (byte)Integer.parseInt(buf.toString(), 2);
+        }
+        public static BitBuffer create() {
+            return new BitBuffer();
+        }
+    }
+
+    private static byte[] reduceNills(byte[] bitMask) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int nills = 0;
+        BitBuffer bitBuffer = BitBuffer.create();
+        for (int ndx=0; ndx < bitMask.length; ++ndx) {
+            for (int n=1; n < 9; ++n) {
+                boolean bit = isSet(bitMask[ndx], n);
+                bitBuffer.set(bit);
+                if (!bit) {
+                    nills++;
+                } else {
+
+                }
+            }
+        }
+        return baos.toByteArray();
+    }
+
+    private static int nillsBefore(byte b) {
+        int nills = 0;
+        for (int bit=1; bit < 9; ++bit) {
+            if (isSet(b, bit)) return nills;
+            ++nills;
+        }
+        return nills;
+    }
+
     private static List<String> reduceNills2(String seq) {
         List<String> result = new ArrayList<>();
         if (seq.length() < 10) {
             result.add(seq);
             return result;
         }
-        //String[] split = seq.split("1");
         String[] split = splitSequence(seq);
-        System.out.println(Arrays.toString(split));
         if (split.length == 0) {
 
         } else {
