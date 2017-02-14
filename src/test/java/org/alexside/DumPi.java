@@ -25,23 +25,27 @@ public class DumPi {
             "On November 13, 2006, Sun released much of its Java virtual machine (JVM) as free and open-source software, (FOSS), under the terms of the GNU General Public License (GPL). On May 8, 2007, Sun finished the process, making all of its JVM's core code available under free software/open-source distribution terms, aside from a small portion of code to which Sun did not hold the copyright.[33]\n" +
             "\n" +
             "Sun's vice-president Rich Green said that Sun's ideal role with regard to Java was as an \"evangelist\".[34] Following Oracle Corporation's acquisition of Sun Microsystems in 2009–10, Oracle has described itself as the \"steward of Java technology with a relentless commitment to fostering a community of participation and transparency\".[35] This did not prevent Oracle from filing a lawsuit against Google shortly after that for using Java inside the Android SDK (see Google section below). Java software runs on everything from laptops to data centers, game consoles to scientific supercomputers.[36] On April 2, 2010, James Gosling resigned from Oracle.[37]";
-    private static final String DATA_TEST = "Hello everyone. My name is Alex";
+    private static final String DATA_TEST = "Hello everyone. My name is Alex.";
     public static void main(String[] args) {
-        byte[] digest = piBytes(512);
-        byte[] source = DATA_TEST.getBytes();
-        BitSet bitMask = compressData(digest, source);
+        byte[] digest = piBytes(1024);
+        byte[] source = DATA_EN.getBytes();
 
-        String digestBin = toBitString(digest);
+//        BitSet digestBitSet = BitSet.valueOf(digest);
+//        String digestBitSetStr = toSplitString(digestBitSet);
+//        System.out.printf("digest (bitset) : %s\n", digestBitSetStr);
+
+        String digestBin = toSplitString(digest);
         System.out.printf("digest (binary) : %s\n", digestBin);
         System.out.printf("digest (hex)    : %s\n", Arrays.toString(digest));
         System.out.printf("digest length:  %s\n", digest.length);
 
-        String sourceBin = toBitString(source);
+        String sourceBin = toSplitString(source);
         System.out.printf("source (binary) : %s\n", sourceBin);
         System.out.printf("source (hex)    : %s\n", Arrays.toString(source));
         System.out.printf("source  length: %s\n", source.length);
 
-        String bitMaskBin = toBitString(bitMask.toByteArray());
+        BitSet bitMask = compressData(digest, source);
+        String bitMaskBin = toSplitString(bitMask.toByteArray());
         System.out.printf("bitmask (binary): %s\n", bitMaskBin);
         System.out.printf("bitmask (hex)   : %s\n", Arrays.toString(bitMask.toByteArray()));
         System.out.printf("bitmask length: %s\n", bitMask.toByteArray().length);
@@ -56,9 +60,11 @@ public class DumPi {
         byte[] restored = restoreData(digest, bitMask.toByteArray());
         String restoredBin = toBitString(restored);
         System.out.printf("restored (binary): %s\n", restoredBin);
+        System.out.printf("source   (hex)   : %s\n", Arrays.toString(source));
         System.out.printf("restored (hex)   : %s\n", Arrays.toString(restored));
         System.out.printf("restored length: %s\n", restored.length);
-        System.out.printf("Data restored: %s\n", Objects.equals(source, restored));
+        System.out.printf("Data restored: %s\n", arrayEqual(source, restored));
+        System.out.println(new String(restored));
 
         //reduceNills(bitMask);
 
@@ -98,6 +104,16 @@ public class DumPi {
         //compressData(pi4b);
     }
 
+    public static boolean arrayEqual(byte[] a1, byte[] a2) {
+        if (a1 == null) return a2 == null;
+        if (a1.length != a2.length) return false;
+        for (int ndx=0; ndx < a1.length; ++ndx) {
+            if (a1[ndx] != a2[ndx])
+                return false;
+        }
+        return true;
+    }
+
     private static boolean validMask(String src, String digest, String mask) {
         System.out.println("DumPi::validMask...");
         System.out.printf("source: %s\n", src);
@@ -133,7 +149,6 @@ public class DumPi {
     private static BitSet compressData(byte[] digest, byte[] source) {
         BitSet bitSet = new BitSet();
         final int[] bitSetNdx = {0};
-        StringBuilder bitMask = new StringBuilder();
         int bitNdx = 0; // счетчик для digest (bitNdx/2 - индекс в массиве, bitNdx%2 - индекс полубайта)
         for (int ndx=0; ndx < source.length; ++ndx) {
             boolean imposed = false; // флаг наложения текущего байта
@@ -145,26 +160,21 @@ public class DumPi {
                 System.out.printf(
                         "ndx: %s, bitNdx -> (%s,%s), src byte -> %s, src bits -> %s src chunks -> %s, chunk byte -> %s, chunk bits -> %s, imposedBits -> %s\n",
                         ndx, bitNdx/2, bitNdx%2,
-                        source[ndx], toBinaryString(source[ndx]), Arrays.toString(srcChunks),
-                        chunk, toBinaryString(chunk), imposedBits
+                        source[ndx], Integer.toBinaryString(source[ndx] & 0xff), Arrays.toString(srcChunks),
+                        chunk, Integer.toBinaryString(chunk & 0xff), imposedBits
                 );
                 bitNdx++;
                 if (chunk == srcChunks[imposedBits]) {
-                    bitMask.append("1");
                     bitSet.set(bitSetNdx[0]++, true);
                     if (++imposedBits >= 2) {
                         imposed = true;
                     }
                 } else {
-                    bitMask.append("0");
                     bitSet.set(bitSetNdx[0]++, false);
                 }
             }
         }
         System.out.println(toBitString(bitSet));
-        System.out.println(toBitString(bitSet.toLongArray()));
-        System.out.println(toBitString(bitSet.toByteArray()));
-        System.out.println(bitMask.toString());
         return bitSet;
     }
 
@@ -176,9 +186,9 @@ public class DumPi {
         int bitsNdx = 0;
         byte[] bits = new byte[2];
         while ((curSet = maskBitSet.nextSetBit(curSet)) != -1) {
-            //System.out.printf("%s -> %s\n", bitsNdx%2, curSet);
-            //System.out.println(curSet);
-            bits[bitsNdx%2] = digest[curSet % digest.length];
+            byte chunk = getByteChunk(digest, curSet);
+            //System.out.printf("%s -> %s -> %s\n", curSet, curSet % digest.length, chunk);
+            bits[bitsNdx%2] = chunk;
             if (++bitsNdx >= 2) {
                 bitsNdx = 0;
                 byte restored = concatByBits(bits[0], bits[1]);
@@ -207,14 +217,11 @@ public class DumPi {
         return digest == (byte)(source & 0x0f);
     }
 
-    private static byte[] splitByBits(byte b, int bits) {
+    private static byte[] splitByBits(byte b) {
         byte low = (byte) ((b >> 4) & (byte)0x0F);
         byte high = (byte) (b & 0x0F);
+        // передаем сначала старший полубайт затем младший, чтобы читать байт слева-напрвво
         return new byte[] { low, high };
-    }
-
-    private static byte[] splitByBits(byte b) {
-        return splitByBits(b, 1);
     }
 
     private static byte concatByBits(byte low, byte high) {
@@ -376,6 +383,31 @@ public class DumPi {
                 .mapToObj(ndx -> bytes[ndx])
                 .map(b -> toBinaryString(b))
                 .reduce("", (s1, s2) -> s1 + s2);
+    }
+    private static String toSplitString(byte[] bytes) {
+        StringBuilder buffer = new StringBuilder();
+        for (int ndx = 0; ndx < bytes.length; ++ndx) {
+            buffer.append(String.format("%s->%s%s, ", ndx, Integer.toBinaryString(bytes[ndx] & 0xff), Arrays.toString(splitByBits(bytes[ndx]))));
+        }
+        return buffer.toString();
+    }
+    private static String toBit4String(byte[] bytes) {
+        String bitString = toBitString(bytes);
+        return toBit4String(bitString);
+    }
+    private static String toBit4String(BitSet bitSet) {
+        String bitString = toBitString(bitSet);
+        return toBit4String(bitString);
+    }
+    private static String toBit4String(String bitString) {
+        StringBuilder buffer = new StringBuilder();
+        int curNdx=0;
+        while (curNdx < bitString.length()) {
+            String substr = String.format("%s -> %s, ", curNdx/4, bitString.substring(curNdx, Math.min(curNdx+4, bitString.length())));
+            buffer.append(substr);
+            curNdx += 4;
+        }
+        return buffer.toString();
     }
     private static String toBitString(long[] bytes) {
         return IntStream
