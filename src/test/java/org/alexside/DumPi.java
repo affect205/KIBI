@@ -1,7 +1,6 @@
 package org.alexside;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -30,7 +29,7 @@ public class DumPi {
     public static void main(String[] args) {
         byte[] digest = piBytes(512);
         byte[] source = DATA_TEST.getBytes();
-        byte[] bitMask = compressData(digest, source);
+        BitSet bitMask = compressData(digest, source);
 
         String digestBin = toBitString(digest);
         System.out.printf("digest (binary) : %s\n", digestBin);
@@ -42,25 +41,26 @@ public class DumPi {
         System.out.printf("source (hex)    : %s\n", Arrays.toString(source));
         System.out.printf("source  length: %s\n", source.length);
 
-        String bitMaskBin = toBitString(bitMask);
+        String bitMaskBin = toBitString(bitMask.toByteArray());
         System.out.printf("bitmask (binary): %s\n", bitMaskBin);
-        System.out.printf("bitmask (hex)   : %s\n", Arrays.toString(bitMask));
-        System.out.printf("bitmask length: %s\n", bitMask.length);
-
-        List<String> reduced = reduceNills2(toBitString(bitMask));
+        System.out.printf("bitmask (hex)   : %s\n", Arrays.toString(bitMask.toByteArray()));
+        System.out.printf("bitmask length: %s\n", bitMask.toByteArray().length);
+        System.out.printf("bitmask zeros: %s, units: %s\n", bitMask.toByteArray().length, bitMaskBin.replaceAll("1", "").length(), bitMaskBin.replaceAll("0", "").length());
+        List<String> reduced = reduceNills2(toBitString(bitMask.toByteArray()));
         System.out.printf("bitmask reduced (binary): %s\n", Arrays.toString(reduced.toArray(new String[reduced.size()])));
         String reducedStr = reduced.stream().reduce("", (s1, s2) -> s1+s2);
-        String srcStr = toBitString(bitMask);
+        String srcStr = toBitString(bitMask.toByteArray());
         System.out.printf("bitmask reduced length: %s, byte length: %s, bitMask byte length: %s, src byte length: %s\n",
                 reducedStr.length()/8, reducedStr.getBytes().length, srcStr.getBytes().length, source.length);
 
-        String sourceBinTest = "01001000111111011101000000110011100101100111";
-        String digestBinTest = "10111000111100100010000011001100100101101000";
-        String bitMaskBinTest = "01100100110";
-        System.out.printf("Mask validation: %s\n", validMask(sourceBinTest, digestBinTest, bitMaskBinTest) ? "SUCCESS" : "FAILURE");
-        System.out.println("// --------------------------------------------------------------------------------------");
+        byte[] restored = restoreData(digest, bitMask.toByteArray());
+        String restoredBin = toBitString(restored);
+        System.out.printf("restored (binary): %s\n", restoredBin);
+        System.out.printf("restored (hex)   : %s\n", Arrays.toString(restored));
+        System.out.printf("restored length: %s\n", restored.length);
+        System.out.printf("Data restored: %s\n", Objects.equals(source, restored));
 
-        reduceNills(bitMask);
+        //reduceNills(bitMask);
 
 //        byte b = -111;
 //        byte b2 = -111;
@@ -99,6 +99,10 @@ public class DumPi {
     }
 
     private static boolean validMask(String src, String digest, String mask) {
+        System.out.println("DumPi::validMask...");
+        System.out.printf("source: %s\n", src);
+        System.out.printf("digest: %s\n", digest);
+        System.out.printf("mask:   %s\n", mask);
         for (int ndx=0; ndx < src.length(); ndx+=4) {
             boolean valid = true;
             char maskBit = mask.charAt(ndx/4);
@@ -126,55 +130,74 @@ public class DumPi {
         });
     }
 
-    private static byte[] compressData(byte[] digest, byte[] source) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(); // битовая маска в формате byte[]
-        int digestNdx = 0;// текущий байт дайджеста
-        int imposedBits = 0; // текущая позиция наложенния битов для source[ndx](пока 0 и 1 т.е. накладываем по 4 бита)
-        boolean imposed; // флаг успешного наложения маски
-
+    private static BitSet compressData(byte[] digest, byte[] source) {
+        BitSet bitSet = new BitSet();
+        final int[] bitSetNdx = {0};
+        StringBuilder bitMask = new StringBuilder();
+        int bitNdx = 0; // счетчик для digest (bitNdx/2 - индекс в массиве, bitNdx%2 - индекс полубайта)
         for (int ndx=0; ndx < source.length; ++ndx) {
-            imposed = false;
-            StringBuilder bitMask = new StringBuilder();
-            byte[] bitChunks = new byte[8];
-            int chunkCnt = 0;
+            boolean imposed = false; // флаг наложения текущего байта
+            byte[] srcChunks  = splitByBits(source[ndx]);
+            int imposedBits = 0; // кол-во наложенных полубайтов
 
+            while (!imposed) {
+                byte chunk = getByteChunk(digest, bitNdx);
+                System.out.printf(
+                        "ndx: %s, bitNdx -> (%s,%s), src byte -> %s, src bits -> %s src chunks -> %s, chunk byte -> %s, chunk bits -> %s, imposedBits -> %s\n",
+                        ndx, bitNdx/2, bitNdx%2,
+                        source[ndx], toBinaryString(source[ndx]), Arrays.toString(srcChunks),
+                        chunk, toBinaryString(chunk), imposedBits
+                );
+                bitNdx++;
+                if (chunk == srcChunks[imposedBits]) {
+                    bitMask.append("1");
+                    bitSet.set(bitSetNdx[0]++, true);
+                    if (++imposedBits >= 2) {
+                        imposed = true;
+                    }
+                } else {
+                    bitMask.append("0");
+                    bitSet.set(bitSetNdx[0]++, false);
+                }
+            }
+        }
+        System.out.println(toBitString(bitSet));
+        System.out.println(toBitString(bitSet.toLongArray()));
+        System.out.println(toBitString(bitSet.toByteArray()));
+        System.out.println(bitMask.toString());
+        return bitSet;
+    }
 
-
-//            while(!imposed) {
-//                digestNdx = digestNdx >= digest.length ? 0 : digestNdx;
-//                byte[] dBits = splitByBits(digest[digestNdx++]);
-//                for (int i=0; i < dBits.length; ++i) {
-//                    bitChunks[chunkCnt++] = dBits[i];
-//                    if (isMask(dBits[i], source[ndx], imposedBits)) {
-//                        imposedBits++;
-//                        bitMask.append("1");
-//                    } else {
-//                        bitMask.append("0");
-//                    }
-//                    if (bitMask.toString().length() >= 8) {
-//                        // считали 8 бит - конкатенируем байт, добавляем в буфер
-//                        String s = bitMask.toString().substring(0, 8);
-//                        byte b = (byte)Integer.parseInt(s, 2);
-//                        System.out.printf("ndx: %s, dNdx: %s, src -> %s, src bits -> %s, src chunks -> %s, bit mask -> %s, byte chunks -> %s, imposedBits -> %s\n",
-//                                ndx, digestNdx,
-//                                source[ndx],
-//                                Integer.toBinaryString(source[ndx] & 0xff),
-//                                Arrays.toString(splitByBits(source[ndx])),
-//                                s,
-//                                Arrays.toString(bitChunks),
-//                                imposedBits);
-//                        baos.write(b);
-//                        chunkCnt = 0;
-//                        bitMask.setLength(0);
-//                    }
-//                    if (imposedBits >= 2) {
-//                        imposed = true;
-//                        imposedBits = 0;
-//                    }
-//                }
-//            }
+    private static byte[] restoreData(byte[] digest, byte[] bitMask) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        BitSet maskBitSet = BitSet.valueOf(bitMask);
+        System.out.println(toBitString(maskBitSet));
+        int curSet = 0;
+        int bitsNdx = 0;
+        byte[] bits = new byte[2];
+        while ((curSet = maskBitSet.nextSetBit(curSet)) != -1) {
+            //System.out.printf("%s -> %s\n", bitsNdx%2, curSet);
+            //System.out.println(curSet);
+            bits[bitsNdx%2] = digest[curSet % digest.length];
+            if (++bitsNdx >= 2) {
+                bitsNdx = 0;
+                byte restored = concatByBits(bits[0], bits[1]);
+                baos.write(restored);
+            }
+            curSet++;
         }
         return baos.toByteArray();
+    }
+
+    private static byte getByteChunk(byte[] bytes, int ndx) {
+        int i = ndx > bytes.length ?  ndx % bytes.length : ndx;
+        byte[] bits = splitByBits(bytes[i/2]);
+        return bits[i%2];
+    }
+
+    private static byte getByteChunk(byte[] bytes, int ndx, int bit) {
+        byte[] bits = splitByBits(bytes[ndx]);
+        return bits[bit];
     }
 
     private static boolean isMask(byte digest, byte source, int bit) {
@@ -203,12 +226,39 @@ public class DumPi {
         IntStream.range(1, 9).forEach(bit -> buf.append(isSet(b, bit) ? "1" : "0"));
         return buf.toString();
     }
+    public static String toBinaryString(long l) {
+        StringBuilder buf = new StringBuilder();
+        IntStream.range(1, 65).forEach(bit -> buf.append(isSet(l, bit) ? "1" : "0"));
+        return buf.toString();
+    }
+    public static String toBinaryString(int i) {
+        StringBuilder buf = new StringBuilder();
+        IntStream.range(1, 32).forEach(bit -> buf.append(isSet(i, bit) ? "1" : "0"));
+        return buf.toString();
+    }
 
     public static boolean isSet(byte value, int bit) {
         int b = (int)value & 0xff;
         b >>= bit;
         b &= 0x01;
         if( b != 0 ) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isSet(long value, int bit) {
+        if ((value & (1L << bit)) != 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isSet(int value, int bit) {
+        //int b = (int)value & 0xff;
+        value >>= bit;
+        value &= 0x01;
+        if(value != 0) {
             return true;
         }
         return false;
@@ -225,113 +275,6 @@ public class DumPi {
         b &= ~(1 << bit);
         return (byte)(b & 0xff);
     }
-
-    public enum BitMask {
-        BIT1(1), BIT2(2), BIT4(4), BIT8(8);
-        private int bits;
-        BitMask(int bits) { this.bits = bits; }
-        public int getBits() { return bits; }
-    }
-
-//    private static void compressData(String pi4b) {
-//        List<Boolean> bitMask = new ArrayList<>();
-//        List<Character> characters = new ArrayList<>();
-//
-//        int curIndex = 0;
-//        int[] piDigits = toIntArray(pi4b);
-//        char[] data = DATA_EN.toCharArray();
-//
-//        for (int ndx = 0; ndx < data.length; ++ndx) {
-//            char c = data[ndx];
-//            List<Boolean> charBitMask = new ArrayList<>();
-//            List<Integer> piSeq = new ArrayList<>();
-//
-//            int[] charInt = toIntArray(c);
-//            for (int i : charInt) {
-//                while(curIndex < piDigits.length) {
-//                    int piDigit = piDigits[curIndex++];
-//                    if (curIndex >= piDigits.length) curIndex = 0;
-//                    piSeq.add(piDigit);
-//                    if (i == piDigit) {
-//                        charBitMask.add(true);
-//                        break;
-//                    } else {
-//                        charBitMask.add(false);
-//                    }
-//                }
-//            }
-//            System.out.printf("%s: char = %s, code = %s, bitMask = %s, bitMaskLen = %s, piSeq = %s\n",
-//                    ndx, c, Arrays.toString(charInt), toBitString(charBitMask), charBitMask.size(), toIntString(piSeq));
-//            bitMask.addAll(charBitMask);
-//            characters.add(c);
-//        }
-//
-//        System.out.println(pi4b);
-//        System.out.println("-------------------------------------------------------");
-//        System.out.printf("pi:   %s\n", pi4b);
-//        String bitMaskStr = toBitString(bitMask);
-//        System.out.printf("bits: %s\n", bitMaskStr);
-//        System.out.printf("units: %s, zeros: %s\n", bitMaskStr.replaceAll("0", "").length(), bitMaskStr.replaceAll("1", "").length());
-//        System.out.printf("bitMask size: %s\n", bitMask.size());
-//        List<String> reduced2 = reduceNills2(bitMaskStr);
-//        System.out.printf("bits (reduced): %s\n", Arrays.toString(reduced2.toArray()));
-//        int bitMaskSize = getReducedSize(reduced2);
-//        System.out.printf("bitMask size (reduced): %s\n", bitMaskSize);
-//        String restored = restoreNills(reduced2);
-//        System.out.printf("source   bits: %s\n", bitMaskStr);
-//        System.out.printf("restored bits: %s\n", restored);
-//        System.out.printf("Has restored: %s, srcSize: %s rstSize: %s\n",
-//                Objects.equals(bitMaskStr, restored), characters.size()*2, bitMaskSize/8);
-//    }
-
-//    public static String piSpigot(final int n) {
-//        // найденные цифры сразу же будем записывать в StringBuilder
-//        StringBuilder pi = new StringBuilder(n);
-//        int boxes = n * 10 / 3;	// размер массива
-//        int reminders[] = new int[boxes];
-//        // инициализируем масив двойками
-//        for (int i = 0; i < boxes; i++) {
-//            reminders[i] = 2;
-//        }
-//        int heldDigits = 0;    // счётчик временно недействительных цифр
-//        for (int i = 0; i < n; i++) {
-//            int carriedOver = 0;    // перенос на следующий шаг
-//            int sum = 0;
-//            for (int j = boxes - 1; j >= 0; j--) {
-//                reminders[j] *= 10;
-//                sum = reminders[j] + carriedOver;
-//                int quotient = sum / (j * 2 + 1);   // результат деления суммы на знаменатель
-//                reminders[j] = sum % (j * 2 + 1);   // остаток от деления суммы на знаменатель
-//                carriedOver = quotient * j;   // j - числитель
-//            }
-//            reminders[0] = sum % 10;
-//            int q = sum / 10;	// новая цифра числа Пи
-//            // регулировка недействительных цифр
-//            if (q == 9) {
-//                heldDigits++;
-//            } else if (q == 10) {
-//                q = 0;
-//                for (int k = 1; k <= heldDigits; k++) {
-//                    int replaced = Integer.parseInt(pi.substring(i - k, i - k + 1));
-//                    if (replaced == 9) {
-//                        replaced = 0;
-//                    } else {
-//                        replaced++;
-//                    }
-//                    pi.deleteCharAt(i - k);
-//                    pi.insert(i - k, replaced);
-//                }
-//                heldDigits = 1;
-//            } else {
-//                heldDigits = 1;
-//            }
-//            pi.append(q);	// сохраняем найденную цифру
-//        }
-//        if (pi.length() >= 2) {
-//            //pi.insert(1, '.');	// добавляем в строчку точку после 3
-//        }
-//        return pi.toString();
-//    }
 
     public static String[] splitByLen(String s, int len) {
         String[] split = new String[len+1];
@@ -420,7 +363,28 @@ public class DumPi {
                 .map(bit -> bit ? "1" : "0")
                 .reduce("", (s1, s2) -> s1 + s2);
     }
+    private static String toBitString(BitSet bitSet) {
+        return IntStream
+                .range(0, bitSet.size())
+                .mapToObj(ndx -> bitSet.get(ndx))
+                .map(bit -> bit ? "1" : "0")
+                .reduce("", (s1, s2) -> s1 + s2);
+    }
     private static String toBitString(byte[] bytes) {
+        return IntStream
+                .range(0, bytes.length)
+                .mapToObj(ndx -> bytes[ndx])
+                .map(b -> toBinaryString(b))
+                .reduce("", (s1, s2) -> s1 + s2);
+    }
+    private static String toBitString(long[] bytes) {
+        return IntStream
+                .range(0, bytes.length)
+                .mapToObj(ndx -> bytes[ndx])
+                .map(b -> toBinaryString(b))
+                .reduce("", (s1, s2) -> s1 + s2);
+    }
+    private static String toBitString(int[] bytes) {
         return IntStream
                 .range(0, bytes.length)
                 .mapToObj(ndx -> bytes[ndx])
@@ -477,20 +441,6 @@ public class DumPi {
     }
 
     private static byte[] reduceNills(byte[] bitMask) {
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        int nills = 0;
-//        BitBuffer bitBuffer = BitBuffer.create();
-//        for (int ndx=0; ndx < bitMask.length; ++ndx) {
-//            for (int n=1; n < 9; ++n) {
-//                boolean bit = isSet(bitMask[ndx], n);
-//                bitBuffer.set(bit);
-//                if (!bit) {
-//                    nills++;
-//                } else {
-//
-//                }
-//            }
-//        }
         BitSet reducedBitSet = new BitSet();
         BitSet bitSet = BitSet.valueOf(bitMask);
         System.out.println("Cardinality: " + bitSet.cardinality());
