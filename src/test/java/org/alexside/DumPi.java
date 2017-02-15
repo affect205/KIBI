@@ -9,62 +9,66 @@ import java.util.stream.IntStream;
  */
 public class DumPi {
     private static final String DATA_RU =
-            "Далее, чтобы найти одну цифру числа Пи, необходимо пройтись по всем ячейкам массива с конца к началу и выполнить несложные действия. На примере таблицы, рассмотрим всё по порядку. Допустим, мы хотим найти 3 цифры числа Пи. Для этого нам необходимо зарезервировать 3 * 10 / 3 = 10 ячеек целого типа. Заполняем их все числом 2. Теперь приступим к поиску первой цифры…\n" +
-                    "\n" +
-                    "Начинаем с конца массива. Берём последний элемент (под номером 9, если начинать счёт с 0. Этот же номер будем называть числителем, а тот, что под ним в таблицу – знаменателем) — он равен 2. Умножаем его на 10 (2 * 10 = 20). К получившемуся числу 20 прибавляем число из ячейки «Перенос» – число, которое переносится из более правой операции. Разумеется, правее мы ничего не считали, поэтому это число равно 0. Результат записываем в «сумму». В «остаток» записываем остаток от деления суммы на знаменатель: 20 mod 19 = 1. А сейчас считаем «перенос» для следующего шага. Он будет равен результату деления суммы на знаменатель, умноженному на числитель: (20 / 19) * 9 = 9. И записываем полученное число в ячейку с «переносом», стоящую левее от текущего столбца. Проделываем те же действия с каждым элементом массива (умножить на 10, посчитать сумму, остаток и перенос на следующий шаг), пока не дойдём до элемента с номером 0. Здесь действия немного отличаются. Итак, посмотрим, что у нас в таблице. Под нулём – элемент массива, равный 2, и перенос из предыдущего шага, равный 10. Как и в предыдущих шагах, умножаем элемент массива на 10 и прибавляем к нему перенос. В сумме получили 30. А сейчас делим сумму не на знаменатель, а на 10 (!). В итоге получаем 30 / 10 = 3 + 0 (где 0 – остаток). Полученное число 3 и будет той заветной первой цифрой числа Пи. А остаток 0 записываем в отведённую ему ячейку. Для чего были остатки? Их нужно использовать в следующей итерации – чтобы найти следующую цифру числа Пи. Поэтому разумно сохранять остатки в наш изначальный массив размером 10 * n / 3. Таким образом, видно, что возможности алгоритма упираются именно в размер этого массива. Поэтому число найденных цифр ограничивается доступной памятью компьютера либо языком, на котором вы реализуете алгоритм (конечно, языковые ограничения можно обойти).\n" +
-                    "\n" +
-                    "Но это не всё. Есть один нюанс. В конце каждой итерации может возникать ситуация переполнения. Т.е. в нулевом столбце в «сумме» мы получим число, большее, чем 100 (эта ситуация возникает довольно редко). Тогда следующей цифрой Пи получается 10. Странно, да? Ведь цифр в десятичной системе счисления всего от 0 до 9. В этом случае вместо 10 нужно писать 0, а предыдущую цифру увеличивать на 1 (и стоящую перед последней, если последняя равна 9, и т.д.). Таким образом, появление одной десятки, может изменить одну и больше найденных ранее цифр. Как отслеживать такие ситуации? Необходимо найденную новую цифру первоначально считать недействительной. Для этого достаточно завести одну переменную, которая будет считать количество недействительных цифр. Нашли одну цифру – увеличили количество недействительных цифр на 1. Если следующая найденная цифра не равна ни 9, ни 10, то начинаем считать найденные ранее цифры (и помеченные как недействительные) действительными, т.е. сбрасываем количество недействительных цифр в 0, а найденную новую цифру начинаем считать недействительной (т.е. можно сразу сбрасывать в 1). Если следующая найденная цифра равна 9, то увеличиваем количество недействительных цифр на 1. Если же следующая цифра 10, то увеличиваем все недействительные цифры на 1, вместо 10 записываем 0 и этот 0 считаем недействительным. Если эти ситуации не отслеживать, то будут появляться единичные неверные цифры (или больше).\n" +
-                    "\n" +
+            "Далее, чтобы найти одну цифру числа Пи, необходимо пройтись по всем ячейкам массива с конца к началу и выполнить несложные действия. На примере таблицы, рассмотрим всё по порядку. Допустим, мы хотим найти 3 цифры числа Пи. Для этого нам необходимо зарезервировать 3 * 10 / 3 = 10 ячеек целого типа. Заполняем их все числом 2. Теперь приступим к поиску первой цифры…" +
+                    "Начинаем с конца массива. Берём последний элемент (под номером 9, если начинать счёт с 0. Этот же номер будем называть числителем, а тот, что под ним в таблицу – знаменателем) — он равен 2. Умножаем его на 10 (2 * 10 = 20). К получившемуся числу 20 прибавляем число из ячейки «Перенос» – число, которое переносится из более правой операции. Разумеется, правее мы ничего не считали, поэтому это число равно 0. Результат записываем в «сумму». В «остаток» записываем остаток от деления суммы на знаменатель: 20 mod 19 = 1. А сейчас считаем «перенос» для следующего шага. Он будет равен результату деления суммы на знаменатель, умноженному на числитель: (20 / 19) * 9 = 9. И записываем полученное число в ячейку с «переносом», стоящую левее от текущего столбца. Проделываем те же действия с каждым элементом массива (умножить на 10, посчитать сумму, остаток и перенос на следующий шаг), пока не дойдём до элемента с номером 0. Здесь действия немного отличаются. Итак, посмотрим, что у нас в таблице. Под нулём – элемент массива, равный 2, и перенос из предыдущего шага, равный 10. Как и в предыдущих шагах, умножаем элемент массива на 10 и прибавляем к нему перенос. В сумме получили 30. А сейчас делим сумму не на знаменатель, а на 10 (!). В итоге получаем 30 / 10 = 3 + 0 (где 0 – остаток). Полученное число 3 и будет той заветной первой цифрой числа Пи. А остаток 0 записываем в отведённую ему ячейку. Для чего были остатки? Их нужно использовать в следующей итерации – чтобы найти следующую цифру числа Пи. Поэтому разумно сохранять остатки в наш изначальный массив размером 10 * n / 3. Таким образом, видно, что возможности алгоритма упираются именно в размер этого массива. Поэтому число найденных цифр ограничивается доступной памятью компьютера либо языком, на котором вы реализуете алгоритм (конечно, языковые ограничения можно обойти). " +
+                    "Но это не всё. Есть один нюанс. В конце каждой итерации может возникать ситуация переполнения. Т.е. в нулевом столбце в «сумме» мы получим число, большее, чем 100 (эта ситуация возникает довольно редко). Тогда следующей цифрой Пи получается 10. Странно, да? Ведь цифр в десятичной системе счисления всего от 0 до 9. В этом случае вместо 10 нужно писать 0, а предыдущую цифру увеличивать на 1 (и стоящую перед последней, если последняя равна 9, и т.д.). Таким образом, появление одной десятки, может изменить одну и больше найденных ранее цифр. Как отслеживать такие ситуации? Необходимо найденную новую цифру первоначально считать недействительной. Для этого достаточно завести одну переменную, которая будет считать количество недействительных цифр. Нашли одну цифру – увеличили количество недействительных цифр на 1. Если следующая найденная цифра не равна ни 9, ни 10, то начинаем считать найденные ранее цифры (и помеченные как недействительные) действительными, т.е. сбрасываем количество недействительных цифр в 0, а найденную новую цифру начинаем считать недействительной (т.е. можно сразу сбрасывать в 1). Если следующая найденная цифра равна 9, то увеличиваем количество недействительных цифр на 1. Если же следующая цифра 10, то увеличиваем все недействительные цифры на 1, вместо 10 записываем 0 и этот 0 считаем недействительным. Если эти ситуации не отслеживать, то будут появляться единичные неверные цифры (или больше). " +
                     "Вот и весь алгоритм, который авторы сравнили с краном. Ниже привожу код метода, реализованного на Java, который возвращает строку с числом Пи.";
-    private static final String DATA_EN = "James Gosling, Mike Sheridan, and Patrick Naughton initiated the Java language project in June 1991.[22] Java was originally designed for interactive television, but it was too advanced for the digital cable television industry at the time.[23] The language was initially called Oak after an oak tree that stood outside Gosling's office. Later the project went by the name Green and was finally renamed Java, from Java coffee.[24] Gosling designed Java with a C/C++-style syntax that system and application programmers would find familiar.[25]\n" +
-            "\n" +
-            "Sun Microsystems released the first public implementation as Java 1.0 in 1995.[26] It promised \"Write Once, Run Anywhere\" (WORA), providing no-cost run-times on popular platforms. Fairly secure and featuring configurable security, it allowed network- and file-access restrictions. Major web browsers soon incorporated the ability to run Java applets within web pages, and Java quickly became popular, while mostly outside of browsers, that wasn't the original plan. In January 2016, Oracle announced that Java runtime environments based on JDK 9 will discontinue the browser plugin.[27] The Java 1.0 compiler was re-written in Java by Arthur van Hoff to comply strictly with the Java 1.0 language specification.[28] With the advent of Java 2 (released initially as J2SE 1.2 in December 1998 – 1999), new versions had multiple configurations built for different types of platforms. J2EE included technologies and APIs for enterprise applications typically run in server environments, while J2ME featured APIs optimized for mobile applications. The desktop version was renamed J2SE. In 2006, for marketing purposes, Sun renamed new J2 versions as Java EE, Java ME, and Java SE, respectively.\n" +
-            "\n" +
-            "In 1997, Sun Microsystems approached the ISO/IEC JTC 1 standards body and later the Ecma International to formalize Java, but it soon withdrew from the process.[29][30][31] Java remains a de facto standard, controlled through the Java Community Process.[32] At one time, Sun made most of its Java implementations available without charge, despite their proprietary software status. Sun generated revenue from Java through the selling of licenses for specialized products such as the Java Enterprise System.\n" +
-            "\n" +
-            "On November 13, 2006, Sun released much of its Java virtual machine (JVM) as free and open-source software, (FOSS), under the terms of the GNU General Public License (GPL). On May 8, 2007, Sun finished the process, making all of its JVM's core code available under free software/open-source distribution terms, aside from a small portion of code to which Sun did not hold the copyright.[33]\n" +
-            "\n" +
+    private static final String DATA_EN =
+            "James Gosling, Mike Sheridan, and Patrick Naughton initiated the Java language project in June 1991.[22] Java was originally designed for interactive television, but it was too advanced for the digital cable television industry at the time.[23] The language was initially called Oak after an oak tree that stood outside Gosling's office. Later the project went by the name Green and was finally renamed Java, from Java coffee.[24] Gosling designed Java with a C/C++-style syntax that system and application programmers would find familiar.[25] " +
+            "Sun Microsystems released the first public implementation as Java 1.0 in 1995.[26] It promised \"Write Once, Run Anywhere\" (WORA), providing no-cost run-times on popular platforms. Fairly secure and featuring configurable security, it allowed network- and file-access restrictions. Major web browsers soon incorporated the ability to run Java applets within web pages, and Java quickly became popular, while mostly outside of browsers, that wasn't the original plan. In January 2016, Oracle announced that Java runtime environments based on JDK 9 will discontinue the browser plugin.[27] The Java 1.0 compiler was re-written in Java by Arthur van Hoff to comply strictly with the Java 1.0 language specification.[28] With the advent of Java 2 (released initially as J2SE 1.2 in December 1998 – 1999), new versions had multiple configurations built for different types of platforms. J2EE included technologies and APIs for enterprise applications typically run in server environments, while J2ME featured APIs optimized for mobile applications. The desktop version was renamed J2SE. In 2006, for marketing purposes, Sun renamed new J2 versions as Java EE, Java ME, and Java SE, respectively. " +
+            "In 1997, Sun Microsystems approached the ISO/IEC JTC 1 standards body and later the Ecma International to formalize Java, but it soon withdrew from the process.[29][30][31] Java remains a de facto standard, controlled through the Java Community Process.[32] At one time, Sun made most of its Java implementations available without charge, despite their proprietary software status. Sun generated revenue from Java through the selling of licenses for specialized products such as the Java Enterprise System. " +
+            "On November 13, 2006, Sun released much of its Java virtual machine (JVM) as free and open-source software, (FOSS), under the terms of the GNU General Public License (GPL). On May 8, 2007, Sun finished the process, making all of its JVM's core code available under free software/open-source distribution terms, aside from a small portion of code to which Sun did not hold the copyright.[33] " +
             "Sun's vice-president Rich Green said that Sun's ideal role with regard to Java was as an \"evangelist\".[34] Following Oracle Corporation's acquisition of Sun Microsystems in 2009–10, Oracle has described itself as the \"steward of Java technology with a relentless commitment to fostering a community of participation and transparency\".[35] This did not prevent Oracle from filing a lawsuit against Google shortly after that for using Java inside the Android SDK (see Google section below). Java software runs on everything from laptops to data centers, game consoles to scientific supercomputers.[36] On April 2, 2010, James Gosling resigned from Oracle.[37]";
     private static final String DATA_TEST = "Hello everyone. My name is Alex.";
+
     public static void main(String[] args) {
-        byte[] digest = piBytes(1024);
-        byte[] source = DATA_EN.getBytes();
+        byte[] digest = piBytes(2048);
+        byte[] source = DATA_TEST.getBytes();
 
-//        BitSet digestBitSet = BitSet.valueOf(digest);
-//        String digestBitSetStr = toSplitString(digestBitSet);
-//        System.out.printf("digest (bitset) : %s\n", digestBitSetStr);
+        byte b1 = 32;
+        byte b2 = 15;
+        byte concat = concatByBits(b1, b2);
+        byte[] split = splitByBits(concat);
+        System.out.printf("%s[%s] -> %s[%s] -> %s[%s] -> %s\n",
+                b1, Integer.toBinaryString(b1 & 0xff),
+                b2, Integer.toBinaryString(b2 & 0xff),
+                concat, Integer.toBinaryString(concat & 0xff),
+                Arrays.toString(split));
 
-        String digestBin = toSplitString(digest);
-        System.out.printf("digest (binary) : %s\n", digestBin);
-        System.out.printf("digest (hex)    : %s\n", Arrays.toString(digest));
-        System.out.printf("digest length:  %s\n", digest.length);
+        String digestBin = toBitString(digest);
+        System.out.printf("digest   (binary) : %s\n", digestBin);
+        System.out.printf("digest   (hex)    : %s\n", Arrays.toString(digest));
+        System.out.printf("digest   length   : %s\n", digest.length);
 
-        String sourceBin = toSplitString(source);
-        System.out.printf("source (binary) : %s\n", sourceBin);
-        System.out.printf("source (hex)    : %s\n", Arrays.toString(source));
-        System.out.printf("source  length: %s\n", source.length);
+        String sourceBin = toBitString(source);
+        System.out.printf("source   (binary) : %s\n", sourceBin);
+        System.out.printf("source   (hex)    : %s\n", Arrays.toString(source));
+        System.out.printf("source   length   : %s\n", source.length);
+        System.out.printf("source            : zero(%s), unit(%s)\n", sourceBin.replaceAll("1", "").length(), sourceBin.replaceAll("0", "").length());
 
+        long before = System.currentTimeMillis();
         BitSet bitMask = compressData(digest, source);
-        String bitMaskBin = toSplitString(bitMask.toByteArray());
-        System.out.printf("bitmask (binary): %s\n", bitMaskBin);
-        System.out.printf("bitmask (hex)   : %s\n", Arrays.toString(bitMask.toByteArray()));
-        System.out.printf("bitmask length: %s\n", bitMask.toByteArray().length);
-        System.out.printf("bitmask zeros: %s, units: %s\n", bitMask.toByteArray().length, bitMaskBin.replaceAll("1", "").length(), bitMaskBin.replaceAll("0", "").length());
-        List<String> reduced = reduceNills2(toBitString(bitMask.toByteArray()));
-        System.out.printf("bitmask reduced (binary): %s\n", Arrays.toString(reduced.toArray(new String[reduced.size()])));
-        String reducedStr = reduced.stream().reduce("", (s1, s2) -> s1+s2);
-        String srcStr = toBitString(bitMask.toByteArray());
-        System.out.printf("bitmask reduced length: %s, byte length: %s, bitMask byte length: %s, src byte length: %s\n",
-                reducedStr.length()/8, reducedStr.getBytes().length, srcStr.getBytes().length, source.length);
+        long after = System.currentTimeMillis();
+        System.out.printf("[compress data... size = %skb, time = %sms]\n", source.length / 1024, after - before);
+        String bitMaskBin = toBitString(bitMask.toByteArray());
+        System.out.printf("bitmask  (binary) : %s\n", bitMaskBin);
+        System.out.printf("bitmask  (hex)    : %s\n", Arrays.toString(bitMask.toByteArray()));
+        System.out.printf("bitmask  length   : %s\n", bitMask.toByteArray().length);
+        System.out.printf("bitmask  zeros    : %s, units: %s\n", bitMask.toByteArray().length, bitMaskBin.replaceAll("1", "").length(), bitMaskBin.replaceAll("0", "").length());
+
+        BitSet reducedBitMask = reduceNills(bitMask.toByteArray());
+        String reducedBitMaskBin = toBitString(reducedBitMask.toByteArray());
+        System.out.printf("bitmask reduced (binary): %s\n", reducedBitMaskBin);
+        System.out.printf("bitmask reduced length: %s, src byte length: %s\n",
+                reducedBitMask.length(), source.length);
 
         byte[] restored = restoreData(digest, bitMask.toByteArray());
         String restoredBin = toBitString(restored);
-        System.out.printf("restored (binary): %s\n", restoredBin);
-        System.out.printf("source   (hex)   : %s\n", Arrays.toString(source));
-        System.out.printf("restored (hex)   : %s\n", Arrays.toString(restored));
-        System.out.printf("restored length: %s\n", restored.length);
-        System.out.printf("Data restored: %s\n", arrayEqual(source, restored));
-        System.out.println(new String(restored));
+        System.out.printf("restored (binary) : %s\n", restoredBin);
+        System.out.printf("source   (hex)    : %s\n", Arrays.toString(source));
+        System.out.printf("restored (hex)    : %s\n", Arrays.toString(restored));
+        System.out.printf("restored length   : %s\n", restored.length);
+        System.out.printf("Data restored     : %s\n", arraysEqual(source, restored));
 
         //reduceNills(bitMask);
 
@@ -104,7 +108,7 @@ public class DumPi {
         //compressData(pi4b);
     }
 
-    public static boolean arrayEqual(byte[] a1, byte[] a2) {
+    public static boolean arraysEqual(byte[] a1, byte[] a2) {
         if (a1 == null) return a2 == null;
         if (a1.length != a2.length) return false;
         for (int ndx=0; ndx < a1.length; ++ndx) {
@@ -157,12 +161,12 @@ public class DumPi {
 
             while (!imposed) {
                 byte chunk = getByteChunk(digest, bitNdx);
-                System.out.printf(
-                        "ndx: %s, bitNdx -> (%s,%s), src byte -> %s, src bits -> %s src chunks -> %s, chunk byte -> %s, chunk bits -> %s, imposedBits -> %s\n",
-                        ndx, bitNdx/2, bitNdx%2,
-                        source[ndx], Integer.toBinaryString(source[ndx] & 0xff), Arrays.toString(srcChunks),
-                        chunk, Integer.toBinaryString(chunk & 0xff), imposedBits
-                );
+//                System.out.printf(
+//                        "ndx: %s, bitNdx -> (%s,%s), src byte -> %s, src bits -> %s src chunks -> %s, chunk byte -> %s, chunk bits -> %s, imposedBits -> %s\n",
+//                        ndx, bitNdx/2, bitNdx%2,
+//                        source[ndx], Integer.toBinaryString(source[ndx] & 0xff), Arrays.toString(srcChunks),
+//                        chunk, Integer.toBinaryString(chunk & 0xff), imposedBits
+//                );
                 bitNdx++;
                 if (chunk == srcChunks[imposedBits]) {
                     bitSet.set(bitSetNdx[0]++, true);
@@ -174,14 +178,13 @@ public class DumPi {
                 }
             }
         }
-        System.out.println(toBitString(bitSet));
+        //System.out.println(toBitString(bitSet));
         return bitSet;
     }
 
     private static byte[] restoreData(byte[] digest, byte[] bitMask) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BitSet maskBitSet = BitSet.valueOf(bitMask);
-        System.out.println(toBitString(maskBitSet));
         int curSet = 0;
         int bitsNdx = 0;
         byte[] bits = new byte[2];
@@ -199,22 +202,103 @@ public class DumPi {
         return baos.toByteArray();
     }
 
+    private static BitSet reduceNills(byte[] bitMask) {
+        BitSet reducedBs = new BitSet();
+        BitSet bitSet = BitSet.valueOf(bitMask);
+        int shiftSum = 0;
+        final int[] bitNdx = {0};
+        int curSet = 0, nills = -1;
+        while (bitSet.nextSetBit(curSet) != -1) {
+//            System.out.printf("prevSet: %s, curSet: %s, bits(%s, %s): %s\n",
+//                    prevSet, curSet, prevSet, curSet, toBitString(bitSet.get(prevSet, curSet), curSet-prevSet));
+            if(bitSet.get(curSet)) {
+                if (nills > 0) {
+                    System.out.printf("%s -> %s\n", nills, Integer.toBinaryString(nills));
+                    Integer.toBinaryString(nills)
+                            .chars()
+                            .mapToObj(c -> c == '1' ? true : false)
+                            .forEach(bit -> reducedBs.set(bitNdx[0]++, bit));
+                    shiftSum += Integer.toBinaryString(nills).length();
+                    nills = 0;
+                }
+                reducedBs.set(bitNdx[0]++, true);
+                //reducedBs.set(bitNdx[0]++, false); // после 1 всегда идет 0
+            } else {
+                nills++;
+            }
+            ++curSet;
+        }
+        String bitMaskBin = toBitString(bitMask);
+        System.out.println("[DumPi::reduceNills]...");
+        System.out.printf("BitMask (binary)   : %s\n", bitMaskBin);
+        System.out.printf("BitMask size       : %s\n", bitMask.length);
+        System.out.printf("BitMask            : zero(%s), unit(%s)\n", bitMaskBin.replaceAll("1", "").length(), bitMaskBin.replaceAll("0", "").length());
+        String bitMaskReducedBin = toBitString(reducedBs.toByteArray());
+        System.out.printf("reducedBs (binary) : %s\n", bitMaskReducedBin);
+        System.out.printf("reducedBs          : zero(%s), unit(%s)\n", bitMaskReducedBin.replaceAll("1", "").length(), bitMaskReducedBin.replaceAll("0", "").length());
+        System.out.printf("reducedBs size     : %s\n", reducedBs.toByteArray().length);
+        System.out.printf("Shift sum: %s\n", shiftSum);
+
+//        BitSet restoredBs = restoreBitMask(reducedBs.toByteArray());
+//        String bitMaskRestoredBin = toBitString(restoredBs.toByteArray());
+//        System.out.printf("reducedBs (binary) : %s\n", bitMaskRestoredBin);
+//        System.out.printf("reducedBs          : zero(%s), unit(%s)\n", bitMaskRestoredBin.replaceAll("1", "").length(), bitMaskRestoredBin.replaceAll("0", "").length());
+//        System.out.printf("reducedBs size     : %s\n", restoredBs.toByteArray().length);
+
+        return reducedBs;
+    }
+
+    public static BitSet restoreBitMask(byte[] reduced) {
+        BitSet restoredBs = new BitSet();
+        BitSet reducedBs;
+
+        return restoredBs;
+    }
+
+    public static BitSet bitSetfromValue(int value) {
+        BitSet bits = new BitSet();
+        int index = 0;
+        while (value != 0L) {
+            if (value % 2L != 0) {
+                bits.set(index);
+            }
+            ++index;
+            value = value >>> 1;
+        }
+        return bits;
+    }
+
+    public static long valueFromBitSet(BitSet bits) {
+        long value = 0L;
+        for (int i = 0; i < bits.length(); ++i) {
+            value += bits.get(i) ? (1L << i) : 0L;
+        }
+        return value;
+    }
+
+    @Deprecated
+    private static List<String> reduceNills2(String seq) {
+        List<String> result = new ArrayList<>();
+        if (seq.length() < 10) {
+            result.add(seq);
+            return result;
+        }
+        String[] split = splitSequence(seq);
+        if (split.length == 0) {
+
+        } else {
+            IntStream.range(0, split.length).forEach(ndx -> {
+                String bin = split[ndx].length() > 0 ? Integer.toBinaryString(split[ndx].length()) : "";
+                result.add(bin + (ndx == split.length-1 ? "" : "1"));
+            });
+        }
+        return result;
+    }
+
     private static byte getByteChunk(byte[] bytes, int ndx) {
         int i = ndx > bytes.length ?  ndx % bytes.length : ndx;
         byte[] bits = splitByBits(bytes[i/2]);
         return bits[i%2];
-    }
-
-    private static byte getByteChunk(byte[] bytes, int ndx, int bit) {
-        byte[] bits = splitByBits(bytes[ndx]);
-        return bits[bit];
-    }
-
-    private static boolean isMask(byte digest, byte source, int bit) {
-        if (bit % 2 == 0) {
-            return digest == (byte)((source >> 4) & (byte)0x0F);
-        }
-        return digest == (byte)(source & 0x0f);
     }
 
     private static byte[] splitByBits(byte b) {
@@ -283,22 +367,12 @@ public class DumPi {
         return (byte)(b & 0xff);
     }
 
-    public static String[] splitByLen(String s, int len) {
-        String[] split = new String[len+1];
-        for (int i=0, ndx=0; i < s.length(); i += len, ++ndx) {
-            split[ndx] = s.substring(ndx, Math.max(ndx, s.length()));
-        }
-        return split;
-    }
-
     public static byte[] splitOnBytes(String s, int len) {
         byte[] split = new byte[s.length() / len + 1];
         for (int i=0, ndx=0; i < s.length(); i += len, ++ndx) {
             String strNum = s.substring(i, Math.min(i + len, s.length()));
             byte byteNum = (byte) Integer.parseInt(strNum);
             split[ndx] = byteNum;
-//            System.out.printf("ndx: %s, num: %s, byte: %s, bits: %s\n",
-//                    i, strNum, byteNum, Integer.toBinaryString(byteNum & 0xff));
         }
         return split;
     }
@@ -353,9 +427,6 @@ public class DumPi {
     }
 
     private static String toStr(boolean v) { return v ? "1" : "0"; }
-    private static String toBitString(List<Boolean> list) {
-        return list.stream().map(v -> toStr(v)).reduce("", String::concat);
-    }
     private static String toHexString(byte[] bytes) {
         return IntStream
                 .range(0, bytes.length)
@@ -434,89 +505,6 @@ public class DumPi {
                 .mapToInt(i -> i)
                 .toArray();
     }
-    private static int[] toIntArray(char c) {
-        return toIntArray(String.valueOf((int)c));
-    }
-
-    private static class BitBuffer {
-        private boolean[] bits;
-        private int ndx;
-        private BitBuffer() {
-            this.bits = new boolean[8];
-        }
-        public void set(boolean bit) {
-            if (ndx < bits.length) {
-                bits[ndx++] = bit;
-            }
-        }
-        public boolean isSet(int ndx) {
-            if (ndx < bits.length) return false;
-            return bits[ndx];
-        }
-        public boolean isFull() {
-            return ndx >= (bits.length-1);
-        }
-        public void clear() {
-            IntStream.range(0, bits.length).forEach(ndx -> bits[ndx] = false);
-            ndx = 0;
-        }
-        public byte toByte() {
-            StringBuilder buf = new StringBuilder();
-            IntStream.range(0, bits.length).forEach(ndx -> {
-                buf.append(bits[ndx] ? "1" : "0");
-            });
-            return (byte)Integer.parseInt(buf.toString(), 2);
-        }
-        public static BitBuffer create() {
-            return new BitBuffer();
-        }
-    }
-
-    private static byte[] reduceNills(byte[] bitMask) {
-        BitSet reducedBitSet = new BitSet();
-        BitSet bitSet = BitSet.valueOf(bitMask);
-        System.out.println("Cardinality: " + bitSet.cardinality());
-        System.out.println("BitMask: " + toBitString(bitMask));
-        System.out.println("BitMask size: " + bitMask.length);
-        System.out.println("BitSet:  " + toBitString(bitSet.toByteArray()));
-        System.out.println("BitSet: size: " + bitSet.toByteArray().length);
-        int curSet=0, prevSet=0;
-        while ((curSet = bitSet.nextSetBit(curSet)) != -1) {
-            System.out.printf("prevSet: %s, curSet: %s, bits(%s, %s): %s\n",
-                    prevSet, curSet, prevSet, curSet, toBitString(bitSet.get(prevSet, curSet), curSet-prevSet));
-            prevSet = curSet;
-            curSet += 1;
-        }
-        return reducedBitSet.toByteArray();
-    }
-
-    private static int nillsBefore(byte b) {
-        int nills = 0;
-        for (int bit=1; bit < 9; ++bit) {
-            if (isSet(b, bit)) return nills;
-            ++nills;
-        }
-        return nills;
-    }
-
-    private static List<String> reduceNills2(String seq) {
-        List<String> result = new ArrayList<>();
-        if (seq.length() < 10) {
-            result.add(seq);
-            return result;
-        }
-        String[] split = splitSequence(seq);
-        if (split.length == 0) {
-
-        } else {
-            IntStream.range(0, split.length).forEach(ndx -> {
-                String bin = split[ndx].length() > 0 ? Integer.toBinaryString(split[ndx].length()) : "";
-                result.add(bin + (ndx == split.length-1 ? "" : "1"));
-            });
-        }
-        return result;
-    }
-
     private static String[] splitSequence(String seq) {
         List<String> result = new ArrayList<>();
         String buffer = "";
@@ -533,27 +521,6 @@ public class DumPi {
             result.add(buffer);
         }
         return result.toArray(new String[result.size()]);
-    }
-
-    private static int getReducedSize(List<String> reduced) {
-        return reduced.stream().map(String::length).reduce((x, y) -> x + y).orElse(-1);
-    }
-
-    private static String restoreNills(List<String> seq) {
-        StringBuilder sb = new StringBuilder();
-        IntStream.range(0, seq.size()).forEach(ndx -> {
-            int endNdx = ndx < seq.size() - 1 ? seq.get(ndx).lastIndexOf("1") : seq.get(ndx).length();
-            String bin = seq.get(ndx).substring(0, endNdx);
-            if (!bin.isEmpty()) {
-                final String[] bits = {""};
-                IntStream.range(0, Integer.parseInt(bin, 2)).forEach(ndx2 -> bits[0] += "0");
-                sb.append(bits[0]);
-                //System.out.printf("%s -> %s\n", bin, bits[0]);
-            }
-            if (ndx < seq.size() - 1)
-                sb.append("1");
-        });
-        return sb.toString();
     }
 }
 
